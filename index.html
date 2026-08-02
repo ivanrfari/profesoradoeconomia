@@ -35,7 +35,6 @@
       scroll-behavior: smooth;
     }
     
-    /* Ocultar scrollbar en contenedores horizontales para mejor UI móvil */
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
@@ -48,7 +47,6 @@
       display: flex; flex-direction: column; height: 100%; position: relative;
     }
     
-    /* ESTADOS VISUALES */
     /* Aprobada */
     .subject-card[data-state="approved"] {
       background-color: #0f172a; border: 2px solid #0f172a; color: #ffffff;
@@ -96,7 +94,6 @@
     .subject-card[data-state="locked"] .info-btn { background-color: #ffffff; color: #94a3b8; border: 1px solid #e2e8f0;}
     .subject-card[data-state="locked"]:hover { background-color: #f1f5f9; border-color: #94a3b8; }
 
-    /* Clases lógicas para Filtros */
     .filter-active  { opacity: 1 !important; display: flex !important; }
     .filter-dimmed  { opacity: 0.15 !important; filter: grayscale(100%); pointer-events: none; }
 
@@ -113,7 +110,6 @@
 
 <body class="min-h-screen text-slate-800 flex flex-col">
 
-  <!-- Service Worker para PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       const swCode = "self.addEventListener('fetch', function(event) {});";
@@ -143,6 +139,7 @@
     </div>
   </div>
 
+  <!-- ESTADO DE LA MATERIA (CON VALIDACIÓN EN TIEMPO REAL) -->
   <div id="status-modal" class="modal-backdrop fixed inset-0 z-[80] flex items-center justify-center p-4 hidden" onclick="closeStatusModal(event)">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
       <h2 class="text-xl font-black mb-1 text-slate-900 leading-tight" id="status-subject-name">Nombre Materia</h2>
@@ -162,7 +159,7 @@
         
         <div id="grade-container" class="hidden">
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Nota Final:</label>
-          <input type="number" id="status-grade" min="1" max="10" placeholder="Ej: 8" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50">
+          <input type="number" id="status-grade" min="0" max="10" step="0.01" oninput="validateGrade(this)" placeholder="Ej: 8.50" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50">
         </div>
       </div>
       
@@ -275,9 +272,7 @@
         </div>
       </div>
       
-      <!-- Panel de Estadísticas / KPIs -->
       <div class="flex justify-between sm:justify-end items-center gap-4 sm:gap-8 bg-slate-800/50 rounded-2xl px-5 py-4 border border-slate-700 w-full lg:w-auto">
-        
         <div class="text-center sm:text-right flex flex-col flex-1 sm:flex-none">
           <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Promedio</p>
           <div class="flex items-baseline gap-1 justify-center sm:justify-end">
@@ -305,7 +300,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </header>
 
@@ -313,12 +307,9 @@
        BARRA STICKY: HERRAMIENTAS Y PROGRESO
   ══════════════════════════════════════════ -->
   <div class="sticky top-0 z-20 flex flex-col shadow-sm">
-    
-    <!-- Barra de Herramientas -->
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
         
-        <!-- Búsqueda y Toggle (Mobile friendly) -->
         <div class="flex w-full lg:w-auto flex-1 gap-3">
           <div class="relative flex-1">
             <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
@@ -332,9 +323,7 @@
           </label>
         </div>
 
-        <!-- Botones de Acción (Scroll Horizontal en Móvil) -->
         <div class="flex items-center gap-2 w-full lg:w-auto overflow-x-auto hide-scrollbar pb-1 lg:pb-0">
-          
           <button id="btn-install" onclick="installApp()" class="hidden shrink-0 text-xs bg-slate-900 text-white px-3 py-2 rounded-xl font-bold hover:bg-slate-800 transition shadow-sm flex items-center gap-1.5">
             <span>📱</span> Instalar App
           </button>
@@ -359,7 +348,6 @@
       </div>
     </div>
 
-    <!-- Barra de Leyenda y Progreso -->
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
       <div class="max-w-screen-xl mx-auto px-4 py-2.5 flex flex-col md:flex-row gap-3 items-center justify-between">
         
@@ -388,7 +376,6 @@
        GRILLA CURRICULAR & ZONA DE EXPORTACIÓN
   ══════════════════════════════════════════ -->
   <div id="export-area" class="pb-8 flex-1">
-    
     <div id="export-watermark" class="hidden mx-auto max-w-screen-xl px-4 pt-8 pb-4">
       <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-xl flex justify-between items-center border-l-8 border-blue-500">
         <div>
@@ -409,7 +396,76 @@
     </main>
   </div>
 
+  <!-- ══════════════════════════════════════════
+       MODAL DE INFORMACIÓN MATERIA
+  ══════════════════════════════════════════ -->
+  <div id="modal-backdrop" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 hidden" onclick="closeModal(event)">
+    <div id="modal-box" class="bg-white w-full max-w-lg shadow-2xl rounded-3xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
+      
+      <div id="modal-header" class="p-5 sm:p-6 text-white bg-slate-900 border-b border-slate-700 relative overflow-hidden shrink-0">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 10px 10px;"></div>
+        <div class="relative z-10 flex justify-between items-start gap-3">
+          <div>
+            <span id="modal-badge" class="text-[9px] sm:text-[10px] uppercase tracking-widest font-black bg-white/20 text-white px-3 py-1 rounded-full shadow-sm backdrop-blur-sm border border-white/20 inline-block mb-3"></span>
+            <h2 id="modal-title" class="text-xl sm:text-2xl font-black leading-tight tracking-tight text-white drop-shadow-md"></h2>
+          </div>
+          <button onclick="closeModal()" class="text-white hover:text-slate-200 bg-white/20 hover:bg-white/30 border border-white/20 rounded-full w-9 h-9 shrink-0 flex items-center justify-center transition shadow-sm text-base">✕</button>
+        </div>
+      </div>
+      
+      <div class="p-5 sm:p-7 space-y-5 text-sm text-slate-700 bg-slate-50 overflow-y-auto">
+        <div class="grid grid-cols-3 gap-3 sm:gap-4">
+          <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <p class="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Formato</p>
+            <p class="font-black text-slate-800 text-[11px] sm:text-sm leading-tight break-words" id="modal-formato">—</p>
+          </div>
+          <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <p class="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Régimen</p>
+            <p class="font-black text-slate-800 text-[11px] sm:text-sm leading-tight break-words" id="modal-regimen">—</p>
+          </div>
+          <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <p class="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Inversión Hs</p>
+            <p class="font-black text-blue-600 text-base sm:text-lg font-mono leading-tight" id="modal-hs">—</p>
+          </div>
+        </div>
+        
+        <div id="modal-corr-section" class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-4 sm:p-5">
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-slate-500 mb-2 flex items-center gap-2"><span>🔒</span> Requisitos Previos</h3>
+          <p id="modal-corr" class="text-sm font-bold text-slate-700 leading-snug"></p>
+        </div>
+
+        <div>
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-blue-600 mb-2">Finalidad Formativa</h3>
+          <p id="modal-finalidades" class="leading-relaxed text-sm text-slate-600 font-medium"></p>
+        </div>
+        
+        <div>
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-blue-600 mb-3">Núcleos de Contenido</h3>
+          <ul id="modal-contenidos" class="list-none space-y-2 text-sm text-slate-600 font-medium bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-sm"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
 <script>
+/* ─────────────────────────────────────────────
+   VALIDADOR DE NOTAS EN TIEMPO REAL
+───────────────────────────────────────────── */
+function validateGrade(el) {
+  let val = el.value;
+  if (!val) return;
+  
+  if (parseFloat(val) < 0) el.value = 0;
+  if (parseFloat(val) > 10) el.value = 10;
+  
+  if (val.includes('.')) {
+    let parts = val.split('.');
+    if (parts[1] && parts[1].length > 2) {
+      el.value = parts[0] + '.' + parts[1].substring(0, 2);
+    }
+  }
+}
+
 /* ─────────────────────────────────────────────
    DATOS DEL PLAN DE ESTUDIOS
 ───────────────────────────────────────────── */
@@ -424,7 +480,7 @@ const SUBJECTS = [
   { id: 'intro-economia-politica', name: 'Introducción a la Economía Política', year: 1, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: [], finalidades: 'Introducir los conceptos fundamentales de la Economía Política como ciencia social crítica.', contenidos: ['El objeto de la Economía Política','Valor, trabajo y mercancía','Oferta, demanda y formación de precios','Distribución del ingreso y clases sociales','El rol del Estado en la economía'] },
   { id: 'teoria-organizaciones', name: 'Teoría de las organizaciones', year: 1, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Estudiar las organizaciones como fenómeno social complejo.', contenidos: ['Concepto y tipología de organizaciones','Escuelas del pensamiento organizacional','Cultura y clima organizacional','Organizaciones y entorno: enfoque sistémico'] },
   { id: 'sic-i', name: 'Sistemas de Información Contable I', year: 1, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Introducir los fundamentos de la contabilidad como sistema de información.', contenidos: ['Partida doble y ecuación patrimonial','El ciclo contable','Registración de operaciones básicas','Estados contables básicos'] },
-  { id: 'practica-i', name: 'Práctica Docente I', year: 1, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 128, prereqs: [], finalidades: 'Iniciar el recorrido por instituciones educativas para observar el trabajo docente.', contenidos: ['El rol docente y la construcción de la identidad profesional','Observación participante en institutions escolares','Análisis del contexto institucional y comunitario','Primeras intervenciones pedagógicas supervisadas'] },
+  { id: 'practica-i', name: 'Práctica Docente I', year: 1, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 128, prereqs: [], finalidades: 'Iniciar el recorrido por instituciones educativas para observar el trabajo docente.', contenidos: ['El rol docente y la construcción de la identidad profesional','Observación participante en instituciones escolares','Análisis del contexto institucional y comunitario','Primeras intervenciones pedagógicas supervisadas'] },
   
   // 2DO AÑO
   { id: 'didactica-curriculum', name: 'Didáctica y currículum', year: 2, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['pedagogia'], finalidades: 'Analizar la Didáctica como campo de conocimiento y el currículum como construcción social.', contenidos: ['La Didáctica: objeto, enfoques y tradiciones','Diseño curricular: niveles y componentes','Programación de la enseñanza','Evaluación: concepciones y prácticas'] },
@@ -500,7 +556,6 @@ function installApp() {
 }
 
 function init() {
-  // Migración y Carga
   const oldSaved = localStorage.getItem('isfd100_aprobadas');
   if (oldSaved && !localStorage.getItem('isfd100_data_v2')) {
     const arr = JSON.parse(oldSaved);
@@ -681,8 +736,16 @@ function toggleGradeInput() {
 function saveSubjectStatus() {
   const id = document.getElementById('status-subject-id').value;
   const newStatus = document.getElementById('status-select').value;
-  let grade = document.getElementById('status-grade').value;
-  grade = grade ? parseFloat(grade) : null;
+  let gradeInput = document.getElementById('status-grade').value;
+  let grade = null;
+  
+  if (newStatus === 'approved' && gradeInput) {
+    grade = parseFloat(gradeInput);
+    if (grade < 0 || grade > 10) {
+      showAlert("La nota debe estar comprendida entre 0 y 10.");
+      return;
+    }
+  }
   
   const subject = SUBJECTS.find(s => s.id === id);
   const currentStatus = state.userSubjects[id]?.status;
@@ -788,7 +851,6 @@ function applyFilterStyles() {
       card.classList.remove('hidden', 'filter-dimmed');
       card.classList.add('filter-active');
     } else {
-      card.classList.remove('filter-active'); // ELIMINAR LA CLASE QUE FUERZA EL DISPLAY
       if(q || showOnlyEnabled) {
          card.classList.add('hidden');
          card.classList.remove('filter-dimmed');
@@ -904,7 +966,6 @@ function openModal(event, id) {
   
   document.getElementById('modal-badge').textContent = `${CAMPO_COLORS[subject.campo].label} — ${CAMPO_COLORS[subject.campo].title}`;
   
-  // SOLUCIÓN: Título con text-white explícito para que no se pierda el contraste en el modal
   document.getElementById('modal-title').className = "text-xl sm:text-2xl font-black leading-tight tracking-tight text-white drop-shadow-md";
   document.getElementById('modal-title').textContent = subject.name;
   
@@ -937,7 +998,11 @@ function closeModal(event) {
     box.classList.remove('scale-100');
     box.classList.add('scale-95');
   }
-  setTimeout(() => { document.getElementById('modal-backdrop').classList.add('hidden'); document.body.style.overflow = ''; }, 150);
+  
+  setTimeout(() => {
+    document.getElementById('modal-backdrop').classList.add('hidden');
+    document.body.style.overflow = '';
+  }, 150);
 }
 
 function closeOnboarding() {
@@ -951,7 +1016,10 @@ function closeOnboarding() {
 function confirmReset() {
   const modal = document.getElementById('confirm-modal');
   modal.classList.remove('hidden');
-  setTimeout(() => { modal.children[0].classList.remove('scale-95'); modal.children[0].classList.add('scale-100'); }, 10);
+  setTimeout(() => {
+    modal.children[0].classList.remove('scale-95');
+    modal.children[0].classList.add('scale-100');
+  }, 10);
 }
 
 function closeConfirmModal() {
@@ -975,7 +1043,10 @@ function showAlert(msg) {
   document.getElementById('alert-message').innerHTML = msg;
   const modal = document.getElementById('alert-modal');
   modal.classList.remove('hidden');
-  setTimeout(() => { modal.children[0].classList.remove('scale-95'); modal.children[0].classList.add('scale-100'); }, 10);
+  setTimeout(() => {
+    modal.children[0].classList.remove('scale-95');
+    modal.children[0].classList.add('scale-100');
+  }, 10);
 }
 
 function closeAlertModal() {
