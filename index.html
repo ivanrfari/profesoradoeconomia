@@ -5,20 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mapa Curricular · Economía · ISFD N°100</title>
   
-  <!-- Manifest dinámico para PWA -->
   <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            cfg: '#334155', 
-            cfe: '#0f172a', 
-            cpd: '#475569', 
-            brand: '#2563eb' 
+            cfg: '#334155', cfe: '#0f172a', cpd: '#475569', brand: '#2563eb' 
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -29,7 +24,6 @@
     }
   </script>
 
-  <!-- Librerías Externas -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -42,24 +36,15 @@
     }
     .year-col { min-width: 280px; max-width: 300px; }
 
-    /* ── Tarjetas ── */
+    /* ── Tarjetas Estructura ── */
     .subject-card {
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      cursor: pointer;
-      border-radius: 1rem;
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      position: relative;
+      cursor: pointer; border-radius: 1rem; padding: 1.25rem;
+      display: flex; flex-direction: column; height: 100%; position: relative;
     }
     
-    /* CRÍTICO: Soluciona el bug de filtrado ocultando la tarjeta forzadamente */
-    .subject-card.hidden {
-      display: none !important;
-    }
-    
-    /* APROBADA */
+    /* ESTADOS VISUALES */
+    /* Aprobada */
     .subject-card[data-state="approved"] {
       background-color: #0f172a; border: 2px solid #0f172a; color: #ffffff;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
@@ -71,7 +56,19 @@
     .subject-card[data-state="approved"] .info-btn { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155;}
     .subject-card[data-state="approved"]:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
 
-    /* HABILITADA */
+    /* En Curso (NUEVO - VIOLETA) */
+    .subject-card[data-state="en_curso"] {
+      background-color: #fdf4ff; border: 2px solid #a855f7; color: #3b0764;
+      box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.15);
+    }
+    .subject-card[data-state="en_curso"] h3 { color: #3b0764; }
+    .subject-card[data-state="en_curso"] .subtitle { color: #7e22ce; }
+    .subject-card[data-state="en_curso"] .card-divider { border-color: #e9d5ff; }
+    .subject-card[data-state="en_curso"] .status-label { color: #9333ea; }
+    .subject-card[data-state="en_curso"] .info-btn { background-color: #ffffff; color: #a855f7; border: 1px solid #d8b4fe;}
+    .subject-card[data-state="en_curso"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(168, 85, 247, 0.2); }
+
+    /* Habilitada */
     .subject-card[data-state="enabled"] {
       background-color: #ffffff; border: 2px solid #2563eb; color: #0f172a;
       box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15);
@@ -83,7 +80,7 @@
     .subject-card[data-state="enabled"] .info-btn { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;}
     .subject-card[data-state="enabled"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.2); }
 
-    /* BLOQUEADA */
+    /* Bloqueada */
     .subject-card[data-state="locked"] {
       background-color: #f8fafc; border: 2px dashed #cbd5e1; color: #64748b;
     }
@@ -124,8 +121,10 @@
   </script>
 
   <!-- ══════════════════════════════════════════
-       MODAL: ONBOARDING
+       MODALES DEL SISTEMA
   ══════════════════════════════════════════ -->
+  
+  <!-- ONBOARDING -->
   <div id="onboarding-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-md p-8 shadow-2xl text-center border border-slate-100 transform scale-95 transition-transform duration-200">
       <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-5 border-4 border-blue-100">
@@ -133,25 +132,84 @@
       </div>
       <h2 class="text-2xl font-black mb-3 text-slate-900 tracking-tight">Portal de Planificación</h2>
       <p class="text-sm text-slate-600 mb-6 leading-relaxed">
-        Gestioná tu progreso académico con un diseño optimizado para la claridad visual.<br><br>
-        <span class="inline-block bg-slate-900 text-white px-2 py-0.5 rounded text-xs font-bold mb-1">APROBADA</span> — Materias superadas.<br>
-        <span class="inline-block bg-white border-2 border-blue-500 text-blue-700 px-2 py-0.5 rounded text-xs font-bold mb-1">DISPONIBLE</span> — Listas para cursar.<br>
-        <span class="inline-block bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-2 py-0.5 rounded text-xs font-bold mb-1">RESTRINGIDA</span> — Faltan correlativas.<br>
-        <span class="inline-block bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-bold">🔥 RUTA CRÍTICA</span> — Traba 3 o más materias.
+        Gestioná tu progreso académico con un diseño optimizado.<br><br>
+        <span class="inline-block bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-bold mb-1">APROBADA</span> — Materias superadas.<br>
+        <span class="inline-block bg-purple-50 border border-purple-400 text-purple-700 px-2 py-0.5 rounded text-[10px] font-bold mb-1">EN CURSO</span> — Cursando actualmente.<br>
+        <span class="inline-block bg-white border border-blue-500 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold mb-1">HABILITADA</span> — Listas para cursar.<br>
+        <span class="inline-block bg-slate-50 border border-dashed border-slate-300 text-slate-500 px-2 py-0.5 rounded text-[10px] font-bold mb-1">BLOQUEADA</span> — Faltan correlativas.<br>
       </p>
-      <button onclick="closeOnboarding()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-md">
-        Comenzar a planificar
-      </button>
+      <button onclick="closeOnboarding()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-md">Comenzar a planificar</button>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       MODAL: REINICIO DE DATOS
-  ══════════════════════════════════════════ -->
+  <!-- ESTADO DE LA MATERIA (NUEVO) -->
+  <div id="status-modal" class="modal-backdrop fixed inset-0 z-[80] flex items-center justify-center p-4 hidden" onclick="closeStatusModal(event)">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black mb-1 text-slate-900 leading-tight" id="status-subject-name">Nombre Materia</h2>
+      <p class="text-xs text-slate-500 mb-5 font-mono">Gestión de estado</p>
+      
+      <input type="hidden" id="status-subject-id">
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Situación Actual:</label>
+          <select id="status-select" onchange="toggleGradeInput()" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50">
+            <option value="enabled">▶ Habilitada (Sin cursar)</option>
+            <option value="en_curso">⏳ En Curso (Cursando actualmente)</option>
+            <option value="approved">✅ Aprobada</option>
+          </select>
+        </div>
+        
+        <div id="grade-container" class="hidden">
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Nota Final:</label>
+          <input type="number" id="status-grade" min="1" max="10" placeholder="Ej: 8" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50">
+        </div>
+      </div>
+      
+      <div class="flex gap-3 justify-end mt-6">
+        <button onclick="closeStatusModal()" class="px-5 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition flex-1">Cancelar</button>
+        <button onclick="saveSubjectStatus()" class="px-5 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition flex-1">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SINCRONIZACIÓN (NUEVO) -->
+  <div id="sync-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden" onclick="closeSyncModal(event)">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>💾</span> Sincronización Segura</h2>
+      <p class="text-xs text-slate-500 mb-5 leading-relaxed">Guardá o transferí tu progreso a otro dispositivo copiando este código encriptado. No requiere contraseñas.</p>
+      
+      <div class="space-y-6 overflow-y-auto">
+        <!-- Exportar -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+          <h3 class="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">1. Exportar (Respaldo)</h3>
+          <p class="text-xs text-slate-500 mb-2">Copiá tu código actual:</p>
+          <div class="flex gap-2">
+            <input type="text" id="sync-export-code" readonly class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono bg-white text-slate-400 outline-none truncate">
+            <button onclick="copySyncCode()" id="btn-copy-sync" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap shadow-sm">Copiar</button>
+          </div>
+        </div>
+
+        <!-- Importar -->
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+          <h3 class="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2">2. Importar</h3>
+          <p class="text-xs text-slate-500 mb-2">Pegá un código para restaurar un perfil:</p>
+          <div class="flex gap-2">
+            <input type="text" id="sync-import-code" placeholder="Pegá el código acá..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+            <button onclick="importSyncCode()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition whitespace-nowrap shadow-sm">Cargar</button>
+          </div>
+        </div>
+      </div>
+      
+      <button onclick="closeSyncModal()" class="w-full mt-4 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- ALERTA Y CONFIRMACIONES -->
   <div id="confirm-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
       <h2 class="text-xl font-black mb-2 text-slate-900 flex items-center gap-2">⚠️ Liquidar Datos</h2>
-      <p class="text-sm text-slate-600 mb-6 leading-relaxed">¿Estás seguro de reiniciar tu balance? Se borrará todo tu historial de materias aprobadas y horarios.</p>
+      <p class="text-sm text-slate-600 mb-6 leading-relaxed">¿Estás seguro de reiniciar tu balance? Se borrará todo tu historial, notas y horarios.</p>
       <div class="flex gap-3 justify-end">
         <button onclick="closeConfirmModal()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
         <button onclick="executeReset()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition">Sí, reiniciar</button>
@@ -159,9 +217,6 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       MODAL: ALERTA DE DEPENDENCIAS
-  ══════════════════════════════════════════ -->
   <div id="alert-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
       <h2 class="text-xl font-black mb-3 text-slate-900 flex items-center gap-2">🛑 Movimiento Bloqueado</h2>
@@ -170,13 +225,9 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════
-       MODAL: ARMADOR DE HORARIOS
-  ══════════════════════════════════════════ -->
+  <!-- SIMULADOR Y HORARIOS -->
   <div id="schedule-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 hidden" onclick="closeSchedule(event)">
     <div class="bg-white rounded-3xl w-full max-w-5xl h-[90vh] sm:h-[85vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation()">
-      
-      <!-- Header -->
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
         <div>
           <h2 class="text-xl font-black flex items-center gap-2 tracking-tight"><span>📅</span> Planificador de Horarios</h2>
@@ -185,7 +236,6 @@
         <button onclick="closeSchedule()" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
       </div>
       
-      <!-- Formulario de carga -->
       <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row gap-3 shrink-0">
         <select id="sched-subject" class="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none truncate"></select>
         <div class="flex gap-3">
@@ -197,22 +247,34 @@
             <option value="Viernes">Viernes</option>
           </select>
           <input type="text" id="sched-time" placeholder="Ej: 18:00 a 20:00" class="w-1/3 sm:w-36 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
-          <button onclick="addScheduleItem()" class="w-1/3 sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition">Agregar</button>
+          <button onclick="addScheduleItem()" class="w-1/3 sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm">Agregar</button>
         </div>
       </div>
       
-      <!-- Grilla Semanal (Kanban) -->
       <div class="flex-1 overflow-x-auto p-4 bg-slate-100">
-        <div class="flex gap-4 min-w-max h-full" id="schedule-grid">
-          <!-- Renderizado por JS -->
-        </div>
+        <div class="flex gap-4 min-w-max h-full" id="schedule-grid"></div>
       </div>
+    </div>
+  </div>
 
+  <div id="simulador-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden" onclick="closeSimulador(event)">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 tracking-tight">
+        <span class="text-blue-600">📈</span> Proyección de Cursada
+      </h2>
+      <p class="text-xs text-slate-500 mt-2 mb-5 leading-relaxed">El sistema calculará las opciones estratégicas para destrabar la carrera.</p>
+      
+      <div class="flex items-center gap-3 mb-5">
+        <input type="number" id="sim-qty" value="3" min="1" max="10" class="w-20 px-3 py-2.5 border-2 border-slate-200 rounded-xl text-center font-bold text-slate-700 font-mono focus:border-blue-500 focus:ring-0 outline-none transition">
+        <button onclick="runSimulador()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow-md transition">Calcular Plan</button>
+      </div>
+      
+      <div id="sim-results" class="mt-4 max-h-[45vh] overflow-y-auto pr-2 space-y-3"></div>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════
-       HEADER PRINCIPAL TIPO DASHBOARD
+       HEADER PRINCIPAL DASHBOARD
   ══════════════════════════════════════════ -->
   <header class="bg-slate-900 text-white py-6 px-6 shadow-xl relative z-30">
     <div class="max-w-screen-xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
@@ -229,8 +291,18 @@
         </div>
       </div>
       
-      <!-- Panel de Estadísticas / KPIs -->
-      <div class="flex flex-wrap justify-center sm:justify-end items-center gap-6 sm:gap-10 bg-slate-800/50 rounded-2xl px-8 py-4 border border-slate-700 w-full lg:w-auto">
+      <!-- Panel de Estadísticas / KPIs Actualizado -->
+      <div class="flex flex-wrap justify-center sm:justify-end items-center gap-5 sm:gap-8 bg-slate-800/50 rounded-2xl px-6 sm:px-8 py-4 border border-slate-700 w-full lg:w-auto">
+        
+        <div class="text-center sm:text-right flex flex-col">
+          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Promedio</p>
+          <div class="flex items-baseline gap-1 justify-center sm:justify-end">
+            <span class="text-4xl font-black text-white font-mono tracking-tighter" id="promedio-label">-</span>
+          </div>
+        </div>
+
+        <div class="w-px h-12 bg-slate-700 hidden sm:block"></div>
+
         <div class="text-center sm:text-right flex flex-col">
           <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Avance Global</p>
           <div class="flex items-baseline gap-1 justify-center sm:justify-end">
@@ -262,7 +334,6 @@
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
         
-        <!-- Búsqueda -->
         <div class="flex flex-wrap items-center gap-3 flex-1 min-w-[200px]">
           <div class="relative w-full sm:max-w-sm flex-1">
             <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
@@ -270,31 +341,35 @@
           </div>
         </div>
 
-        <!-- Herramientas de Acción -->
-        <div class="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto">
+        <div class="flex flex-wrap items-center justify-end gap-2 w-full lg:w-auto">
           
-          <button id="btn-install" onclick="installApp()" class="hidden text-xs bg-slate-900 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-slate-800 transition shadow-md flex items-center gap-1.5" title="Instalar como aplicación nativa">
+          <button id="btn-install" onclick="installApp()" class="hidden text-xs bg-slate-900 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-slate-800 transition shadow-md flex items-center gap-1.5">
             <span>📱</span> <span class="hidden sm:inline">Instalar App</span>
           </button>
 
-          <!-- Toggle: Modo Inscripción (Slider Visual restaurado) -->
-          <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2.5 rounded-xl border border-blue-200 transition shadow-sm" title="Muestra únicamente las materias que ya podés cursar">
+          <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 sm:px-4 py-2.5 rounded-xl border border-blue-200 transition shadow-sm" title="Muestra únicamente las materias que ya podés cursar">
             <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
             <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
-            <span>Modo Inscripción</span>
+            Modo Inscripción
           </label>
           
           <div class="w-px h-6 bg-slate-300 hidden md:block"></div>
           
-          <!-- Botones de Acción -->
           <div class="flex gap-2">
-            <button onclick="openSchedule()" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-2.5 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm" title="Armar horario semanal">
+            <button onclick="openSchedule()" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-2.5 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm">
               <span>📅</span> <span class="hidden xl:inline">Horarios</span>
+            </button>
+            <button onclick="openSimulador()" class="text-xs bg-cyan-50 text-cyan-700 px-3 py-2.5 rounded-xl font-bold border border-cyan-200 hover:bg-cyan-100 transition flex items-center gap-1.5 shadow-sm">
+              <span>📈</span> <span class="hidden xl:inline">Proyectar</span>
+            </button>
+            <!-- Botón Sincronizar Nuevo -->
+            <button onclick="openSyncModal()" class="text-xs bg-amber-50 text-amber-700 px-3 py-2.5 rounded-xl font-bold border border-amber-200 hover:bg-amber-100 transition flex items-center gap-1.5 shadow-sm" title="Sincronizar Dispositivos">
+              <span>💾</span> <span class="hidden xl:inline">Sincronizar</span>
             </button>
             <button onclick="exportMap()" id="btn-export" class="text-xs bg-emerald-50 text-emerald-700 px-3 py-2.5 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
               <span>📄</span> <span class="hidden xl:inline">Reporte</span>
             </button>
-            <button onclick="confirmReset()" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2.5 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm" title="Liquidar Datos">
+            <button onclick="confirmReset()" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2.5 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm">
               <span>🔄</span>
             </button>
           </div>
@@ -303,14 +378,15 @@
       </div>
     </div>
 
-    <!-- Barra de Leyenda Estructural -->
+    <!-- 2. Barra de Leyenda y Progreso -->
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
       <div class="max-w-screen-xl mx-auto px-4 py-2.5 flex flex-col lg:flex-row gap-4 items-center justify-between">
         
-        <div class="flex flex-wrap gap-2 text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wide">
+        <div class="flex flex-wrap justify-center gap-2 text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wide">
           <div class="flex items-center gap-1.5 bg-slate-900 text-white px-2.5 py-1 rounded-lg"><span>✓</span> Aprobada</div>
+          <div class="flex items-center gap-1.5 bg-purple-50 border border-purple-400 text-purple-700 px-2.5 py-0.5 rounded-lg"><span class="text-purple-600">⏳</span> En Curso</div>
           <div class="flex items-center gap-1.5 bg-white border-2 border-blue-500 text-slate-800 px-2.5 py-0.5 rounded-lg"><span class="text-blue-600">▶</span> Habilitada</div>
-          <div class="flex items-center gap-1.5 bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-2.5 py-0.5 rounded-lg"><span>🔒</span> Restringida</div>
+          <div class="flex items-center gap-1.5 bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-2.5 py-0.5 rounded-lg"><span>🔒</span> Bloqueada</div>
         </div>
         
         <div class="flex items-center gap-4 w-full lg:w-96">
@@ -325,7 +401,7 @@
       </div>
     </div>
 
-  </div> <!-- Fin Contenedor Sticky -->
+  </div> 
 
   <!-- ══════════════════════════════════════════
        GRILLA CURRICULAR & ZONA DE EXPORTACIÓN
@@ -408,7 +484,6 @@
    DATOS DEL PLAN DE ESTUDIOS
 ───────────────────────────────────────────── */
 const SUBJECTS = [
-  // 1ER AÑO
   { id: 'pedagogia', name: 'Pedagogía', year: 1, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Introducir a los/as estudiantes en el campo de la Pedagogía.', contenidos: ['La educación como práctica social y política','Historia de la pedagogía moderna','Escuela, conocimiento y poder','Corrientes pedagógicas contemporáneas'] },
   { id: 'educacion-transformaciones', name: 'Educación y transformaciones sociales contemporáneas', year: 1, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Abordar los vínculos entre educación y sociedad a la luz de los cambios actuales.', contenidos: ['Modernidad, postmodernidad y educación','Globalización y desigualdad educativa','Políticas de inclusión y exclusión escolar','Identidades, diversidad y cultura escolar'] },
   { id: 'esi', name: 'ESI — Educación Sexual Integral', year: 1, campo: 'CFG', formato: 'Taller', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Brindar herramientas conceptuales y didácticas para abordar la ESI.', contenidos: ['Marco normativo','Perspectiva de géneros y derechos','Cuerpo, salud y relaciones interpersonales','ESI y enseñanza disciplinar'] },
@@ -434,7 +509,7 @@ const SUBJECTS = [
   { id: 'practica-ii', name: 'Práctica Docente II', year: 2, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 128, prereqs: ['practica-i', 'educacion-transformaciones', 'intro-economia-politica'], finalidades: 'Ampliar el conocimiento sobre la institución escolar e intervenir en situaciones de enseñanza.', contenidos: ['La planificación como hipótesis de trabajo','Estrategias de enseñanza en Ciencias Económicas','Gestión del aula y convivencia escolar','Análisis reflexivo de las primeras intervenciones'] },
   
   // 3ER AÑO
-  { id: 'politica-educativa', name: 'Política educativa argentina', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['pensamiento-politico'], finalidades: 'Analizar el sistema educativo argentino en sus dimensions normativas y políticas.', contenidos: ['El Estado y la política educativa','Sistema educativo argentino: estructura y niveles','Financiamiento educativo y políticas de igualdad','Reformas educativas en Argentina'] },
+  { id: 'politica-educativa', name: 'Política educativa argentina', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['pensamiento-politico'], finalidades: 'Analizar el sistema educativo argentino en sus dimensiones normativas y políticas.', contenidos: ['El Estado y la política educativa','Sistema educativo argentino: estructura y niveles','Financiamiento educativo y políticas de igualdad','Reformas educativas en Argentina'] },
   { id: 'problemas-filosoficos', name: 'Problemas filosóficos de la educación', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Reflexionar sobre los fundamentos filosóficos de la educación.', contenidos: ['Epistemología y educación','Ética docente y deontología profesional','Filosofía política y educación democrática','El problema de la autoridad pedagógica'] },
   { id: 'trayectorias-jovenes', name: 'Trayectorias educativas de jóvenes y adultos', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32, prereqs: ['esi', 'cultura-digital'], finalidades: 'Analizar las trayectorias educativas en los contextos actuales.', contenidos: ['Juventudes: diversidad de trayectorias vitales','Educación de jóvenes y adultos: marcos normativos','Dispositivos institucionales de acompañamiento','TIC y educación de adultos'] },
   { id: 'economia-politica-ii', name: 'Economía Política II', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['intro-economia-politica', 'matematica-cs-economicas'], finalidades: 'Avanzar en el estudio de las economías capitalistas contemporáneas.', contenidos: ['Financiarización y capital especulativo','Economía internacional: teorías y debates','Mundialización del capital y empresas transnacionales','Crisis del neoliberalismo y alternativas'] },
@@ -460,10 +535,11 @@ const SUBJECTS = [
 ];
 
 /* ─────────────────────────────────────────────
-   ESTADO GLOBAL & LOCAL STORAGE
+   ESTADO GLOBAL (V2) & LOCAL STORAGE
 ───────────────────────────────────────────── */
+// userSubjects guarda: { 'id': { status: 'approved'|'en_curso', grade: 8 } }
 const state = {
-  approved: new Set(),
+  userSubjects: {},
   searchQuery: '',
   totalHs: 0,
   schedule: { 'Lunes': [], 'Martes': [], 'Miércoles': [], 'Jueves': [], 'Viernes': [] }
@@ -486,7 +562,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 function installApp() {
   if (deferredPrompt) {
     deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
+    deferredPrompt.userChoice.then(() => {
       deferredPrompt = null;
       document.getElementById('btn-install').classList.add('hidden');
     });
@@ -494,24 +570,27 @@ function installApp() {
 }
 
 function init() {
-  // Cargar Aprobadas
-  const saved = localStorage.getItem('isfd100_aprobadas');
-  if (saved) state.approved = new Set(JSON.parse(saved));
-  
-  // Cargar Horario
+  // Migración y Carga
+  const oldSaved = localStorage.getItem('isfd100_aprobadas');
+  if (oldSaved && !localStorage.getItem('isfd100_data_v2')) {
+    const arr = JSON.parse(oldSaved);
+    arr.forEach(id => { state.userSubjects[id] = { status: 'approved', grade: null }; });
+    saveState();
+  }
+
+  const savedV2 = localStorage.getItem('isfd100_data_v2');
+  if (savedV2) state.userSubjects = JSON.parse(savedV2);
+
   const savedSchedule = localStorage.getItem('isfd100_horarios');
   if (savedSchedule) state.schedule = JSON.parse(savedSchedule);
 
   state.totalHs = SUBJECTS.reduce((acc, s) => acc + s.hs, 0);
 
-  // Calcular dependencias (Ruta Crítica)
   calculateDependencies();
 
   if (!localStorage.getItem('isfd100_onboarding')) {
     document.getElementById('onboarding-modal').classList.remove('hidden');
-    setTimeout(() => {
-      document.getElementById('onboarding-modal').children[0].classList.add('scale-100');
-    }, 10);
+    setTimeout(() => { document.getElementById('onboarding-modal').children[0].classList.add('scale-100'); }, 10);
   }
 
   renderGrid();
@@ -525,7 +604,7 @@ function init() {
 }
 
 function saveState() {
-  localStorage.setItem('isfd100_aprobadas', JSON.stringify([...state.approved]));
+  localStorage.setItem('isfd100_data_v2', JSON.stringify(state.userSubjects));
   localStorage.setItem('isfd100_horarios', JSON.stringify(state.schedule));
 }
 
@@ -580,9 +659,6 @@ function renderGrid() {
   });
 }
 
-/* ─────────────────────────────────────────────
-   DISEÑO DE TARJETA
-───────────────────────────────────────────── */
 function createCard(subject) {
   const card = document.createElement('div');
   card.className = 'subject-card group';
@@ -613,7 +689,7 @@ function createCard(subject) {
   
   card.addEventListener('click', (e) => {
     if (e.target.closest('.info-btn')) return;
-    toggleApproved(subject.id);
+    handleCardClick(subject.id);
   });
   
   return card;
@@ -622,31 +698,93 @@ function createCard(subject) {
 /* ─────────────────────────────────────────────
    LOGICA & ACTUALIZACIÓN DE ESTADOS DOM
 ───────────────────────────────────────────── */
-function toggleApproved(id) {
+// Dependencia solo se cumple si la materia está APROBADA (en_curso no habilita)
+function isSubjectEnabled(id) {
   const subject = SUBJECTS.find(s => s.id === id);
-  if (!subject) return;
+  if (!subject) return false;
+  return subject.prereqs.every(pid => state.userSubjects[pid] && state.userSubjects[pid].status === 'approved');
+}
 
+function handleCardClick(id) {
   const isEnabled = isSubjectEnabled(id);
-  const isApproved = state.approved.has(id);
-  const previouslyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
+  const currentStatus = state.userSubjects[id] ? state.userSubjects[id].status : null;
+  
+  // Si no está habilitada y no tiene estado, no hace nada
+  if (!isEnabled && !currentStatus) return;
 
-  if (isApproved) {
-    const dependents = SUBJECTS.filter(s => s.prereqs.includes(id) && state.approved.has(s.id));
+  openStatusModal(id);
+}
+
+function openStatusModal(id) {
+  const subject = SUBJECTS.find(s => s.id === id);
+  document.getElementById('status-subject-name').textContent = subject.name;
+  document.getElementById('status-subject-id').value = id;
+  
+  const currentStatus = state.userSubjects[id]?.status || 'enabled';
+  const grade = state.userSubjects[id]?.grade || '';
+  
+  document.getElementById('status-select').value = currentStatus;
+  document.getElementById('status-grade').value = grade;
+  
+  toggleGradeInput();
+
+  const modal = document.getElementById('status-modal');
+  modal.classList.remove('hidden');
+  setTimeout(() => { modal.children[0].classList.remove('scale-95'); modal.children[0].classList.add('scale-100'); }, 10);
+}
+
+function closeStatusModal(e) {
+  if (e && e.target !== document.getElementById('status-modal') && e.type === 'click') return;
+  const modal = document.getElementById('status-modal');
+  modal.children[0].classList.remove('scale-100');
+  modal.children[0].classList.add('scale-95');
+  setTimeout(() => { modal.classList.add('hidden'); }, 150);
+}
+
+function toggleGradeInput() {
+  const val = document.getElementById('status-select').value;
+  const container = document.getElementById('grade-container');
+  if (val === 'approved') {
+    container.classList.remove('hidden');
+  } else {
+    container.classList.add('hidden');
+  }
+}
+
+function saveSubjectStatus() {
+  const id = document.getElementById('status-subject-id').value;
+  const newStatus = document.getElementById('status-select').value;
+  let grade = document.getElementById('status-grade').value;
+  grade = grade ? parseFloat(grade) : null;
+  
+  const subject = SUBJECTS.find(s => s.id === id);
+  const currentStatus = state.userSubjects[id]?.status;
+
+  // Validación: No se puede des-aprobar si hay dependencias aprobadas/en curso
+  if (currentStatus === 'approved' && newStatus !== 'approved') {
+    const dependents = SUBJECTS.filter(s => s.prereqs.includes(id) && state.userSubjects[s.id]);
     if (dependents.length > 0) {
-      showAlert(`Las siguientes materias dependen de <b>${subject.name}</b> para su validez:<br><br><span class="text-xs text-slate-500 font-mono">▪ ${dependents.map(d=>d.name).join('<br>▪ ')}</span>`);
+      showAlert(`Transacción denegada. Las siguientes materias dependen de <b>${subject.name}</b> para su validez:<br><br><span class="text-xs text-amber-800">▪ ${dependents.map(d=>d.name).join('<br>▪ ')}</span>`);
       return;
     }
-    state.approved.delete(id);
+  }
+
+  const previouslyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
+
+  if (newStatus === 'enabled') {
+    // Si vuelve a 'enabled', borramos del registro
+    delete state.userSubjects[id];
   } else {
-    if (!isEnabled) return; 
-    state.approved.add(id);
+    state.userSubjects[id] = { status: newStatus, grade: grade };
   }
 
   saveState();
   updateAllCards();
   updateProgress();
+  closeStatusModal();
 
-  if (!isApproved) {
+  // Animación pop para las recién habilitadas (solo si pasó a Aprobada)
+  if (newStatus === 'approved') {
     const currentlyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
     currentlyEnabled.forEach(newId => {
       if (!previouslyEnabled.has(newId)) {
@@ -661,12 +799,6 @@ function toggleApproved(id) {
   }
 }
 
-function isSubjectEnabled(id) {
-  const subject = SUBJECTS.find(s => s.id === id);
-  if (!subject) return false;
-  return subject.prereqs.every(pid => state.approved.has(pid));
-}
-
 function updateAllCards() {
   SUBJECTS.forEach(subject => {
     const card = document.getElementById(`card-${subject.id}`);
@@ -674,13 +806,20 @@ function updateAllCards() {
     
     const iconEl = card.querySelector('.status-icon');
     const labelEl = card.querySelector('.status-label');
+    const uData = state.userSubjects[subject.id];
 
-    if (state.approved.has(subject.id)) {
+    if (uData && uData.status === 'approved') {
       card.dataset.state = 'approved';
       iconEl.innerHTML = '✓';
-      labelEl.innerHTML = 'Aprobada';
+      labelEl.innerHTML = uData.grade ? `Aprobada (Nota: ${uData.grade})` : 'Aprobada';
       labelEl.removeAttribute('title');
     } 
+    else if (uData && uData.status === 'en_curso') {
+      card.dataset.state = 'en_curso';
+      iconEl.innerHTML = '⏳';
+      labelEl.innerHTML = 'En Curso';
+      labelEl.removeAttribute('title');
+    }
     else if (isSubjectEnabled(subject.id)) {
       card.dataset.state = 'enabled';
       iconEl.innerHTML = '▶';
@@ -690,7 +829,7 @@ function updateAllCards() {
     else {
       card.dataset.state = 'locked';
       iconEl.innerHTML = '🔒';
-      const missingIds = subject.prereqs.filter(pid => !state.approved.has(pid));
+      const missingIds = subject.prereqs.filter(pid => !state.userSubjects[pid] || state.userSubjects[pid].status !== 'approved');
       const missingNames = missingIds.map(pid => SUBJECTS.find(x=>x.id===pid).name);
       
       labelEl.innerHTML = `Req: ${missingIds.length} mat.`;
@@ -715,9 +854,9 @@ function applyFilterStyles() {
     
     if (q && !subject.name.toLowerCase().includes(q)) visible = false;
     
-    // CORRECCIÓN MODO INSCRIPCIÓN: Oculta aprobadas y bloqueadas
+    // Modo Inscripción: Solo habilitadas (no aprobadas ni en curso ni bloqueadas)
     if (showOnlyEnabled) {
-      if (!isSubjectEnabled(subject.id) || state.approved.has(subject.id)) {
+      if (!isSubjectEnabled(subject.id) || state.userSubjects[subject.id]) {
         visible = false;
       }
     }
@@ -738,17 +877,30 @@ function applyFilterStyles() {
 
 function updateProgress() {
   const total = SUBJECTS.length;
-  const approvedCount = state.approved.size;
+  const approvedSubjects = Object.keys(state.userSubjects).filter(id => state.userSubjects[id].status === 'approved');
+  const approvedCount = approvedSubjects.length;
   const pct = total === 0 ? 0 : Math.round((approvedCount / total) * 100);
   
   let approvedHs = 0;
-  state.approved.forEach(id => approvedHs += SUBJECTS.find(x=>x.id===id).hs);
+  let gradesSum = 0;
+  let gradesCount = 0;
+
+  approvedSubjects.forEach(id => {
+    approvedHs += SUBJECTS.find(x=>x.id===id).hs;
+    if (state.userSubjects[id].grade) {
+      gradesSum += state.userSubjects[id].grade;
+      gradesCount++;
+    }
+  });
+
+  const promedio = gradesCount > 0 ? (gradesSum / gradesCount).toFixed(2) : '-';
 
   document.getElementById('progress-bar').style.width = pct + '%';
   document.getElementById('pct-label').textContent = pct;
   document.getElementById('approved-count').textContent = approvedCount;
   document.getElementById('total-count').textContent = total;
   document.getElementById('hs-count').textContent = approvedHs;
+  document.getElementById('promedio-label').textContent = promedio;
 
   if (pct === 100 && total > 0) {
     confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999, colors: ['#2563eb', '#1e40af', '#60a5fa'] });
@@ -756,7 +908,67 @@ function updateProgress() {
 }
 
 /* ─────────────────────────────────────────────
-   MODALES DE AYUDA Y REINICIO
+   SISTEMA DE SINCRONIZACIÓN
+───────────────────────────────────────────── */
+function openSyncModal() {
+  const modal = document.getElementById('sync-modal');
+  const exportInput = document.getElementById('sync-export-code');
+  
+  // Generar código
+  const data = { v: 2, u: state.userSubjects, s: state.schedule };
+  const encoded = btoa(JSON.stringify(data));
+  exportInput.value = encoded;
+
+  document.getElementById('sync-import-code').value = '';
+  
+  modal.classList.remove('hidden'); 
+  setTimeout(() => {
+    modal.children[0].classList.remove('scale-95');
+    modal.children[0].classList.add('scale-100');
+  }, 10);
+}
+
+function closeSyncModal(e) {
+  if (e && e.target !== document.getElementById('sync-modal') && e.type === 'click') return;
+  const modal = document.getElementById('sync-modal');
+  modal.children[0].classList.remove('scale-100');
+  modal.children[0].classList.add('scale-95');
+  setTimeout(() => { modal.classList.add('hidden'); }, 150);
+}
+
+function copySyncCode() {
+  const copyText = document.getElementById("sync-export-code");
+  copyText.select();
+  document.execCommand("copy");
+  const btn = document.getElementById("btn-copy-sync");
+  const orig = btn.innerText;
+  btn.innerText = "¡Copiado!";
+  setTimeout(() => btn.innerText = orig, 2000);
+}
+
+function importSyncCode() {
+  const val = document.getElementById('sync-import-code').value.trim();
+  if(!val) return;
+  try {
+    const data = JSON.parse(atob(val));
+    if (data.v === 2) {
+      state.userSubjects = data.u || {};
+      state.schedule = data.s || { 'Lunes': [], 'Martes': [], 'Miércoles': [], 'Jueves': [], 'Viernes': [] };
+      saveState();
+      updateAllCards();
+      updateProgress();
+      closeSyncModal();
+      showAlert("¡Perfil sincronizado exitosamente!");
+    } else {
+      alert("Código inválido o versión no soportada.");
+    }
+  } catch(err) {
+    alert("Código incorrecto. Asegurate de haber copiado todo el texto.");
+  }
+}
+
+/* ─────────────────────────────────────────────
+   MODALES Y UTILIDADES CUSTOM
 ───────────────────────────────────────────── */
 function openModal(event, id) {
   event.stopPropagation();
@@ -823,14 +1035,12 @@ function closeConfirmModal() {
 
 function executeReset() {
   closeConfirmModal();
-  state.approved.clear();
+  state.userSubjects = {};
   state.schedule = { 'Lunes': [], 'Martes': [], 'Miércoles': [], 'Jueves': [], 'Viernes': [] };
   saveState();
   updateAllCards();
   updateProgress();
-  if(!document.getElementById('schedule-modal').classList.contains('hidden')) {
-    renderScheduleGrid();
-  }
+  if(!document.getElementById('schedule-modal').classList.contains('hidden')) renderScheduleGrid();
 }
 
 function showAlert(msg) {
@@ -857,7 +1067,8 @@ function openSchedule() {
   const sel = document.getElementById('sched-subject');
   sel.innerHTML = '<option value="" disabled selected>Seleccioná una materia habilitada...</option>';
   
-  const available = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.approved.has(s.id));
+  // Mostrar habilitadas y en curso para el horario
+  const available = SUBJECTS.filter(s => isSubjectEnabled(s.id) && state.userSubjects[s.id]?.status !== 'approved');
   available.sort((a, b) => a.year - b.year);
   
   available.forEach(s => {
@@ -890,20 +1101,14 @@ function addScheduleItem() {
   const day = document.getElementById('sched-day').value;
   const time = document.getElementById('sched-time').value || 'Sin horario definido';
 
-  if (!subId) {
-    alert("Por favor, seleccioná una materia primero.");
-    return;
-  }
+  if (!subId) { alert("Por favor, seleccioná una materia primero."); return; }
 
   let exists = false;
   Object.keys(state.schedule).forEach(d => {
     if (state.schedule[d].some(item => item.id === subId)) exists = true;
   });
 
-  if (exists) {
-    alert("Ya agregaste esta materia a tu semana.");
-    return;
-  }
+  if (exists) { alert("Ya agregaste esta materia a tu semana."); return; }
 
   if (!state.schedule[day]) state.schedule[day] = [];
   state.schedule[day].push({ id: subId, time: time });
@@ -937,7 +1142,6 @@ function renderScheduleGrid() {
       items.forEach((item, index) => {
         const subject = SUBJECTS.find(x => x.id === item.id);
         if (!subject) return;
-        
         const borderCol = subject.campo === 'CFG' ? 'border-blue-500' : subject.campo === 'CFE' ? 'border-emerald-500' : 'border-amber-500';
 
         html += `
@@ -949,7 +1153,6 @@ function renderScheduleGrid() {
         `;
       });
     }
-    
     html += `</div></div>`;
     grid.innerHTML += html;
   });
@@ -976,7 +1179,8 @@ function closeSimulador(e) {
 
 function runSimulador() {
   const qty = parseInt(document.getElementById('sim-qty').value) || 3;
-  const enabled = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.approved.has(s.id));
+  // Solo sugerir habilitadas que no esten ni aprobadas ni en curso
+  const enabled = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.userSubjects[s.id]);
   
   enabled.sort((a,b) => {
     if (b.bottleneckCount !== a.bottleneckCount) return b.bottleneckCount - a.bottleneckCount;
@@ -1002,7 +1206,7 @@ function runSimulador() {
         </div>
         <p class="text-[11px] text-slate-500 mt-1 font-mono">${s.regimen} · Año ${s.year}</p>
       </div>
-      <button onclick="toggleApproved('${s.id}'); closeSimulador();" class="text-[10px] uppercase font-bold bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition shadow-sm">Cursar</button>
+      <button onclick="handleCardClick('${s.id}'); closeSimulador();" class="text-[10px] uppercase font-bold bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition shadow-sm">Gestionar</button>
     </div>
   `).join('');
   
@@ -1083,6 +1287,8 @@ document.addEventListener('keydown', e => {
     closeConfirmModal();
     closeAlertModal();
     closeSchedule();
+    closeStatusModal();
+    closeSyncModal();
   } 
 });
 window.addEventListener('DOMContentLoaded', init);
