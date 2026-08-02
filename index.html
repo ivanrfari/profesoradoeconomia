@@ -212,21 +212,11 @@
     <!-- 1. Barra de Herramientas -->
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-        <!-- Búsqueda y Filtros de Campo -->
-        <div class="flex flex-wrap items-center gap-3 flex-1">
-          <div class="relative w-full sm:w-64">
-            <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
-            <input type="text" id="search-input" placeholder="Buscar por asignatura..." class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-700 transition-all font-medium" onkeyup="applyFilterStyles()">
-          </div>
-
-          <div class="w-px h-6 bg-slate-300 hidden lg:block"></div>
-
-          <div class="flex gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200" id="field-filters">
-            <button onclick="applyFilter('all')" id="btn-all" class="filter-btn active px-4 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-white shadow-sm transition">Todos</button>
-            <button onclick="applyFilter('CFG')" id="btn-CFG" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-blue-800 transition">CFG</button>
-            <button onclick="applyFilter('CFE')" id="btn-CFE" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-emerald-700 transition">CFE</button>
-            <button onclick="applyFilter('CPD')" id="btn-CPD" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-amber-700 transition">CPD</button>
-          </div>
+        
+        <!-- Búsqueda -->
+        <div class="relative w-full sm:max-w-xs flex-1">
+          <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
+          <input type="text" id="search-input" placeholder="Buscar por asignatura..." class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-700 transition-all font-medium" onkeyup="applyFilterStyles()">
         </div>
 
         <!-- Herramientas de Acción -->
@@ -410,7 +400,6 @@ const SUBJECTS = [
 ───────────────────────────────────────────── */
 const state = {
   approved: new Set(),
-  activeFilter: 'all',
   searchQuery: '',
   totalHs: 0
 };
@@ -614,24 +603,7 @@ function updateAllCards() {
   applyFilterStyles();
 }
 
-function applyFilter(campo) {
-  state.activeFilter = campo;
-  document.querySelectorAll('#field-filters .filter-btn').forEach(btn => {
-    btn.classList.remove('bg-white', 'shadow-sm', 'text-slate-700');
-    if(!btn.classList.contains('active')) {
-      btn.classList.add('text-slate-500');
-    }
-  });
-  
-  const activeBtn = document.getElementById(`btn-${campo}`);
-  activeBtn.classList.remove('text-slate-500');
-  activeBtn.classList.add('bg-white', 'shadow-sm', 'text-slate-700');
-  
-  applyFilterStyles();
-}
-
 function applyFilterStyles() {
-  const campo = state.activeFilter;
   const q = state.searchQuery;
   const showOnlyEnabled = document.getElementById('toggle-enabled-only').checked;
 
@@ -640,9 +612,9 @@ function applyFilterStyles() {
     if (!card) return;
     
     let visible = true;
-    if (campo !== 'all' && subject.campo !== campo) visible = false;
     if (q && !subject.name.toLowerCase().includes(q)) visible = false;
     
+    // Filtro Inversión (Qué cursar)
     if (showOnlyEnabled && (!isSubjectEnabled(subject.id) || state.approved.has(subject.id))) {
        visible = false;
     }
