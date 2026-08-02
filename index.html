@@ -3,8 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mapa Curricular · Profesorado en Economía · ISFD N°100</title>
+  <title>Mapa Curricular · Economía · ISFD N°100</title>
   
+  <!-- Manifest dinámico para PWA -->
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%231e3a8a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzFlM2E4YSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -12,16 +15,16 @@
       theme: {
         extend: {
           colors: {
-            cfg: '#1e3a8a', /* Azul Corporativo */
-            cfe: '#059669', /* Verde Esmeralda / Dinero */
-            cpd: '#d97706', /* Ámbar / Oro */
-            approved: '#10b981', /* Verde Aprobado */
-            enabled: '#3b82f6', /* Azul Habilitado */
-            locked: '#64748b' /* Gris Pizarra */
+            cfg: '#1e3a8a', 
+            cfe: '#059669', 
+            cpd: '#d97706', 
+            approved: '#10b981', 
+            enabled: '#3b82f6', 
+            locked: '#64748b' 
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', 'sans-serif'],
-            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
           }
         }
       }
@@ -38,7 +41,6 @@
     ============================================================ */
     body {
       background-color: #f8fafc;
-      /* Patrón de puntos tipo planilla de cálculo/cuaderno financiero */
       background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
       background-size: 20px 20px;
       scroll-behavior: smooth;
@@ -83,6 +85,15 @@
 
 <body class="min-h-screen text-slate-800">
 
+  <!-- Service Worker para PWA (Script inline para instalación) -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      const swCode = "self.addEventListener('fetch', function(event) {});";
+      const blob = new Blob([swCode], {type: 'application/javascript'});
+      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(err => console.log('SW setup falló:', err));
+    }
+  </script>
+
   <!-- ══════════════════════════════════════════
        ONBOARDING MODAL
   ══════════════════════════════════════════ -->
@@ -93,7 +104,7 @@
       </div>
       <h2 class="text-2xl font-black mb-3 text-slate-800">Portal de Planificación</h2>
       <p class="text-sm text-slate-600 mb-6 leading-relaxed">
-        Gestioná tu progreso académico como un portafolio de inversiones.<br><br>
+        Gestioná tu progreso académico en el ISFD N°100 como un portafolio de inversiones.<br><br>
         ✅ <b>Aprobadas:</b> Ingresan a tu capital formativo.<br>
         🟢 <b>Habilitadas:</b> Oportunidades disponibles para cursar.<br>
         🔒 <b>Bloqueadas:</b> Requieren liquidar correlatividades previas.
@@ -139,14 +150,15 @@
       <h2 class="text-xl font-black text-slate-800 flex items-center gap-2">
         <span class="text-blue-600">📈</span> Proyección de Cursada
       </h2>
-      <p class="text-xs text-slate-500 mt-2 mb-5 leading-relaxed">Optimizá tu tiempo. Ingresá la cantidad de materias que podés cursar y el sistema calculará las opciones más estratégicas.</p>
+      <p class="text-xs text-slate-500 mt-2 mb-5 leading-relaxed">Optimizá tu tiempo. Ingresá la cantidad de materias que podés cursar y el sistema calculará las opciones más estratégicas (priorizando destrabar materias correlativas de años siguientes).</p>
       
       <div class="flex items-center gap-3 mb-5">
         <input type="number" id="sim-qty" value="3" min="1" max="10" class="w-20 px-3 py-2.5 border-2 border-slate-200 rounded-xl text-center font-bold text-slate-700 focus:border-blue-500 focus:ring-0 outline-none">
         <button onclick="runSimulador()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow-md transition">Calcular Plan</button>
       </div>
       
-      <div id="sim-results" class="space-y-3 mt-4 max-h-60 overflow-y-auto pr-1"></div>
+      <!-- Contenedor dinámico de resultados -->
+      <div id="sim-results" class="mt-4 max-h-60 overflow-y-auto pr-1"></div>
     </div>
   </div>
 
@@ -193,76 +205,91 @@
   </header>
 
   <!-- ══════════════════════════════════════════
-       BARRA DE HERRAMIENTAS
+       BARRA STICKY: HERRAMIENTAS Y PROGRESO
   ══════════════════════════════════════════ -->
-  <div class="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
-    <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-
-      <!-- Búsqueda y Filtros de Campo -->
-      <div class="flex flex-wrap items-center gap-3 flex-1">
-        <div class="relative w-full sm:w-64">
-          <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
-          <input type="text" id="search-input" placeholder="Buscar por asignatura..." class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-700 transition-all font-medium" onkeyup="applyFilterStyles()">
-        </div>
-
-        <div class="w-px h-6 bg-slate-300 hidden lg:block"></div>
-
-        <div class="flex gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200" id="field-filters">
-          <button onclick="applyFilter('all')" id="btn-all" class="filter-btn active px-4 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-white shadow-sm transition">Todos</button>
-          <button onclick="applyFilter('CFG')" id="btn-CFG" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-blue-800 transition">CFG</button>
-          <button onclick="applyFilter('CFE')" id="btn-CFE" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-emerald-700 transition">CFE</button>
-          <button onclick="applyFilter('CPD')" id="btn-CPD" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-amber-700 transition">CPD</button>
-        </div>
-      </div>
-
-      <!-- Herramientas de Acción -->
-      <div class="flex items-center gap-2">
-        <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-2 rounded-xl border border-emerald-200 transition" title="Muestra únicamente las materias que ya podés cursar">
-          <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
-          <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-emerald-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
-          Modo Habilitadas
-        </label>
-        
-        <div class="flex bg-slate-100 rounded-xl p-1 border border-slate-200">
-          <button onclick="setViewMode('year')" id="btn-view-year" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white shadow-sm text-slate-800 transition">Por Año</button>
-          <button onclick="setViewMode('campo')" id="btn-view-campo" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-800 transition">Por Campo</button>
-        </div>
-        
-        <button onclick="openSimulador()" class="text-xs bg-blue-50 text-blue-700 px-3 py-2 rounded-xl font-bold border border-blue-100 hover:bg-blue-100 hover:border-blue-200 transition flex items-center gap-1.5" title="Proyectar Cursada"><span>📈</span> <span class="hidden sm:inline">Proyectar</span></button>
-        <button onclick="exportMap()" id="btn-export" class="text-xs bg-slate-100 text-slate-700 px-3 py-2 rounded-xl font-bold border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5"><span>📄</span> <span class="hidden sm:inline">Reporte</span></button>
-        <button onclick="confirmReset()" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5" title="Liquidar Datos"><span>🔄</span></button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ══════════════════════════════════════════
-       LEYENDA & PROGRESS BAR
-  ══════════════════════════════════════════ -->
-  <div class="max-w-screen-xl mx-auto px-4 pt-6 pb-2 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-    <div class="flex flex-wrap gap-4 text-xs font-bold text-slate-600 bg-white px-5 py-2.5 rounded-xl shadow-sm border border-slate-200">
-      <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500 border border-emerald-600 shadow-inner"></span> Capitalizado (Aprobada)</span>
-      <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500 border border-blue-600 shadow-inner"></span> Disponible (Habilitada)</span>
-      <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-300 border border-slate-400 shadow-inner"></span> Restringida (Bloqueada)</span>
-    </div>
+  <div class="sticky top-0 z-20 flex flex-col shadow-md">
     
-    <div class="flex items-center gap-4 w-full md:w-96 bg-white px-5 py-3 rounded-xl shadow-sm border border-slate-200">
-      <span class="text-xs font-black text-slate-400 whitespace-nowrap uppercase tracking-wide">
-        <span id="approved-count" class="text-slate-800 text-sm font-mono">0</span> / <span id="total-count" class="font-mono">0</span> MAT.
-      </span>
-      <div class="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner border border-slate-200">
-        <!-- Barra estilo financiero (verde) -->
-        <div id="progress-bar" class="h-full bg-emerald-500 relative" style="width:0%">
-          <div class="absolute inset-0 bg-white/20" style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;"></div>
+    <!-- 1. Barra de Herramientas -->
+    <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
+      <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <!-- Búsqueda y Filtros de Campo -->
+        <div class="flex flex-wrap items-center gap-3 flex-1">
+          <div class="relative w-full sm:w-64">
+            <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
+            <input type="text" id="search-input" placeholder="Buscar por asignatura..." class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-700 transition-all font-medium" onkeyup="applyFilterStyles()">
+          </div>
+
+          <div class="w-px h-6 bg-slate-300 hidden lg:block"></div>
+
+          <div class="flex gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200" id="field-filters">
+            <button onclick="applyFilter('all')" id="btn-all" class="filter-btn active px-4 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-white shadow-sm transition">Todos</button>
+            <button onclick="applyFilter('CFG')" id="btn-CFG" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-blue-800 transition">CFG</button>
+            <button onclick="applyFilter('CFE')" id="btn-CFE" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-emerald-700 transition">CFE</button>
+            <button onclick="applyFilter('CPD')" id="btn-CPD" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-amber-700 transition">CPD</button>
+          </div>
+        </div>
+
+        <!-- Herramientas de Acción -->
+        <div class="flex items-center gap-2">
+          
+          <button id="btn-install" onclick="installApp()" class="hidden text-xs bg-purple-50 text-purple-700 px-3 py-2 rounded-xl font-bold border border-purple-200 hover:bg-purple-100 transition flex items-center gap-1.5" title="Instalar como aplicación nativa"><span>📱</span> <span class="hidden sm:inline">Instalar App</span></button>
+
+          <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-2 rounded-xl border border-emerald-200 transition" title="Muestra únicamente las materias que ya podés cursar">
+            <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
+            <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-emerald-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
+            Modo Habilitadas
+          </label>
+          
+          <button onclick="openSimulador()" class="text-xs bg-blue-50 text-blue-700 px-3 py-2 rounded-xl font-bold border border-blue-100 hover:bg-blue-100 transition flex items-center gap-1.5" title="Proyectar Cursada"><span>📈</span> <span class="hidden sm:inline">Proyectar</span></button>
+          <button onclick="exportMap()" id="btn-export" class="text-xs bg-slate-100 text-slate-700 px-3 py-2 rounded-xl font-bold border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5"><span>📄</span> <span class="hidden sm:inline">Reporte</span></button>
+          <button onclick="confirmReset()" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5" title="Liquidar Datos"><span>🔄</span></button>
         </div>
       </div>
     </div>
-  </div>
+
+    <!-- 2. Barra de Progreso Sticky -->
+    <div class="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+      <div class="max-w-screen-xl mx-auto px-4 py-2 flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div class="flex flex-wrap gap-4 text-xs font-bold text-slate-600">
+          <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500 border border-emerald-600 shadow-inner"></span> Capitalizado (Aprobada)</span>
+          <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500 border border-blue-600 shadow-inner"></span> Disponible (Habilitada)</span>
+          <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-300 border border-slate-400 shadow-inner"></span> Restringida (Bloqueada)</span>
+        </div>
+        
+        <div class="flex items-center gap-4 w-full md:w-96">
+          <span class="text-xs font-black text-slate-400 whitespace-nowrap uppercase tracking-wide">
+            <span id="approved-count" class="text-slate-800 text-sm font-mono">0</span> / <span id="total-count" class="font-mono">0</span> MAT.
+          </span>
+          <div class="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner border border-slate-200">
+            <div id="progress-bar" class="h-full bg-emerald-500 relative" style="width:0%">
+              <div class="absolute inset-0 bg-white/20" style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- Fin Contenedor Sticky -->
 
   <!-- ══════════════════════════════════════════
-       GRILLA CURRICULAR
+       GRILLA CURRICULAR & ZONA DE EXPORTACIÓN
   ══════════════════════════════════════════ -->
-  <div id="export-area" class="transition-colors pb-8">
+  <div id="export-area" class="pb-8 bg-slate-50">
+    
+    <!-- Encabezado oculto que SOLO sale en la foto exportada -->
+    <div id="export-watermark" class="hidden mx-auto max-w-screen-xl px-4 pt-8 pb-4">
+      <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-xl flex justify-between items-center border-l-4 border-emerald-500">
+        <div>
+          <h2 class="text-2xl font-black mb-1">Reporte de Avance Académico</h2>
+          <p class="text-sm text-slate-300">Profesorado en Economía — ISFD N°100 — DGCyE</p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Fecha de Emisión</p>
+          <p id="export-date" class="text-lg font-mono text-emerald-400 font-bold"></p>
+        </div>
+      </div>
+    </div>
+
     <main class="max-w-screen-xl mx-auto px-4 pb-16 pt-5 overflow-x-auto min-h-[60vh]">
       <div class="flex gap-6 min-w-max" id="grid-container">
         <!-- Generado por JS -->
@@ -276,7 +303,6 @@
   <div id="modal-backdrop" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden" onclick="closeModal(event)">
     <div id="modal-box" class="bg-white w-full max-w-lg shadow-2xl rounded-2xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-200" onclick="event.stopPropagation()">
       <div id="modal-header" class="p-6 text-white relative overflow-hidden">
-        <!-- Patrón sutil para el header del modal -->
         <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 10px 10px;"></div>
         <div class="relative z-10 flex justify-between items-start">
           <div>
@@ -385,7 +411,6 @@ const SUBJECTS = [
 const state = {
   approved: new Set(),
   activeFilter: 'all',
-  viewMode: 'year', 
   searchQuery: '',
   totalHs: 0
 };
@@ -395,6 +420,24 @@ const CAMPO_COLORS = {
   CFE: { bg: 'bg-[#059669]', label: 'CFE', title: 'Formación Específica' },
   CPD: { bg: 'bg-[#d97706]', label: 'CPD', title: 'Práctica Docente' },
 };
+
+/* Instalación PWA (App Nativa) */
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('btn-install').classList.remove('hidden');
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      deferredPrompt = null;
+      document.getElementById('btn-install').classList.add('hidden');
+    });
+  }
+}
 
 function init() {
   const saved = localStorage.getItem('isfd100_aprobadas');
@@ -424,63 +467,28 @@ function saveState() {
 }
 
 /* ─────────────────────────────────────────────
-   RENDERIZADO DE GRILLA (Año o Campo)
+   RENDERIZADO DE GRILLA (Solo Año)
 ───────────────────────────────────────────── */
-function setViewMode(mode) {
-  state.viewMode = mode;
-  
-  // Update Buttons
-  document.getElementById('btn-view-year').className = `px-3 py-1.5 text-xs font-bold rounded-lg transition ${mode==='year'?'bg-white shadow-sm text-slate-800':'text-slate-500 hover:text-slate-800'}`;
-  document.getElementById('btn-view-campo').className = `px-3 py-1.5 text-xs font-bold rounded-lg transition ${mode==='campo'?'bg-white shadow-sm text-slate-800':'text-slate-500 hover:text-slate-800'}`;
-  
-  // Manejo de filtros
-  document.getElementById('field-filters').style.opacity = mode === 'campo' ? '0.3' : '1';
-  document.getElementById('field-filters').style.pointerEvents = mode === 'campo' ? 'none' : 'auto';
-  if(mode === 'campo' && state.activeFilter !== 'all') applyFilter('all');
-
-  renderGrid();
-  updateAllCards();
-}
-
 function renderGrid() {
   const container = document.getElementById('grid-container');
   container.innerHTML = '';
 
-  if (state.viewMode === 'year') {
-    const byYear = { 1: [], 2: [], 3: [], 4: [] };
-    SUBJECTS.forEach(s => byYear[s.year].push(s));
-    
-    // Paleta de años más sobria y profesional
-    const yearColors = ['border-blue-700', 'border-emerald-600', 'border-amber-600', 'border-purple-700'];
+  const byYear = { 1: [], 2: [], 3: [], 4: [] };
+  SUBJECTS.forEach(s => byYear[s.year].push(s));
+  
+  const yearColors = ['border-blue-700', 'border-emerald-600', 'border-amber-600', 'border-purple-700'];
 
-    [1, 2, 3, 4].forEach(yr => {
-      const col = document.createElement('div');
-      col.className = 'year-col flex flex-col gap-4';
-      col.innerHTML = `
-        <div class="border-b-[3px] ${yearColors[yr-1]} pb-2 mb-2 font-black text-lg text-slate-800 flex items-center justify-between">
-          <span>${yr}er Año</span> 
-          <span class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-1 rounded-md uppercase tracking-wider">${byYear[yr].length} Mat.</span>
-        </div>`;
-      byYear[yr].forEach(s => col.appendChild(createCard(s)));
-      container.appendChild(col);
-    });
-  } else {
-    const byCampo = { 'CFG': [], 'CFE': [], 'CPD': [] };
-    SUBJECTS.forEach(s => byCampo[s.campo].push(s));
-    
-    ['CFG', 'CFE', 'CPD'].forEach(c => {
-      const col = document.createElement('div');
-      col.className = 'year-col flex flex-col gap-4';
-      // Match exact hex code to bottom border
-      const bColor = c==='CFG' ? '#1e3a8a' : c==='CFE' ? '#059669' : '#d97706';
-      col.innerHTML = `
-        <div class="border-b-[3px] pb-2 mb-2 font-black text-lg text-slate-800" style="border-color:${bColor}">
-          ${CAMPO_COLORS[c].title}
-        </div>`;
-      byCampo[c].forEach(s => col.appendChild(createCard(s)));
-      container.appendChild(col);
-    });
-  }
+  [1, 2, 3, 4].forEach(yr => {
+    const col = document.createElement('div');
+    col.className = 'year-col flex flex-col gap-4';
+    col.innerHTML = `
+      <div class="border-b-[3px] ${yearColors[yr-1]} pb-2 mb-2 font-black text-lg text-slate-800 flex items-center justify-between">
+        <span>${yr}er Año</span> 
+        <span class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-1 rounded-md uppercase tracking-wider">${byYear[yr].length} Mat.</span>
+      </div>`;
+    byYear[yr].forEach(s => col.appendChild(createCard(s)));
+    container.appendChild(col);
+  });
 }
 
 /* ─────────────────────────────────────────────
@@ -610,7 +618,6 @@ function applyFilter(campo) {
   state.activeFilter = campo;
   document.querySelectorAll('#field-filters .filter-btn').forEach(btn => {
     btn.classList.remove('bg-white', 'shadow-sm', 'text-slate-700');
-    // Si no es el activo, ponerlo grisáceo
     if(!btn.classList.contains('active')) {
       btn.classList.add('text-slate-500');
     }
@@ -636,7 +643,6 @@ function applyFilterStyles() {
     if (campo !== 'all' && subject.campo !== campo) visible = false;
     if (q && !subject.name.toLowerCase().includes(q)) visible = false;
     
-    // Filtro Inversión (Qué cursar)
     if (showOnlyEnabled && (!isSubjectEnabled(subject.id) || state.approved.has(subject.id))) {
        visible = false;
     }
@@ -806,7 +812,10 @@ function runSimulador() {
     return;
   }
 
-  container.innerHTML = selected.map(s => `
+  // Texto descriptivo en el simulador
+  let html = `<p class="text-[11px] text-slate-500 font-medium mb-3">A continuación, se detalla tu plan de ruta sugerido. Estas materias están libres de trabas y priorizan destrabar contenidos de años superiores para evitar estancamientos en la carrera:</p>`;
+
+  html += selected.map(s => `
     <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm">
       <div>
         <p class="text-sm font-black text-slate-800 leading-tight">${s.name}</p>
@@ -815,6 +824,8 @@ function runSimulador() {
       <button onclick="toggleApproved('${s.id}'); closeSimulador();" class="text-[10px] uppercase font-bold bg-blue-100 text-blue-700 border border-blue-200 px-2 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition shadow-sm">Cursar</button>
     </div>
   `).join('');
+  
+  container.innerHTML = html;
 }
 
 /* ── Exportar a Imagen ── */
@@ -830,6 +841,7 @@ function exportMap() {
 
   const area = document.getElementById('export-area');
   const main = area.querySelector('main');
+  const watermark = document.getElementById('export-watermark');
   
   const origAreaWidth = area.style.width;
   const origMainOverflow = main.style.overflow;
@@ -842,6 +854,10 @@ function exportMap() {
   main.style.maxWidth = 'none';
   main.style.width = fullWidth + 'px';
   
+  // Mostrar la marca de agua y ponerle la fecha actual
+  document.getElementById('export-date').textContent = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
+  watermark.classList.remove('hidden');
+
   const isMobile = window.innerWidth < 768;
 
   setTimeout(() => {
@@ -856,6 +872,7 @@ function exportMap() {
       main.style.overflow = origMainOverflow;
       main.style.maxWidth = origMainMaxWidth;
       main.style.width = origMainWidth;
+      watermark.classList.add('hidden'); // Ocultar de nuevo
       window.scrollTo(scrollX, scrollY);
       
       const link = document.createElement('a');
@@ -871,6 +888,7 @@ function exportMap() {
       main.style.overflow = origMainOverflow;
       main.style.maxWidth = origMainMaxWidth;
       main.style.width = origMainWidth;
+      watermark.classList.add('hidden');
       window.scrollTo(scrollX, scrollY);
       btn.innerHTML = originalHTML;
       btn.disabled = false;
