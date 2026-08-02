@@ -15,10 +15,7 @@
           colors: {
             cfg: '#1e3a5f',
             cfe: '#7c3d11',
-            cpd: '#14532d',
-            approved: '#0e7490',
-            enabled: '#1d4ed8',
-            locked: '#374151'
+            cpd: '#14532d'
           }
         }
       }
@@ -31,86 +28,38 @@
 
   <style>
     /* ============================================================
-       DESIGN TOKENS & CUSTOM CSS
+       CUSTOM CSS & ANIMACIONES
     ============================================================ */
-    :root {
-      --col-cfg:  #1e3a5f;
-      --col-cfe:  #7c3d11;
-      --col-cpd:  #14532d;
-      --col-approved:  #0e7490;
-      --col-enabled:   #1d4ed8;
-      --col-locked:    #374151;
-      --radius:        0.5rem;
-      --shadow:        0 2px 8px rgba(0,0,0,.12);
-    }
-
     body {
       font-family: 'Inter', system-ui, sans-serif;
       scroll-behavior: smooth;
     }
 
-    .year-col { min-width: 240px; }
+    .year-col { min-width: 260px; max-width: 280px; }
 
-    /* ── Tarjetas ── */
+    /* ── Tarjetas Minimalistas ── */
     .subject-card {
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      transition: transform .15s, box-shadow .15s, opacity .3s ease;
+      transition: transform .15s ease, box-shadow .15s ease, opacity .3s ease, border-color .2s ease;
       cursor: pointer;
-      position: relative;
     }
-    .subject-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.18); }
-
-    .state-locked   { background: var(--col-locked); opacity: .65; cursor: not-allowed; }
-    .state-enabled  { background: var(--col-enabled); opacity: 1; }
-    .state-approved { background: var(--col-approved); opacity: 1; }
+    .subject-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
 
     .filter-active  { opacity: 1 !important; }
-    .filter-dimmed  { opacity: .15 !important; }
+    .filter-dimmed  { opacity: .20 !important; }
 
     /* ── Animación Desbloqueo ── */
     @keyframes unlockPop {
       0% { transform: scale(1); }
-      50% { transform: scale(1.05); box-shadow: 0 0 20px var(--col-enabled); }
+      50% { transform: scale(1.04); box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
       100% { transform: scale(1); }
     }
-    .animate-unlock {
-      animation: unlockPop 0.5s ease-out;
-    }
-
-    /* ── SVG Líneas ── */
-    #lines-svg {
-      position: absolute; top: 0; left: 0;
-      pointer-events: none; /* CRÍTICO: No bloquea clics en las tarjetas */
-      z-index: 0;
-      width: 100%; height: 100%;
-      overflow: visible;
-    }
-    .corr-line { 
-      stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 5 4; fill: none; opacity: .4; transition: all 0.2s; cursor: help; 
-      pointer-events: auto; /* CRÍTICO: Solo la línea captura el mouse para el tooltip */
-    }
-    .corr-line:hover { stroke: #f59e0b; opacity: 1; stroke-width: 3; }
-    .corr-line.active { stroke: #06b6d4; opacity: .8; stroke-dasharray: none; }
-    
-    .dark .corr-line { stroke: #475569; }
-    .dark .corr-line.active { stroke: #22d3ee; }
+    .animate-unlock { animation: unlockPop 0.5s ease-out; }
 
     /* ── Barra Progreso ── */
-    #progress-bar {
-      transition: width .4s ease;
-    }
+    #progress-bar { transition: width .5s cubic-bezier(0.4, 0, 0.2, 1); }
 
     /* ── Modales ── */
-    .modal-backdrop {
-      background: rgba(0,0,0,.6);
-      backdrop-filter: blur(3px);
-    }
-
-    /* ── Badges Campos ── */
-    .badge-cfg { background: var(--col-cfg); }
-    .badge-cfe { background: var(--col-cfe); }
-    .badge-cpd { background: var(--col-cpd); }
+    .modal-backdrop { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); }
 
     /* Custom Scrollbar */
     ::-webkit-scrollbar { height: 8px; width: 8px; }
@@ -128,11 +77,14 @@
   <div id="onboarding-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
     <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md p-6 shadow-2xl text-center">
       <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
-        <span class="text-3xl">🗺️</span>
+        <span class="text-3xl">🚀</span>
       </div>
-      <h2 class="text-2xl font-black mb-2 dark:text-white">Bienvenido al Mapa Curricular</h2>
+      <h2 class="text-2xl font-black mb-2 dark:text-white">¡Bienvenido al Mapa Curricular!</h2>
       <p class="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
-        Hacé clic en las materias habilitadas (azul) para marcarlas como aprobadas (cian). Las líneas te mostrarán qué necesitas cursar para desbloquear el siguiente nivel.<br><br>Podes filtrar por año, por campo, simular tus próximas cursadas y exportar tu progreso.
+        El diseño fue optimizado para que planifiques tu cursada fácilmente.<br><br>
+        ✅ <b>Aprobadas:</b> Hacé clic en las materias para marcarlas.<br>
+        🟢 <b>Habilitadas:</b> Listas para cursar según tus aprobadas.<br>
+        🔒 <b>Bloqueadas:</b> En la tarjeta te indicará qué requisitos te faltan para habilitarla.
       </p>
       <button onclick="closeOnboarding()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition">
         ¡Entendido, a cursar!
@@ -148,108 +100,105 @@
       <h2 class="text-lg font-black dark:text-white flex items-center gap-2">
         <span>🔮</span> Simulador de Cursada
       </h2>
-      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-4">Ingresá cuántas materias querés hacer el próximo cuatrimestre y te sugerimos opciones habilitadas.</p>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-4">Ingresá cuántas materias querés hacer el próximo ciclo y te sugerimos opciones habilitadas óptimas.</p>
       
       <div class="flex items-center gap-3 mb-4">
         <input type="number" id="sim-qty" value="3" min="1" max="10" class="w-20 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
-        <button onclick="runSimulador()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition">Sugerir</button>
+        <button onclick="runSimulador()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition">Generar Plan</button>
       </div>
       
-      <div id="sim-results" class="space-y-2 mt-4 max-h-60 overflow-y-auto"></div>
+      <div id="sim-results" class="space-y-2 mt-4 max-h-60 overflow-y-auto pr-1"></div>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════
-       HEADER
+       HEADER PRINCIPAL
   ══════════════════════════════════════════ -->
   <header class="bg-[#1e3a5f] dark:bg-slate-950 text-white py-4 px-6 shadow-lg relative z-30 transition-colors">
     <div class="max-w-screen-xl mx-auto flex flex-col md:flex-row items-center gap-4">
       <div class="flex-1 text-center md:text-left">
-        <p class="text-xs uppercase tracking-widest text-blue-300 font-semibold">ISFD N°100 · DGCyE</p>
-        <h1 class="text-xl sm:text-2xl font-black mt-0.5 flex items-center justify-center md:justify-start gap-2">
-          Mapa Curricular <span class="font-light hidden sm:inline">— Economía</span>
+        <p class="text-xs uppercase tracking-widest text-blue-300 font-semibold mb-1">ISFD N°100 · DGCyE</p>
+        <h1 class="text-2xl sm:text-3xl font-black mt-0.5 flex items-center justify-center md:justify-start gap-2 tracking-tight">
+          Mapa Curricular <span class="font-light text-blue-200 hidden sm:inline">Economía</span>
         </h1>
       </div>
       
       <!-- Panel de Estadísticas Header -->
-      <div class="flex items-center gap-6 bg-black/20 rounded-xl px-4 py-2">
+      <div class="flex items-center gap-6 bg-black/30 rounded-xl px-5 py-2.5 backdrop-blur-sm border border-white/10">
         <div class="text-right">
-          <span class="text-2xl font-black text-cyan-300" id="pct-label">0%</span>
-          <p class="text-[10px] text-blue-200 uppercase tracking-wide">Progreso</p>
+          <span class="text-2xl font-black text-cyan-400" id="pct-label">0%</span>
+          <p class="text-[10px] text-blue-200 uppercase tracking-widest font-bold">Progreso</p>
         </div>
         <div class="w-px h-8 bg-white/20"></div>
         <div class="text-right">
-          <span class="text-2xl font-black text-amber-300" id="hs-count">0</span>
-          <p class="text-[10px] text-blue-200 uppercase tracking-wide">Horas Aprob.</p>
+          <span class="text-2xl font-black text-amber-400" id="hs-count">0</span>
+          <p class="text-[10px] text-blue-200 uppercase tracking-widest font-bold">Horas</p>
         </div>
         <div class="w-px h-8 bg-white/20"></div>
         <button onclick="toggleDarkMode()" class="p-2 bg-white/10 hover:bg-white/20 rounded-full transition" title="Alternar Modo Oscuro">
-          <span id="dark-icon">🌙</span>
+          <span id="dark-icon" class="text-lg">🌙</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- ══════════════════════════════════════════
-       CONTROLES AVANZADOS
+       BARRA DE HERRAMIENTAS
   ══════════════════════════════════════════ -->
-  <div class="sticky top-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
-    <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-wrap items-center gap-x-4 gap-y-3">
+  <div class="sticky top-0 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+    <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
 
-      <!-- Búsqueda -->
-      <div class="relative min-w-[200px] flex-1 sm:flex-none">
-        <input type="text" id="search-input" placeholder="🔍 Buscar materia..." class="w-full pl-3 pr-3 py-1.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 outline-none dark:text-white transition-colors" onkeyup="applyFilterStyles()">
+      <!-- Búsqueda y Filtros de Campo -->
+      <div class="flex flex-wrap items-center gap-3 flex-1">
+        <div class="relative w-full sm:w-64">
+          <input type="text" id="search-input" placeholder="🔍 Buscar por nombre..." class="w-full pl-4 pr-4 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 outline-none dark:text-white transition-colors" onkeyup="applyFilterStyles()">
+        </div>
+
+        <div class="w-px h-6 bg-slate-300 dark:bg-slate-700 hidden lg:block"></div>
+
+        <div class="flex gap-1.5" id="field-filters">
+          <button onclick="applyFilter('all')" id="btn-all" class="filter-btn active px-4 py-1.5 rounded-lg text-xs font-bold border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 transition">Todos</button>
+          <button onclick="applyFilter('CFG')" id="btn-CFG" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-[#1e3a5f] hover:bg-blue-800 transition">CFG</button>
+          <button onclick="applyFilter('CFE')" id="btn-CFE" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-[#7c3d11] hover:bg-orange-800 transition">CFE</button>
+          <button onclick="applyFilter('CPD')" id="btn-CPD" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-[#14532d] hover:bg-green-800 transition">CPD</button>
+        </div>
       </div>
 
-      <div class="w-px h-6 bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
-
-      <!-- Vistas -->
-      <div class="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 border border-slate-200 dark:border-slate-700">
-        <button onclick="setViewMode('year')" id="btn-view-year" class="px-3 py-1 text-xs font-bold rounded-md bg-white dark:bg-slate-600 shadow-sm transition">Por Año</button>
-        <button onclick="setViewMode('campo')" id="btn-view-campo" class="px-3 py-1 text-xs font-bold rounded-md text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition">Por Campo</button>
-      </div>
-
-      <!-- Filtros Campo -->
-      <div class="flex gap-1" id="field-filters">
-        <button onclick="applyFilter('all')" id="btn-all" class="filter-btn active px-3 py-1 rounded-full text-xs font-bold border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 transition">Todos</button>
-        <button onclick="applyFilter('CFG')" id="btn-CFG" class="filter-btn px-3 py-1 rounded-full text-xs font-bold text-white badge-cfg hover:opacity-80 transition">CFG</button>
-        <button onclick="applyFilter('CFE')" id="btn-CFE" class="filter-btn px-3 py-1 rounded-full text-xs font-bold text-white badge-cfe hover:opacity-80 transition">CFE</button>
-        <button onclick="applyFilter('CPD')" id="btn-CPD" class="filter-btn px-3 py-1 rounded-full text-xs font-bold text-white badge-cpd hover:opacity-80 transition">CPD</button>
-      </div>
-      
-      <div class="flex-1"></div>
-
-      <!-- Herramientas Extra -->
+      <!-- Herramientas de Acción -->
       <div class="flex items-center gap-2">
-        <!-- Toggle Modo Habilitadas -->
-        <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+        <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700 dark:text-slate-300 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 px-3 py-2 rounded-xl border border-blue-200 dark:border-blue-800 transition">
           <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
           <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
-          ¿Qué cursar?
+          Modo Inscripción
         </label>
         
-        <button onclick="openSimulador()" class="text-xs bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 px-3 py-1.5 rounded-lg font-bold hover:bg-indigo-200 transition">🔮 Simulador</button>
-        <button onclick="exportMap()" class="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-200 px-3 py-1.5 rounded-lg font-bold hover:bg-emerald-200 transition">📸 Exportar</button>
-        <button onclick="resetAll()" class="text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 px-3 py-1.5 rounded-lg font-bold transition">↺ Reset</button>
+        <div class="flex bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-700">
+          <button onclick="setViewMode('year')" id="btn-view-year" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-600 shadow-sm text-slate-800 dark:text-white transition">Por Año</button>
+          <button onclick="setViewMode('campo')" id="btn-view-campo" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition">Por Campo</button>
+        </div>
+        
+        <button onclick="openSimulador()" class="text-xs bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300 px-3 py-2 rounded-xl font-bold hover:bg-indigo-200 transition" title="Simulador de cursada">🔮</button>
+        <button onclick="exportMap()" id="btn-export" class="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 px-3 py-2 rounded-xl font-bold hover:bg-emerald-200 transition flex items-center gap-1">📸 <span class="hidden sm:inline">Exportar</span></button>
+        <button onclick="resetAll()" class="text-xs text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 px-3 py-2 rounded-xl font-bold transition" title="Reiniciar progreso">↺</button>
       </div>
 
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════
-       LEYENDA & BARRA PROGRESO MINI
+       LEYENDA & PROGRESS BAR
   ══════════════════════════════════════════ -->
-  <div class="max-w-screen-xl mx-auto px-4 pt-4 pb-1 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-    <div class="flex flex-wrap gap-3 items-center">
-      <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#374151] inline-block"></span>Bloqueada</span>
-      <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#1d4ed8] inline-block"></span>Habilitada</span>
-      <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#0e7490] inline-block"></span>Aprobada</span>
+  <div class="max-w-screen-xl mx-auto px-4 pt-5 pb-2 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+    <div class="flex flex-wrap gap-4 text-xs font-bold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 px-4 py-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+      <span class="flex items-center gap-1.5"><span class="text-base">✅</span> Aprobada</span>
+      <span class="flex items-center gap-1.5"><span class="text-base">🟢</span> Habilitada</span>
+      <span class="flex items-center gap-1.5"><span class="text-base opacity-70">🔒</span> Bloqueada</span>
     </div>
     
-    <div class="flex items-center gap-3 w-full md:w-64">
-      <span id="approved-count" class="font-bold">0</span>/<span id="total-count">0</span>
-      <div class="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-2 overflow-hidden">
-        <div id="progress-bar" class="h-full bg-gradient-to-r from-cyan-600 to-cyan-400" style="width:0%"></div>
+    <div class="flex items-center gap-4 w-full md:w-80 bg-white dark:bg-slate-800 px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+      <span class="text-xs font-black text-slate-500 dark:text-slate-400 whitespace-nowrap"><span id="approved-count" class="text-blue-600 dark:text-blue-400 text-sm">0</span> / <span id="total-count">0</span> mat.</span>
+      <div class="flex-1 bg-slate-100 dark:bg-slate-900 rounded-full h-3 overflow-hidden inset-shadow-sm border border-slate-200 dark:border-slate-700">
+        <div id="progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-cyan-400" style="width:0%"></div>
       </div>
     </div>
   </div>
@@ -258,9 +207,8 @@
        GRILLA CURRICULAR
   ══════════════════════════════════════════ -->
   <div id="export-area" class="bg-slate-50 dark:bg-slate-900 transition-colors">
-    <main class="max-w-screen-xl mx-auto px-4 pb-16 pt-2 overflow-x-auto relative min-h-[60vh]">
-      <svg id="lines-svg" aria-hidden="false"></svg>
-      <div class="flex gap-4 min-w-max relative z-10" id="grid-container">
+    <main class="max-w-screen-xl mx-auto px-4 pb-16 pt-4 overflow-x-auto min-h-[60vh]">
+      <div class="flex gap-6 min-w-max" id="grid-container">
         <!-- Generado por JS -->
       </div>
     </main>
@@ -270,42 +218,46 @@
        MODAL DE INFORMACIÓN MATERIA
   ══════════════════════════════════════════ -->
   <div id="modal-backdrop" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden" onclick="closeModal(event)">
-    <div id="modal-box" class="bg-white dark:bg-slate-800 w-full max-w-lg shadow-2xl rounded-2xl overflow-hidden" onclick="event.stopPropagation()">
-      <div id="modal-header" class="p-5 text-white">
-        <div class="flex justify-between items-start">
+    <div id="modal-box" class="bg-white dark:bg-slate-800 w-full max-w-lg shadow-2xl rounded-2xl overflow-hidden transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <div id="modal-header" class="p-6 text-white relative overflow-hidden">
+        <div class="absolute inset-0 bg-black/10"></div>
+        <div class="relative z-10 flex justify-between items-start">
           <div>
-            <span id="modal-badge" class="text-[10px] uppercase tracking-widest font-bold bg-white/20 px-2 py-0.5 rounded-full"></span>
-            <h2 id="modal-title" class="text-xl font-black mt-2 leading-tight"></h2>
+            <span id="modal-badge" class="text-[10px] uppercase tracking-widest font-black bg-white/20 px-3 py-1 rounded-full shadow-sm"></span>
+            <h2 id="modal-title" class="text-2xl font-black mt-3 leading-tight tracking-tight"></h2>
           </div>
-          <button onclick="closeModal()" class="text-white/70 hover:text-white text-2xl leading-none ml-3">✕</button>
+          <button onclick="closeModal()" class="text-white/70 hover:text-white bg-black/20 hover:bg-black/40 rounded-full w-8 h-8 flex items-center justify-center transition ml-4">✕</button>
         </div>
       </div>
-      <div class="p-5 space-y-4 text-sm text-slate-700 dark:text-slate-300">
-        <div class="grid grid-cols-3 gap-3 text-center">
-          <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-2 border border-slate-100 dark:border-slate-700">
-            <p class="text-[10px] uppercase text-slate-400 font-semibold">Formato</p>
-            <p class="font-bold mt-0.5 dark:text-white" id="modal-formato">—</p>
+      <div class="p-6 space-y-5 text-sm text-slate-700 dark:text-slate-300">
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
+            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Formato</p>
+            <p class="font-black mt-1 dark:text-white text-base" id="modal-formato">—</p>
           </div>
-          <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-2 border border-slate-100 dark:border-slate-700">
-            <p class="text-[10px] uppercase text-slate-400 font-semibold">Régimen</p>
-            <p class="font-bold mt-0.5 dark:text-white" id="modal-regimen">—</p>
+          <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
+            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Régimen</p>
+            <p class="font-black mt-1 dark:text-white text-base" id="modal-regimen">—</p>
           </div>
-          <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-2 border border-slate-100 dark:border-slate-700">
-            <p class="text-[10px] uppercase text-slate-400 font-semibold">Carga</p>
-            <p class="font-bold mt-0.5 dark:text-white" id="modal-hs">—</p>
+          <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
+            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Carga</p>
+            <p class="font-black mt-1 dark:text-white text-base" id="modal-hs">—</p>
           </div>
         </div>
+        
+        <div id="modal-corr-section" class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl p-4">
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-amber-700 dark:text-amber-500 mb-1.5 flex items-center gap-1"><span>🔑</span> Requisitos para cursar</h3>
+          <p id="modal-corr" class="text-sm font-bold text-amber-900 dark:text-amber-200"></p>
+        </div>
+
         <div>
-          <h3 class="text-xs uppercase tracking-wide font-bold text-slate-400 dark:text-slate-500 mb-1">Finalidades formativas</h3>
-          <p id="modal-finalidades" class="leading-relaxed text-xs"></p>
+          <h3 class="text-xs uppercase tracking-widest font-black text-slate-400 dark:text-slate-500 mb-2 border-b border-slate-100 dark:border-slate-700 pb-1">Finalidad Formativa</h3>
+          <p id="modal-finalidades" class="leading-relaxed text-sm"></p>
         </div>
+        
         <div>
-          <h3 class="text-xs uppercase tracking-wide font-bold text-slate-400 dark:text-slate-500 mb-1">Núcleos de contenido</h3>
-          <ul id="modal-contenidos" class="list-disc list-inside space-y-0.5 text-xs"></ul>
-        </div>
-        <div id="modal-corr-section" class="pt-2 border-t border-slate-100 dark:border-slate-700">
-          <h3 class="text-xs uppercase tracking-wide font-bold text-slate-400 dark:text-slate-500 mb-1">Requisitos para cursar</h3>
-          <p id="modal-corr" class="text-xs font-medium text-amber-600 dark:text-amber-400"></p>
+          <h3 class="text-xs uppercase tracking-widest font-black text-slate-400 dark:text-slate-500 mb-2 border-b border-slate-100 dark:border-slate-700 pb-1">Núcleos de Contenido</h3>
+          <ul id="modal-contenidos" class="list-none space-y-1.5 text-sm"></ul>
         </div>
       </div>
     </div>
@@ -313,7 +265,7 @@
 
 <script>
 /* ─────────────────────────────────────────────
-   DATOS DEL PLAN DE ESTUDIOS (Completo)
+   DATOS DEL PLAN DE ESTUDIOS
 ───────────────────────────────────────────── */
 const SUBJECTS = [
   // 1ER AÑO
@@ -346,7 +298,7 @@ const SUBJECTS = [
   { id: 'problemas-filosoficos', name: 'Problemas filosóficos de la educación', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Reflexionar sobre los fundamentos filosóficos de la educación.', contenidos: ['Epistemología y educación','Ética docente y deontología profesional','Filosofía política y educación democrática','El problema de la autoridad pedagógica'] },
   { id: 'trayectorias-jovenes', name: 'Trayectorias educativas de jóvenes y adultos', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32, prereqs: ['esi', 'cultura-digital'], finalidades: 'Analizar las trayectorias educativas en los contextos actuales.', contenidos: ['Juventudes: diversidad de trayectorias vitales','Educación de jóvenes y adultos: marcos normativos','Dispositivos institucionales de acompañamiento','TIC y educación de adultos'] },
   { id: 'economia-politica-ii', name: 'Economía Política II', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['intro-economia-politica', 'matematica-cs-economicas'], finalidades: 'Avanzar en el estudio de las economías capitalistas contemporáneas.', contenidos: ['Financiarización y capital especulativo','Economía internacional: teorías y debates','Mundialización del capital y empresas transnacionales','Crisis del neoliberalismo y alternativas'] },
-  { id: 'sistemas-administrativos', name: 'Sistemas Administrativos', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['teoria-organizaciones', 'sic-i'], finalidades: 'Estudiar los sistemas administrativos, flujos de información y control interno.', contenidos: ['Sistemas y procedimientos administrativos','Manuales de organización y funciones','Control interno: concepto y componentes','Gestión documental y flujos de trabajo'] },
+  { id: 'sistemas-administrativos', name: 'Sistemas Administrativos', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['teoria-organizaciones', 'sic-i'], finalidades: 'Estudiar los sistemas administrativos, flujos de información y control interno.', contenidos: ['Sistemas y procedimientos administrativos','Manuales de organización y funciones','Control interno: concepto y components','Gestión documental y flujos de trabajo'] },
   { id: 'administracion-financiera', name: 'Administración financiera', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['matematica-cs-economicas'], finalidades: 'Desarrollar competencias para el análisis financiero y toma de decisiones.', contenidos: ['Valor tiempo del dinero y matemática financiera','Análisis del riesgo y la rentabilidad','Presupuesto de capital y evaluación de proyectos','Estructura de capital y política de dividendos'] },
   { id: 'analisis-estados-contables', name: 'Análisis de Estados Contables', year: 3, campo: 'CFE', formato: 'Taller', regimen: 'Anual', hs: 64, prereqs: ['sic-ii'], finalidades: 'Desarrollar la capacidad de interpretar y analizar estados contables.', contenidos: ['Lectura crítica de estados contables','Ratios e indicadores financieros','Análisis horizontal y vertical','Casos reales de empresas argentinas'] },
   { id: 'didactica-cs-economicas', name: 'Didáctica de las Ciencias Económicas', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['intro-economia-politica', 'teoria-organizaciones', 'sic-i', 'didactica-curriculum'], finalidades: 'Articular los saberes disciplinares con la Didáctica para diseñar propuestas de enseñanza.', contenidos: ['Transposición didáctica en Ciencias Económicas','Diseño de secuencias didácticas','Recursos y materiales para la enseñanza','Evaluación de aprendizajes en Ciencias Económicas'] },
@@ -373,19 +325,18 @@ const SUBJECTS = [
 const state = {
   approved: new Set(),
   activeFilter: 'all',
-  viewMode: 'year', // 'year' | 'campo'
+  viewMode: 'year', 
   searchQuery: '',
   totalHs: 0
 };
 
 const CAMPO_COLORS = {
-  CFG: { bg: '#1e3a5f', label: 'CFG', title: 'Formación General' },
-  CFE: { bg: '#7c3d11', label: 'CFE', title: 'Formación Específica' },
-  CPD: { bg: '#14532d', label: 'CPD', title: 'Práctica Docente' },
+  CFG: { bg: 'bg-[#1e3a5f]', label: 'CFG', title: 'Formación General' },
+  CFE: { bg: 'bg-[#7c3d11]', label: 'CFE', title: 'Formación Específica' },
+  CPD: { bg: 'bg-[#14532d]', label: 'CPD', title: 'Práctica Docente' },
 };
 
 function init() {
-  // Config Modo Oscuro inicial
   if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
     document.documentElement.classList.add('dark');
   }
@@ -393,16 +344,16 @@ function init() {
   const darkIcon = document.getElementById('dark-icon');
   if (darkIcon) darkIcon.textContent = isDark ? '☀️' : '🌙';
   
-  // Cargar Aprobadas
   const saved = localStorage.getItem('isfd100_aprobadas');
   if (saved) state.approved = new Set(JSON.parse(saved));
   
-  // Horas totales
   state.totalHs = SUBJECTS.reduce((acc, s) => acc + s.hs, 0);
 
-  // Onboarding
   if (!localStorage.getItem('isfd100_onboarding')) {
     document.getElementById('onboarding-modal').classList.remove('hidden');
+    setTimeout(() => {
+      document.getElementById('onboarding-modal').querySelector('div').classList.add('scale-100');
+    }, 10);
   }
 
   renderGrid();
@@ -412,10 +363,7 @@ function init() {
   document.getElementById('search-input').addEventListener('input', (e) => {
     state.searchQuery = e.target.value.toLowerCase();
     applyFilterStyles();
-    drawLines();
   });
-
-  requestAnimationFrame(() => drawLines());
 }
 
 function saveState() {
@@ -427,17 +375,15 @@ function saveState() {
 ───────────────────────────────────────────── */
 function setViewMode(mode) {
   state.viewMode = mode;
-  document.getElementById('btn-view-year').className = `px-3 py-1 text-xs font-bold rounded-md transition ${mode==='year'?'bg-white dark:bg-slate-600 shadow-sm text-slate-800 dark:text-white':'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'}`;
-  document.getElementById('btn-view-campo').className = `px-3 py-1 text-xs font-bold rounded-md transition ${mode==='campo'?'bg-white dark:bg-slate-600 shadow-sm text-slate-800 dark:text-white':'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'}`;
+  document.getElementById('btn-view-year').className = `px-3 py-1.5 text-xs font-bold rounded-lg transition ${mode==='year'?'bg-white dark:bg-slate-600 shadow-sm text-slate-800 dark:text-white':'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'}`;
+  document.getElementById('btn-view-campo').className = `px-3 py-1.5 text-xs font-bold rounded-lg transition ${mode==='campo'?'bg-white dark:bg-slate-600 shadow-sm text-slate-800 dark:text-white':'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'}`;
   
-  // Ocultar filtros de campo si estamos en vista por campo
   document.getElementById('field-filters').style.opacity = mode === 'campo' ? '0.3' : '1';
   document.getElementById('field-filters').style.pointerEvents = mode === 'campo' ? 'none' : 'auto';
   if(mode === 'campo' && state.activeFilter !== 'all') applyFilter('all');
 
   renderGrid();
   updateAllCards();
-  requestAnimationFrame(() => drawLines());
 }
 
 function renderGrid() {
@@ -451,8 +397,8 @@ function renderGrid() {
 
     [1, 2, 3, 4].forEach(yr => {
       const col = document.createElement('div');
-      col.className = 'year-col flex flex-col gap-3';
-      col.innerHTML = `<div class="border-bottom border-b-4 ${yearColors[yr-1]} py-2 px-2 font-black text-sm text-slate-700 dark:text-slate-300 mb-1">${yr}er Año</div>`;
+      col.className = 'year-col flex flex-col gap-4';
+      col.innerHTML = `<div class="border-b-4 ${yearColors[yr-1]} pb-2 mb-2 font-black text-lg text-slate-800 dark:text-slate-100 flex items-center justify-between"><span>${yr}er Año</span> <span class="text-xs font-bold bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded-md text-slate-500">${byYear[yr].length} Mat.</span></div>`;
       byYear[yr].forEach(s => col.appendChild(createCard(s)));
       container.appendChild(col);
     });
@@ -462,27 +408,33 @@ function renderGrid() {
     
     ['CFG', 'CFE', 'CPD'].forEach(c => {
       const col = document.createElement('div');
-      col.className = 'year-col flex flex-col gap-3';
-      col.innerHTML = `<div class="border-bottom border-b-4 py-2 px-2 font-black text-sm text-slate-700 dark:text-slate-300 mb-1" style="border-color:${CAMPO_COLORS[c].bg}">${CAMPO_COLORS[c].title}</div>`;
+      col.className = 'year-col flex flex-col gap-4';
+      col.innerHTML = `<div class="border-b-4 pb-2 mb-2 font-black text-lg text-slate-800 dark:text-slate-100" style="border-color:${c==='CFG'?'#1e3a5f':c==='CFE'?'#7c3d11':'#14532d'}">${CAMPO_COLORS[c].title}</div>`;
       byCampo[c].forEach(s => col.appendChild(createCard(s)));
       container.appendChild(col);
     });
   }
 }
 
+/* ─────────────────────────────────────────────
+   NUEVO DISEÑO DE TARJETA (Sin Flechas)
+───────────────────────────────────────────── */
 function createCard(subject) {
   const card = document.createElement('div');
-  
-  // CRÍTICO: Eliminamos el 'bg-white' que rompía el color de estado
-  card.className = 'subject-card p-3';
+  card.className = 'subject-card p-4 flex flex-col h-full bg-white dark:bg-slate-800 border-2 rounded-xl transition-all';
   card.id = `card-${subject.id}`;
   
   card.innerHTML = `
-    <span class="text-[9px] uppercase tracking-widest font-bold text-white/80">${CAMPO_COLORS[subject.campo].label}</span>
-    <p class="text-white text-xs font-bold leading-snug mt-0.5 pr-5">${subject.name}</p>
-    <div class="flex items-center justify-between mt-3">
-      <span class="text-white/70 text-[10px] font-medium">${subject.regimen} · ${subject.hs}hs</span>
-      <button onclick="openModal(event, '${subject.id}')" class="info-btn w-6 h-6 rounded-full bg-white/20 hover:bg-white/40 text-white text-[11px] font-black flex items-center justify-center transition" title="Ver información">i</button>
+    <div class="flex justify-between items-start mb-3">
+      <span class="${CAMPO_COLORS[subject.campo].bg} px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-sm">${CAMPO_COLORS[subject.campo].label}</span>
+      <span class="status-icon text-lg leading-none filter drop-shadow-sm"></span>
+    </div>
+    <h3 class="font-black text-[15px] leading-tight text-slate-800 dark:text-slate-100 mb-1 pr-2">${subject.name}</h3>
+    <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-4">${subject.regimen} · ${subject.hs}hs</p>
+    
+    <div class="mt-auto pt-3 border-t border-slate-100 dark:border-slate-700/60 flex justify-between items-center bg-transparent">
+      <span class="status-text transition-colors duration-200"></span>
+      <button onclick="openModal(event, '${subject.id}')" class="info-btn w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 text-xs font-black flex items-center justify-center transition" title="Ver información de la materia">i</button>
     </div>
   `;
   card.addEventListener('click', (e) => {
@@ -493,7 +445,7 @@ function createCard(subject) {
 }
 
 /* ─────────────────────────────────────────────
-   LOGICA PRINCIPAL
+   LOGICA & ACTUALIZACIÓN DE ESTADOS DOM
 ───────────────────────────────────────────── */
 function toggleApproved(id) {
   const subject = SUBJECTS.find(s => s.id === id);
@@ -502,7 +454,6 @@ function toggleApproved(id) {
   const isEnabled = isSubjectEnabled(id);
   const isApproved = state.approved.has(id);
 
-  // Capturar estado previo para animaciones
   const previouslyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
 
   if (isApproved) {
@@ -520,9 +471,7 @@ function toggleApproved(id) {
   saveState();
   updateAllCards();
   updateProgress();
-  drawLines();
 
-  // Disparar animación "pop" en materias recién habilitadas
   if (!isApproved) {
     const currentlyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
     currentlyEnabled.forEach(newId => {
@@ -530,7 +479,7 @@ function toggleApproved(id) {
         const card = document.getElementById(`card-${newId}`);
         if(card) {
           card.classList.remove('animate-unlock');
-          void card.offsetWidth; // trigger reflow
+          void card.offsetWidth; 
           card.classList.add('animate-unlock');
         }
       }
@@ -548,18 +497,41 @@ function updateAllCards() {
   SUBJECTS.forEach(subject => {
     const card = document.getElementById(`card-${subject.id}`);
     if (!card) return;
-    card.classList.remove('state-locked', 'state-enabled', 'state-approved');
+    
+    const iconEl = card.querySelector('.status-icon');
+    const textEl = card.querySelector('.status-text');
+    
+    // Limpiar clases de estados anteriores
+    card.classList.remove(
+      'border-slate-200', 'bg-slate-50', 'dark:border-slate-700', 'dark:bg-slate-800/40', 'opacity-60',
+      'border-blue-400', 'bg-blue-50', 'dark:border-blue-500/50', 'dark:bg-blue-900/20',
+      'border-cyan-500', 'bg-cyan-50', 'dark:border-cyan-500/50', 'dark:bg-cyan-900/20'
+    );
 
     if (state.approved.has(subject.id)) {
-      card.classList.add('state-approved');
-      card.title = `${subject.name} — Aprobada`;
-    } else if (isSubjectEnabled(subject.id)) {
-      card.classList.add('state-enabled');
-      card.title = `${subject.name} — Habilitada para cursar`;
-    } else {
-      card.classList.add('state-locked');
-      const missing = subject.prereqs.filter(pid => !state.approved.has(pid)).map(pid => SUBJECTS.find(x=>x.id===pid).name);
-      card.title = `Bloqueada. Requiere: ${missing.join(', ')}`;
+      card.classList.add('border-cyan-500', 'bg-cyan-50', 'dark:border-cyan-500/50', 'dark:bg-cyan-900/20');
+      iconEl.innerHTML = '✅';
+      textEl.innerHTML = 'Aprobada';
+      textEl.className = 'status-text text-xs font-black text-cyan-700 dark:text-cyan-400 tracking-wide';
+      textEl.removeAttribute('title');
+    } 
+    else if (isSubjectEnabled(subject.id)) {
+      card.classList.add('border-blue-400', 'bg-blue-50', 'dark:border-blue-500/50', 'dark:bg-blue-900/20');
+      iconEl.innerHTML = '🟢';
+      textEl.innerHTML = 'Habilitada';
+      textEl.className = 'status-text text-xs font-black text-blue-700 dark:text-blue-400 tracking-wide';
+      textEl.removeAttribute('title');
+    } 
+    else {
+      card.classList.add('border-slate-200', 'bg-slate-50', 'dark:border-slate-700', 'dark:bg-slate-800/40', 'opacity-60');
+      iconEl.innerHTML = '🔒';
+      
+      const missingIds = subject.prereqs.filter(pid => !state.approved.has(pid));
+      const missingNames = missingIds.map(pid => SUBJECTS.find(x=>x.id===pid).name);
+      
+      textEl.innerHTML = `Req: ${missingIds.length} mat.`;
+      textEl.title = `Falta aprobar:\n• ${missingNames.join('\n• ')}`;
+      textEl.className = 'status-text text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate max-w-[140px] cursor-help border-b border-dashed border-slate-400';
     }
   });
   applyFilterStyles();
@@ -570,7 +542,6 @@ function applyFilter(campo) {
   document.querySelectorAll('#field-filters .filter-btn').forEach(btn => btn.classList.remove('ring-2', 'ring-offset-2', 'dark:ring-offset-slate-900', 'ring-blue-400'));
   document.getElementById(`btn-${campo}`).classList.add('ring-2', 'ring-offset-2', 'dark:ring-offset-slate-900', 'ring-blue-400');
   applyFilterStyles();
-  drawLines();
 }
 
 function applyFilterStyles() {
@@ -585,7 +556,11 @@ function applyFilterStyles() {
     let visible = true;
     if (campo !== 'all' && subject.campo !== campo) visible = false;
     if (q && !subject.name.toLowerCase().includes(q)) visible = false;
-    if (showOnlyEnabled && !card.classList.contains('state-enabled')) visible = false;
+    
+    // En modo Inscripción (Qué cursar), ocultamos las bloqueadas y las ya aprobadas
+    if (showOnlyEnabled && (!isSubjectEnabled(subject.id) || state.approved.has(subject.id))) {
+       visible = false;
+    }
 
     if (visible) {
       card.classList.remove('filter-dimmed');
@@ -611,60 +586,9 @@ function updateProgress() {
   document.getElementById('total-count').textContent = total;
   document.getElementById('hs-count').textContent = approvedHs;
 
-  // Lógica de Egreso
   if (pct === 100 && total > 0) {
     confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999 });
   }
-}
-
-/* ─────────────────────────────────────────────
-   DIBUJO DE LÍNEAS SVG CON TOOLTIPS
-───────────────────────────────────────────── */
-function drawLines() {
-  const svg = document.getElementById('lines-svg');
-  const container = document.getElementById('grid-container');
-  const containerRect = container.getBoundingClientRect();
-  svg.innerHTML = '';
-
-  const visibleIds = new Set(
-    SUBJECTS.filter(s => {
-      const card = document.getElementById(`card-${s.id}`);
-      return card && card.classList.contains('filter-active');
-    }).map(s => s.id)
-  );
-
-  SUBJECTS.forEach(subject => {
-    if (!visibleIds.has(subject.id)) return;
-    subject.prereqs.forEach(pid => {
-      if (!visibleIds.has(pid)) return;
-      const fromCard = document.getElementById(`card-${pid}`);
-      const toCard   = document.getElementById(`card-${subject.id}`);
-      if (!fromCard || !toCard) return;
-
-      const fromRect = fromCard.getBoundingClientRect();
-      const toRect   = toCard.getBoundingClientRect();
-
-      const x1 = fromRect.right - containerRect.left;
-      const y1 = fromRect.top - containerRect.top + fromRect.height / 2;
-      const x2 = toRect.left - containerRect.left;
-      const y2 = toRect.top - containerRect.top + toRect.height / 2;
-
-      const cp1x = x1 + (x2 - x1) * 0.4;
-      const cp2x = x1 + (x2 - x1) * 0.6;
-
-      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-      path.setAttribute('d', `M${x1},${y1} C${cp1x},${y1} ${cp2x},${y2} ${x2},${y2}`);
-      path.setAttribute('class', `corr-line ${state.approved.has(pid) ? 'active' : ''}`);
-
-      // Tooltip nativo en la línea
-      const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-      const fromName = SUBJECTS.find(x=>x.id===pid).name;
-      title.textContent = `Requisito: ${fromName} -> para cursar -> ${subject.name}`;
-      path.appendChild(title);
-
-      svg.appendChild(path);
-    });
-  });
 }
 
 /* ─────────────────────────────────────────────
@@ -675,9 +599,11 @@ function openModal(event, id) {
   const subject = SUBJECTS.find(s => s.id === id);
   if (!subject) return;
 
-  const cc = CAMPO_COLORS[subject.campo];
-  document.getElementById('modal-header').style.background = cc.bg;
-  document.getElementById('modal-badge').textContent = `${cc.label} — ${cc.title}`;
+  // Fondo del header modal
+  const ccBg = subject.campo === 'CFG' ? '#1e3a5f' : subject.campo === 'CFE' ? '#7c3d11' : '#14532d';
+  document.getElementById('modal-header').style.backgroundColor = ccBg;
+  
+  document.getElementById('modal-badge').textContent = `${CAMPO_COLORS[subject.campo].label} — ${CAMPO_COLORS[subject.campo].title}`;
   document.getElementById('modal-title').textContent = subject.name;
   document.getElementById('modal-formato').textContent = subject.formato;
   document.getElementById('modal-regimen').textContent = subject.regimen;
@@ -685,19 +611,33 @@ function openModal(event, id) {
   document.getElementById('modal-finalidades').textContent = subject.finalidades;
   
   const ul = document.getElementById('modal-contenidos');
-  ul.innerHTML = subject.contenidos.map(c => `<li>${c}</li>`).join('');
+  ul.innerHTML = subject.contenidos.map(c => `<li><span class="text-blue-500 mr-1">▪</span> ${c}</li>`).join('');
 
-  const corrText = subject.prereqs.length === 0 ? 'Sin correlativas previas.' : subject.prereqs.map(pid => SUBJECTS.find(x=>x.id===pid).name).join(' · ');
-  document.getElementById('modal-corr').textContent = corrText;
+  const corrText = subject.prereqs.length === 0 ? 'Libre (Sin requisitos previos)' : subject.prereqs.map(pid => `• ${SUBJECTS.find(x=>x.id===pid).name}`).join('<br>');
+  document.getElementById('modal-corr').innerHTML = corrText;
 
-  document.getElementById('modal-backdrop').classList.remove('hidden');
+  const backdrop = document.getElementById('modal-backdrop');
+  backdrop.classList.remove('hidden');
+  
+  // Pequeño timeout para animar entrada
+  setTimeout(() => {
+    document.getElementById('modal-box').classList.remove('scale-95');
+    document.getElementById('modal-box').classList.add('scale-100');
+  }, 10);
+  
   document.body.style.overflow = 'hidden';
 }
 
 function closeModal(event) {
   if (event && event.target !== document.getElementById('modal-backdrop') && event.type === 'click') return;
-  document.getElementById('modal-backdrop').classList.add('hidden');
-  document.body.style.overflow = '';
+  const box = document.getElementById('modal-box');
+  box.classList.remove('scale-100');
+  box.classList.add('scale-95');
+  
+  setTimeout(() => {
+    document.getElementById('modal-backdrop').classList.add('hidden');
+    document.body.style.overflow = '';
+  }, 150);
 }
 
 function closeOnboarding() {
@@ -714,36 +654,34 @@ function closeSimulador(e) {
 
 function runSimulador() {
   const qty = parseInt(document.getElementById('sim-qty').value) || 3;
-  // Buscar habilitadas que no estén aprobadas
   const enabled = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.approved.has(s.id));
-  
-  // Sugerir primero las de años inferiores para destrabar correlatividades
   enabled.sort((a,b) => a.year - b.year);
   const selected = enabled.slice(0, qty);
 
   const container = document.getElementById('sim-results');
   if(selected.length === 0) {
-    container.innerHTML = '<p class="text-sm text-green-600 font-bold text-center py-4">¡Ya no tenés materias pendientes habilitadas!</p>';
+    container.innerHTML = '<p class="text-sm text-emerald-600 dark:text-emerald-400 font-bold text-center py-4">¡Felicidades! No tenés materias pendientes habilitadas.</p>';
     return;
   }
 
   container.innerHTML = selected.map(s => `
-    <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
-      <p class="text-xs font-bold dark:text-white">${s.name}</p>
-      <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1">${s.regimen} · Año ${s.year}</p>
+    <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 flex justify-between items-center">
+      <div>
+        <p class="text-sm font-bold dark:text-white leading-tight">${s.name}</p>
+        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium">${s.regimen} · ${s.year}er Año</p>
+      </div>
+      <button onclick="toggleApproved('${s.id}'); closeSimulador();" class="text-[10px] uppercase font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 px-2 py-1 rounded-md hover:bg-blue-200 transition">Aprobar</button>
     </div>
   `).join('');
 }
 
-/* ── Exportar a Imagen (Optimizada para Android/PC) ── */
+/* ── Exportar (Optimizada para Android/PC) ── */
 function exportMap() {
-  const btn = document.querySelector('button[onclick="exportMap()"]');
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '⏳ Procesando...';
+  const btn = document.getElementById('btn-export');
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML = '⏳ <span class="hidden sm:inline">Procesando...</span>';
   btn.disabled = true;
 
-  // 1. Guardar la posición del scroll actual y forzar ir arriba de todo 
-  // (CRÍTICO para que html2canvas no corte la imagen en celulares)
   const scrollX = window.scrollX;
   const scrollY = window.scrollY;
   window.scrollTo(0, 0);
@@ -751,27 +689,19 @@ function exportMap() {
   const area = document.getElementById('export-area');
   const main = area.querySelector('main');
   
-  // 2. Guardar los estilos originales
   const origAreaWidth = area.style.width;
   const origMainOverflow = main.style.overflow;
   const origMainMaxWidth = main.style.maxWidth;
   const origMainWidth = main.style.width;
   
-  // 3. Forzar la expansión usando píxeles exactos (scrollWidth) en vez de max-content
   const fullWidth = main.scrollWidth;
   area.style.width = fullWidth + 'px';
   main.style.overflow = 'visible';
   main.style.maxWidth = 'none';
   main.style.width = fullWidth + 'px';
   
-  // 4. Redibujar las líneas para que ocupen todo el ancho nuevo
-  drawLines();
-
-  // 5. Ajustar calidad: si es celular (pantalla chica) bajamos la escala a 1 
-  // para que el navegador de Android no se quede sin RAM y cancele la descarga.
   const isMobile = window.innerWidth < 768;
 
-  // Le damos 300ms al navegador de Android para que termine de repintar la tabla expandida
   setTimeout(() => {
     html2canvas(area, { 
       backgroundColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#f8fafc',
@@ -780,37 +710,30 @@ function exportMap() {
       scrollY: 0,
       useCORS: true
     }).then(canvas => {
-      // 6. Restaurar todo a la normalidad
       area.style.width = origAreaWidth;
       main.style.overflow = origMainOverflow;
       main.style.maxWidth = origMainMaxWidth;
       main.style.width = origMainWidth;
       window.scrollTo(scrollX, scrollY);
-      drawLines(); 
       
-      // 7. Descargar la imagen
       const link = document.createElement('a');
       link.download = 'mapa-curricular-isfd100.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
       
-      // Restaurar botón
-      btn.innerHTML = originalText;
+      btn.innerHTML = originalHTML;
       btn.disabled = false;
     }).catch(err => {
-      console.error("Error al exportar:", err);
-      // Si falla, restaurar todo de todas formas
+      console.error("Error exportando:", err);
       area.style.width = origAreaWidth;
       main.style.overflow = origMainOverflow;
       main.style.maxWidth = origMainMaxWidth;
       main.style.width = origMainWidth;
       window.scrollTo(scrollX, scrollY);
-      drawLines();
-      btn.innerHTML = originalText;
+      btn.innerHTML = originalHTML;
       btn.disabled = false;
-      alert("Hubo un error al exportar la imagen. Si el problema persiste, intentá descargarla desde una PC.");
     });
-  }, 300);
+  }, 400);
 }
 
 /* ── Modo Oscuro ── */
@@ -827,10 +750,8 @@ function resetAll() {
   saveState();
   updateAllCards();
   updateProgress();
-  drawLines();
 }
 
-window.addEventListener('resize', () => requestAnimationFrame(drawLines));
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeSimulador(); } });
 window.addEventListener('DOMContentLoaded', init);
 </script>
