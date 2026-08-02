@@ -75,7 +75,7 @@
        ONBOARDING MODAL
   ══════════════════════════════════════════ -->
   <div id="onboarding-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md p-6 shadow-2xl text-center">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md p-6 shadow-2xl text-center transform scale-95 transition-transform duration-200">
       <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
         <span class="text-3xl">🚀</span>
       </div>
@@ -93,10 +93,37 @@
   </div>
 
   <!-- ══════════════════════════════════════════
+       MODAL DE CONFIRMACIÓN DE REINICIO
+  ══════════════════════════════════════════ -->
+  <div id="confirm-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
+      <h2 class="text-xl font-black mb-2 dark:text-white flex items-center gap-2">⚠️ Mapa Curricular</h2>
+      <p class="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
+        ¿Reiniciar el progreso? Se desmarcarán todas las materias que marcaste como aprobadas.
+      </p>
+      <div class="flex gap-3 justify-end">
+        <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition">Cancelar</button>
+        <button onclick="executeReset()" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition">Sí, reiniciar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL DE ALERTA (Dependencias)
+  ══════════════════════════════════════════ -->
+  <div id="alert-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
+      <h2 class="text-xl font-black mb-3 text-amber-600 dark:text-amber-500 flex items-center gap-2">🔒 Mapa Curricular</h2>
+      <p id="alert-message" class="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed"></p>
+      <button onclick="closeAlertModal()" class="w-full px-4 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition">Entendido</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
        SIMULADOR MODAL
   ══════════════════════════════════════════ -->
   <div id="simulador-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden" onclick="closeSimulador(event)">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl" onclick="event.stopPropagation()">
+    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
       <h2 class="text-lg font-black dark:text-white flex items-center gap-2">
         <span>🔮</span> Simulador de Cursada
       </h2>
@@ -179,7 +206,7 @@
         
         <button onclick="openSimulador()" class="text-xs bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300 px-3 py-2 rounded-xl font-bold hover:bg-indigo-200 transition" title="Simulador de cursada">🔮</button>
         <button onclick="exportMap()" id="btn-export" class="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 px-3 py-2 rounded-xl font-bold hover:bg-emerald-200 transition flex items-center gap-1">📸 <span class="hidden sm:inline">Exportar</span></button>
-        <button onclick="resetAll()" class="text-xs text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 px-3 py-2 rounded-xl font-bold transition" title="Reiniciar progreso">↺</button>
+        <button onclick="confirmReset()" class="text-xs text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 px-3 py-2 rounded-xl font-bold transition" title="Reiniciar progreso">↺</button>
       </div>
 
     </div>
@@ -352,7 +379,7 @@ function init() {
   if (!localStorage.getItem('isfd100_onboarding')) {
     document.getElementById('onboarding-modal').classList.remove('hidden');
     setTimeout(() => {
-      document.getElementById('onboarding-modal').querySelector('div').classList.add('scale-100');
+      document.getElementById('onboarding-modal').children[0].classList.add('scale-100');
     }, 10);
   }
 
@@ -417,7 +444,7 @@ function renderGrid() {
 }
 
 /* ─────────────────────────────────────────────
-   NUEVO DISEÑO DE TARJETA (Sin Flechas)
+   NUEVO DISEÑO DE TARJETA
 ───────────────────────────────────────────── */
 function createCard(subject) {
   const card = document.createElement('div');
@@ -459,7 +486,7 @@ function toggleApproved(id) {
   if (isApproved) {
     const dependents = SUBJECTS.filter(s => s.prereqs.includes(id) && state.approved.has(s.id));
     if (dependents.length > 0) {
-      alert(`No podés desmarcar esta materia. Dependen de ella: ${dependents.map(d=>d.name).join(', ')}`);
+      showAlert(`No podés desmarcar esta materia. Dependen de ella:<br><br><b>${dependents.map(d=>d.name).join('<br>')}</b>`);
       return;
     }
     state.approved.delete(id);
@@ -501,7 +528,6 @@ function updateAllCards() {
     const iconEl = card.querySelector('.status-icon');
     const textEl = card.querySelector('.status-text');
     
-    // Limpiar clases de estados anteriores
     card.classList.remove(
       'border-slate-200', 'bg-slate-50', 'dark:border-slate-700', 'dark:bg-slate-800/40', 'opacity-60',
       'border-blue-400', 'bg-blue-50', 'dark:border-blue-500/50', 'dark:bg-blue-900/20',
@@ -557,7 +583,6 @@ function applyFilterStyles() {
     if (campo !== 'all' && subject.campo !== campo) visible = false;
     if (q && !subject.name.toLowerCase().includes(q)) visible = false;
     
-    // En modo Inscripción (Qué cursar), ocultamos las bloqueadas y las ya aprobadas
     if (showOnlyEnabled && (!isSubjectEnabled(subject.id) || state.approved.has(subject.id))) {
        visible = false;
     }
@@ -592,14 +617,13 @@ function updateProgress() {
 }
 
 /* ─────────────────────────────────────────────
-   MODALES Y UTILIDADES
+   MODALES Y UTILIDADES CUSTOM
 ───────────────────────────────────────────── */
 function openModal(event, id) {
   event.stopPropagation();
   const subject = SUBJECTS.find(s => s.id === id);
   if (!subject) return;
 
-  // Fondo del header modal
   const ccBg = subject.campo === 'CFG' ? '#1e3a5f' : subject.campo === 'CFE' ? '#7c3d11' : '#14532d';
   document.getElementById('modal-header').style.backgroundColor = ccBg;
   
@@ -619,7 +643,6 @@ function openModal(event, id) {
   const backdrop = document.getElementById('modal-backdrop');
   backdrop.classList.remove('hidden');
   
-  // Pequeño timeout para animar entrada
   setTimeout(() => {
     document.getElementById('modal-box').classList.remove('scale-95');
     document.getElementById('modal-box').classList.add('scale-100');
@@ -631,8 +654,10 @@ function openModal(event, id) {
 function closeModal(event) {
   if (event && event.target !== document.getElementById('modal-backdrop') && event.type === 'click') return;
   const box = document.getElementById('modal-box');
-  box.classList.remove('scale-100');
-  box.classList.add('scale-95');
+  if(box) {
+    box.classList.remove('scale-100');
+    box.classList.add('scale-95');
+  }
   
   setTimeout(() => {
     document.getElementById('modal-backdrop').classList.add('hidden');
@@ -642,14 +667,79 @@ function closeModal(event) {
 
 function closeOnboarding() {
   localStorage.setItem('isfd100_onboarding', 'true');
-  document.getElementById('onboarding-modal').classList.add('hidden');
+  const box = document.getElementById('onboarding-modal').children[0];
+  box.classList.remove('scale-100');
+  box.classList.add('scale-95');
+  setTimeout(() => {
+    document.getElementById('onboarding-modal').classList.add('hidden');
+  }, 150);
+}
+
+/* ── Custom Confirm Reset ── */
+function confirmReset() {
+  const modal = document.getElementById('confirm-modal');
+  modal.classList.remove('hidden');
+  setTimeout(() => {
+    modal.children[0].classList.remove('scale-95');
+    modal.children[0].classList.add('scale-100');
+  }, 10);
+}
+
+function closeConfirmModal() {
+  const modal = document.getElementById('confirm-modal');
+  modal.children[0].classList.remove('scale-100');
+  modal.children[0].classList.add('scale-95');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 150);
+}
+
+function executeReset() {
+  closeConfirmModal();
+  state.approved.clear();
+  saveState();
+  updateAllCards();
+  updateProgress();
+}
+
+/* ── Custom Alert ── */
+function showAlert(msg) {
+  document.getElementById('alert-message').innerHTML = msg;
+  const modal = document.getElementById('alert-modal');
+  modal.classList.remove('hidden');
+  setTimeout(() => {
+    modal.children[0].classList.remove('scale-95');
+    modal.children[0].classList.add('scale-100');
+  }, 10);
+}
+
+function closeAlertModal() {
+  const modal = document.getElementById('alert-modal');
+  modal.children[0].classList.remove('scale-100');
+  modal.children[0].classList.add('scale-95');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 150);
 }
 
 /* ── Simulador ── */
-function openSimulador() { document.getElementById('simulador-modal').classList.remove('hidden'); }
+function openSimulador() { 
+  const modal = document.getElementById('simulador-modal');
+  modal.classList.remove('hidden'); 
+  setTimeout(() => {
+    modal.children[0].classList.remove('scale-95');
+    modal.children[0].classList.add('scale-100');
+  }, 10);
+}
+
 function closeSimulador(e) {
   if (e && e.target !== document.getElementById('simulador-modal') && e.type === 'click') return;
-  document.getElementById('simulador-modal').classList.add('hidden');
+  const modal = document.getElementById('simulador-modal');
+  modal.children[0].classList.remove('scale-100');
+  modal.children[0].classList.add('scale-95');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 150);
 }
 
 function runSimulador() {
@@ -675,7 +765,7 @@ function runSimulador() {
   `).join('');
 }
 
-/* ── Exportar (Optimizada para Android/PC) ── */
+/* ── Exportar a Imagen ── */
 function exportMap() {
   const btn = document.getElementById('btn-export');
   const originalHTML = btn.innerHTML;
@@ -744,15 +834,14 @@ function toggleDarkMode() {
   document.getElementById('dark-icon').textContent = isDark ? '☀️' : '🌙';
 }
 
-function resetAll() {
-  if (!confirm('¿Reiniciar el progreso? Se desmarcarán todas las materias aprobadas.')) return;
-  state.approved.clear();
-  saveState();
-  updateAllCards();
-  updateProgress();
-}
-
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeSimulador(); } });
+document.addEventListener('keydown', e => { 
+  if (e.key === 'Escape') { 
+    closeModal(); 
+    closeSimulador(); 
+    closeConfirmModal();
+    closeAlertModal();
+  } 
+});
 window.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
