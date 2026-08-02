@@ -735,58 +735,82 @@ function runSimulador() {
   `).join('');
 }
 
-/* ── Exportar a Imagen ── */
+/* ── Exportar a Imagen (Optimizada para Android/PC) ── */
 function exportMap() {
-  // 1. Cambiamos el texto del botón para dar feedback de carga
   const btn = document.querySelector('button[onclick="exportMap()"]');
   const originalText = btn.innerHTML;
   btn.innerHTML = '⏳ Procesando...';
   btn.disabled = true;
 
+  // 1. Guardar la posición del scroll actual y forzar ir arriba de todo 
+  // (CRÍTICO para que html2canvas no corte la imagen en celulares)
+  const scrollX = window.scrollX;
+  const scrollY = window.scrollY;
+  window.scrollTo(0, 0);
+
   const area = document.getElementById('export-area');
   const main = area.querySelector('main');
   
-  // 2. Guardamos los estilos originales para restaurarlos después
+  // 2. Guardar los estilos originales
   const origAreaWidth = area.style.width;
   const origMainOverflow = main.style.overflow;
   const origMainMaxWidth = main.style.maxWidth;
   const origMainWidth = main.style.width;
   
-  // 3. Forzamos al contenedor a expandirse al 100% de su contenido
-  area.style.width = 'max-content';
+  // 3. Forzar la expansión usando píxeles exactos (scrollWidth) en vez de max-content
+  const fullWidth = main.scrollWidth;
+  area.style.width = fullWidth + 'px';
   main.style.overflow = 'visible';
   main.style.maxWidth = 'none';
-  main.style.width = 'max-content';
+  main.style.width = fullWidth + 'px';
   
-  // 4. Redibujamos las líneas para que se adapten al nuevo ancho expandido
+  // 4. Redibujar las líneas para que ocupen todo el ancho nuevo
   drawLines();
 
-  // 5. Capturamos el canvas con mejor calidad (scale: 2)
-  html2canvas(area, { 
-    backgroundColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#f8fafc',
-    scale: 2 
-  }).then(canvas => {
-    // 6. Restauramos la web a la normalidad
-    area.style.width = origAreaWidth;
-    main.style.overflow = origMainOverflow;
-    main.style.maxWidth = origMainMaxWidth;
-    main.style.width = origMainWidth;
-    drawLines(); 
-    
-    // 7. Descargamos la imagen
-    const link = document.createElement('a');
-    link.download = 'mapa-curricular-isfd100.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    
-    // Restauramos el botón
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-  }).catch(err => {
-    console.error("Error al exportar:", err);
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-  });
+  // 5. Ajustar calidad: si es celular (pantalla chica) bajamos la escala a 1 
+  // para que el navegador de Android no se quede sin RAM y cancele la descarga.
+  const isMobile = window.innerWidth < 768;
+
+  // Le damos 300ms al navegador de Android para que termine de repintar la tabla expandida
+  setTimeout(() => {
+    html2canvas(area, { 
+      backgroundColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#f8fafc',
+      scale: isMobile ? 1 : 2, 
+      scrollX: 0,
+      scrollY: 0,
+      useCORS: true
+    }).then(canvas => {
+      // 6. Restaurar todo a la normalidad
+      area.style.width = origAreaWidth;
+      main.style.overflow = origMainOverflow;
+      main.style.maxWidth = origMainMaxWidth;
+      main.style.width = origMainWidth;
+      window.scrollTo(scrollX, scrollY);
+      drawLines(); 
+      
+      // 7. Descargar la imagen
+      const link = document.createElement('a');
+      link.download = 'mapa-curricular-isfd100.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      
+      // Restaurar botón
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }).catch(err => {
+      console.error("Error al exportar:", err);
+      // Si falla, restaurar todo de todas formas
+      area.style.width = origAreaWidth;
+      main.style.overflow = origMainOverflow;
+      main.style.maxWidth = origMainMaxWidth;
+      main.style.width = origMainWidth;
+      window.scrollTo(scrollX, scrollY);
+      drawLines();
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+      alert("Hubo un error al exportar la imagen. Si el problema persiste, intentá descargarla desde una PC.");
+    });
+  }, 300);
 }
 
 /* ── Modo Oscuro ── */
