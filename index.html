@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mapa Curricular · Economía · ISFD N°100</title>
   
-  <!-- Manifest dinámico para PWA -->
   <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -26,7 +24,6 @@
     }
   </script>
 
-  <!-- Librerías Externas -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -50,10 +47,7 @@
       display: flex; flex-direction: column; height: 100%; position: relative;
     }
     
-    /* CRÍTICO: Fuerza a ocultar la tarjeta para que los filtros funcionen */
-    .subject-card.hidden {
-      display: none !important;
-    }
+    .subject-card.hidden { display: none !important; }
 
     /* Aprobada */
     .subject-card[data-state="approved"] {
@@ -118,7 +112,6 @@
 
 <body class="min-h-screen text-slate-800 flex flex-col">
 
-  <!-- Service Worker para PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       const swCode = "self.addEventListener('fetch', function(event) {});";
@@ -180,12 +173,12 @@
 
   <div id="sync-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden" onclick="closeSyncModal(event)">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
-      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>💾</span> Sincronización Segura</h2>
-      <p class="text-xs text-slate-500 mb-5 leading-relaxed">Guardá o transferí tu progreso a otro dispositivo copiando este código encriptado.</p>
+      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>💾</span> Sincronización Rápida</h2>
+      <p class="text-xs text-slate-500 mb-5 leading-relaxed">Copiá tu código para guardar un respaldo o transferir tu progreso a otro dispositivo.</p>
       
       <div class="space-y-6 overflow-y-auto">
         <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-          <h3 class="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">1. Exportar (Respaldo)</h3>
+          <h3 class="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">1. Exportar (Copiar Código)</h3>
           <div class="flex gap-2">
             <input type="text" id="sync-export-code" readonly class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono bg-white text-slate-400 outline-none truncate">
             <button onclick="copySyncCode()" id="btn-copy-sync" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm">Copiar</button>
@@ -193,9 +186,9 @@
         </div>
 
         <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-          <h3 class="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2">2. Importar</h3>
+          <h3 class="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2">2. Importar (Pegar Código)</h3>
           <div class="flex gap-2">
-            <input type="text" id="sync-import-code" placeholder="Pegá el código..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+            <input type="text" id="sync-import-code" placeholder="Pegá tu código acá..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
             <button onclick="importSyncCode()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm">Cargar</button>
           </div>
         </div>
@@ -316,31 +309,27 @@
   ══════════════════════════════════════════ -->
   <div class="sticky top-0 z-20 flex flex-col shadow-sm">
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
-      <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
         
-        <!-- Búsqueda y Filtros en móvil (Nueva estructura) -->
-        <div class="flex w-full md:w-auto flex-1 gap-3">
+        <div class="flex w-full lg:w-auto flex-1 gap-3">
           <div class="relative flex-1">
             <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
             <input type="text" id="search-input" placeholder="Buscar materia..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-800 transition-all font-medium truncate" onkeyup="applyFilterStyles()">
           </div>
+          
+          <label class="flex shrink-0 items-center gap-2 cursor-pointer text-[11px] sm:text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl border border-blue-200 transition shadow-sm" title="Muestra únicamente las materias que ya podés cursar">
+            <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
+            <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
+            <span class="hidden sm:inline">Modo Inscripción</span>
+          </label>
         </div>
 
-        <!-- Botones de Acción (Scroll Horizontal Asegurado) -->
-        <div class="flex items-center justify-start md:justify-end gap-2 w-full md:w-auto overflow-x-auto hide-scrollbar pb-1 md:pb-0 pt-1 md:pt-0">
-          
+        <div class="flex items-center justify-start md:justify-end gap-2 w-full lg:w-auto overflow-x-auto hide-scrollbar pb-1 md:pb-0 pt-1 md:pt-0">
           <button id="btn-install" onclick="installApp()" class="hidden shrink-0 text-xs bg-slate-900 text-white px-3 sm:px-4 py-2 rounded-xl font-bold hover:bg-slate-800 transition shadow-sm flex items-center gap-1.5">
             <span>📱</span> App
           </button>
-
-          <!-- Toggle Modo Inscripción Movido acá -->
-          <label class="flex shrink-0 items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl border border-blue-200 transition shadow-sm">
-            <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
-            <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
-            <span>Modo Inscripción</span>
-          </label>
           
-          <div class="w-px h-6 bg-slate-300 hidden md:block shrink-0 mx-1"></div>
+          <div class="w-px h-6 bg-slate-300 hidden md:block mx-1"></div>
           
           <button onclick="openSchedule()" class="shrink-0 text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📅</span> Horarios
@@ -390,6 +379,7 @@
        GRILLA CURRICULAR & ZONA DE EXPORTACIÓN
   ══════════════════════════════════════════ -->
   <div id="export-area" class="pb-8 flex-1">
+    
     <div id="export-watermark" class="hidden mx-auto max-w-screen-xl px-4 pt-8 pb-4">
       <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-xl flex justify-between items-center border-l-8 border-blue-500">
         <div>
@@ -532,7 +522,7 @@ const SUBJECTS = [
   { id: 'economia-politica-iii', name: 'Economía Política III', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: ['economia-politica-ii'], finalidades: 'Profundizar en grandes debates: financiarización, trabajo, Estado y poscapitalismo.', contenidos: ['El debate sobre el fin del trabajo','Economía popular, social y solidaria','Renta básica universal y redistribución','Perspectivas ecosocialistas y feministas'] },
   { id: 'diseno-proyectos', name: 'Diseño de Proyectos Organizacionales', year: 4, campo: 'CFE', formato: 'Taller', regimen: 'Anual', hs: 96, prereqs: ['administracion'], finalidades: 'Desarrollar competencias para el diseño y evaluación de proyectos en contextos reales.', contenidos: ['Marco lógico para la planificación de proyectos','Estudio de prefactibilidad técnica y financiera','Formulación de proyectos de economía social','Monitoreo, evaluación y sistematización de proyectos'] },
   { id: 'eoi-cfe', name: 'Espacio de Opción Institucional (CFE)', year: 4, campo: 'CFE', formato: 'A definir', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Espacio de definición institucional para profundizar en Ciencias Económicas.', contenidos: ['Definido por el ISFD N°100 según su proyecto institucional'] },
-  { id: 'practica-iv', name: 'Práctica Docente IV — Residencia', year: 4, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['practica-iii'], finalidades: 'Asumir la conducción del proceso de enseñanza de manera integral completando la residencia.', contenidos: ['Residencia docente autónoma en nivel secundario','Elaboración del portfolio de residencia','Reflexión crítica sobre la práctica profesional','Coloquio integrador y presentación final'] }
+  { id: 'practica-iv', name: 'Práctica Docente IV — Residencia', year: 4, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['practica-iii'], finalidades: 'Asumir la conducción del proceso de enseñanza de manera integral completando la residencia.', contenidos: ['Residencia docente autónoma en nivel secundario','Elaboración del portfolio de residencia','Reflexión crítica sobre la práctica profesional','Coloquio integrador y presentation final'] }
 ];
 
 /* ─────────────────────────────────────────────
@@ -608,7 +598,7 @@ function saveState() {
 }
 
 /* ─────────────────────────────────────────────
-   ALGORITMO DE RUTA CRÍTICA
+   ALGORITMO COMPRESOR DE CODIGO RUTA CRITICA Y SINCRONIZACION
 ───────────────────────────────────────────── */
 function calculateDependencies() {
   const dependentsMap = {};
@@ -634,6 +624,86 @@ function calculateDependencies() {
     s.bottleneckCount = downstream.size;
   });
 }
+
+// NUEVO: Algoritmo de Compresión a base de índices
+function generateShortCode() {
+  const uParts = [];
+  Object.keys(state.userSubjects).forEach(id => {
+    const idx = SUBJECTS.findIndex(s => s.id === id);
+    if (idx === -1) return;
+    const sub = state.userSubjects[id];
+    const st = sub.status === 'approved' ? 'a' : 'c';
+    const gr = sub.grade !== null ? sub.grade : '';
+    uParts.push(`${idx}${st}${gr}`);
+  });
+  const uStr = uParts.join(',');
+
+  const sParts = [];
+  const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+  days.forEach((day, dIdx) => {
+    if (state.schedule[day]) {
+      state.schedule[day].forEach(item => {
+        const idx = SUBJECTS.findIndex(s => s.id === item.id);
+        if (idx !== -1) sParts.push(`${dIdx}-${idx}-${item.time}`);
+      });
+    }
+  });
+  const sStr = sParts.join(',');
+
+  const finalStr = `v3|${uStr}|${sStr}`;
+  // Quitamos los padding "=" para hacerlo un poquito más corto
+  return btoa(finalStr).replace(/=/g, '');
+}
+
+// NUEVO: Algoritmo de Descompresión a base de índices
+function decodeShortCode(encoded) {
+  let str = encoded;
+  // Devolvemos el padding si le falta
+  while (str.length % 4 !== 0) str += '=';
+  
+  const decoded = atob(str);
+  const parts = decoded.split('|');
+  
+  // Regla de compatibilidad si nos pegan el código de versión 2 o inferior
+  if (parts[0] !== 'v3') {
+     const data = JSON.parse(atob(encoded));
+     if (data.v === 2) {
+         return { u: data.u || {}, s: data.s || { 'Lunes': [], 'Martes': [], 'Miércoles': [], 'Jueves': [], 'Viernes': [] } };
+     }
+     throw new Error("Invalid");
+  }
+
+  const newU = {};
+  if (parts[1]) {
+    parts[1].split(',').forEach(p => {
+      const match = p.match(/^(\d+)([ac])(.*)$/);
+      if (match) {
+        const idx = parseInt(match[1]);
+        const status = match[2] === 'a' ? 'approved' : 'en_curso';
+        const grade = match[3] ? parseFloat(match[3]) : null;
+        if (SUBJECTS[idx]) newU[SUBJECTS[idx].id] = { status, grade };
+      }
+    });
+  }
+
+  const newS = { 'Lunes': [], 'Martes': [], 'Miércoles': [], 'Jueves': [], 'Viernes': [] };
+  const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+  if (parts[2]) {
+    parts[2].split(',').forEach(p => {
+      const match = p.match(/^(\d+)-(\d+)-(.*)$/);
+      if (match) {
+        const dIdx = parseInt(match[1]);
+        const sIdx = parseInt(match[2]);
+        const time = match[3];
+        if (days[dIdx] && SUBJECTS[sIdx]) {
+          newS[days[dIdx]].push({ id: SUBJECTS[sIdx].id, time });
+        }
+      }
+    });
+  }
+  return { u: newU, s: newS };
+}
+
 
 /* ─────────────────────────────────────────────
    RENDERIZADO DE GRILLA (Solo Año)
@@ -916,9 +986,11 @@ function openSyncModal() {
   const modal = document.getElementById('sync-modal');
   const exportInput = document.getElementById('sync-export-code');
   
-  const data = { v: 2, u: state.userSubjects, s: state.schedule };
-  const encoded = btoa(JSON.stringify(data));
-  exportInput.value = encoded;
+  try {
+    exportInput.value = generateShortCode();
+  } catch(e) {
+    exportInput.value = "Error generando código";
+  }
 
   document.getElementById('sync-import-code').value = '';
   
@@ -951,20 +1023,16 @@ function importSyncCode() {
   const val = document.getElementById('sync-import-code').value.trim();
   if(!val) return;
   try {
-    const data = JSON.parse(atob(val));
-    if (data.v === 2) {
-      state.userSubjects = data.u || {};
-      state.schedule = data.s || { 'Lunes': [], 'Martes': [], 'Miércoles': [], 'Jueves': [], 'Viernes': [] };
-      saveState();
-      updateAllCards();
-      updateProgress();
-      closeSyncModal();
-      showAlert('✅ ¡Éxito!', "Perfil sincronizado exitosamente.");
-    } else {
-      showAlert('❌ Error', "Código inválido o versión no soportada.");
-    }
+    const data = decodeShortCode(val);
+    state.userSubjects = data.u;
+    state.schedule = data.s;
+    saveState();
+    updateAllCards();
+    updateProgress();
+    closeSyncModal();
+    showAlert('✅ ¡Éxito!', "Perfil sincronizado exitosamente.");
   } catch(err) {
-    showAlert('❌ Error', "Código incorrecto. Asegurate de haber copiado todo el texto.");
+    showAlert('❌ Error', "Código incorrecto o dañado. Asegurate de haber copiado todo el texto sin espacios extra.");
   }
 }
 
