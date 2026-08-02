@@ -54,6 +54,11 @@
       position: relative;
     }
     
+    /* CRÍTICO: Soluciona el bug de filtrado ocultando la tarjeta forzadamente */
+    .subject-card.hidden {
+      display: none !important;
+    }
+    
     /* APROBADA */
     .subject-card[data-state="approved"] {
       background-color: #0f172a; border: 2px solid #0f172a; color: #ffffff;
@@ -166,7 +171,7 @@
   </div>
 
   <!-- ══════════════════════════════════════════
-       MODAL: ARMADOR DE HORARIOS (NUEVO)
+       MODAL: ARMADOR DE HORARIOS
   ══════════════════════════════════════════ -->
   <div id="schedule-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 hidden" onclick="closeSchedule(event)">
     <div class="bg-white rounded-3xl w-full max-w-5xl h-[90vh] sm:h-[85vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation()">
@@ -253,13 +258,13 @@
   ══════════════════════════════════════════ -->
   <div class="sticky top-0 z-20 flex flex-col shadow-sm">
     
-    <!-- Barra de Herramientas -->
+    <!-- 1. Barra de Herramientas -->
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
         
         <!-- Búsqueda -->
         <div class="flex flex-wrap items-center gap-3 flex-1 min-w-[200px]">
-          <div class="relative w-full flex-1">
+          <div class="relative w-full sm:max-w-sm flex-1">
             <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
             <input type="text" id="search-input" placeholder="Buscar materia..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-800 transition-all font-medium truncate" onkeyup="applyFilterStyles()">
           </div>
@@ -272,18 +277,12 @@
             <span>📱</span> <span class="hidden sm:inline">Instalar App</span>
           </button>
 
-          <!-- Toggles (Ruta Crítica e Inscripción) -->
-          <div class="flex gap-2">
-            <label class="flex items-center justify-center cursor-pointer text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 px-3 py-2.5 rounded-xl border border-red-200 transition shadow-sm" title="Destaca las materias que traban 3 o más asignaturas posteriores.">
-              <input type="checkbox" id="toggle-bottlenecks" class="sr-only" onchange="applyFilterStyles()">
-              <span>🔥 <span class="hidden md:inline">Ruta Crítica</span></span>
-            </label>
-
-            <label class="flex items-center justify-center cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2.5 rounded-xl border border-blue-200 transition shadow-sm" title="Muestra únicamente las materias que ya podés cursar">
-              <input type="checkbox" id="toggle-enabled-only" class="sr-only" onchange="applyFilterStyles()">
-              <span>🎯 <span class="hidden md:inline">Modo Inscripción</span></span>
-            </label>
-          </div>
+          <!-- Toggle: Modo Inscripción (Slider Visual restaurado) -->
+          <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2.5 rounded-xl border border-blue-200 transition shadow-sm" title="Muestra únicamente las materias que ya podés cursar">
+            <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
+            <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
+            <span>Modo Inscripción</span>
+          </label>
           
           <div class="w-px h-6 bg-slate-300 hidden md:block"></div>
           
@@ -326,7 +325,7 @@
       </div>
     </div>
 
-  </div>
+  </div> <!-- Fin Contenedor Sticky -->
 
   <!-- ══════════════════════════════════════════
        GRILLA CURRICULAR & ZONA DE EXPORTACIÓN
@@ -435,7 +434,7 @@ const SUBJECTS = [
   { id: 'practica-ii', name: 'Práctica Docente II', year: 2, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 128, prereqs: ['practica-i', 'educacion-transformaciones', 'intro-economia-politica'], finalidades: 'Ampliar el conocimiento sobre la institución escolar e intervenir en situaciones de enseñanza.', contenidos: ['La planificación como hipótesis de trabajo','Estrategias de enseñanza en Ciencias Económicas','Gestión del aula y convivencia escolar','Análisis reflexivo de las primeras intervenciones'] },
   
   // 3ER AÑO
-  { id: 'politica-educativa', name: 'Política educativa argentina', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['pensamiento-politico'], finalidades: 'Analizar el sistema educativo argentino en sus dimensiones normativas y políticas.', contenidos: ['El Estado y la política educativa','Sistema educativo argentino: estructura y niveles','Financiamiento educativo y políticas de igualdad','Reformas educativas en Argentina'] },
+  { id: 'politica-educativa', name: 'Política educativa argentina', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['pensamiento-politico'], finalidades: 'Analizar el sistema educativo argentino en sus dimensions normativas y políticas.', contenidos: ['El Estado y la política educativa','Sistema educativo argentino: estructura y niveles','Financiamiento educativo y políticas de igualdad','Reformas educativas en Argentina'] },
   { id: 'problemas-filosoficos', name: 'Problemas filosóficos de la educación', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Reflexionar sobre los fundamentos filosóficos de la educación.', contenidos: ['Epistemología y educación','Ética docente y deontología profesional','Filosofía política y educación democrática','El problema de la autoridad pedagógica'] },
   { id: 'trayectorias-jovenes', name: 'Trayectorias educativas de jóvenes y adultos', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32, prereqs: ['esi', 'cultura-digital'], finalidades: 'Analizar las trayectorias educativas en los contextos actuales.', contenidos: ['Juventudes: diversidad de trayectorias vitales','Educación de jóvenes y adultos: marcos normativos','Dispositivos institucionales de acompañamiento','TIC y educación de adultos'] },
   { id: 'economia-politica-ii', name: 'Economía Política II', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['intro-economia-politica', 'matematica-cs-economicas'], finalidades: 'Avanzar en el estudio de las economías capitalistas contemporáneas.', contenidos: ['Financiarización y capital especulativo','Economía internacional: teorías y debates','Mundialización del capital y empresas transnacionales','Crisis del neoliberalismo y alternativas'] },
@@ -505,7 +504,7 @@ function init() {
 
   state.totalHs = SUBJECTS.reduce((acc, s) => acc + s.hs, 0);
 
-  // Calcular dependencias "aguas abajo" (Ruta Crítica)
+  // Calcular dependencias (Ruta Crítica)
   calculateDependencies();
 
   if (!localStorage.getItem('isfd100_onboarding')) {
@@ -531,36 +530,29 @@ function saveState() {
 }
 
 /* ─────────────────────────────────────────────
-   ALGORITMO DE RUTA CRÍTICA (Cuellos de Botella)
+   ALGORITMO DE RUTA CRÍTICA
 ───────────────────────────────────────────── */
 function calculateDependencies() {
-  // 1. Armar grafo invertido (quién depende de mí)
   const dependentsMap = {};
   SUBJECTS.forEach(s => dependentsMap[s.id] = []);
   
   SUBJECTS.forEach(s => {
     s.prereqs.forEach(pre => {
-      if (dependentsMap[pre]) {
-        dependentsMap[pre].push(s.id);
-      }
+      if (dependentsMap[pre]) dependentsMap[pre].push(s.id);
     });
   });
 
-  // 2. Función recursiva para contar todas las ramas (directas e indirectas)
   function countAllDownstream(id, visited = new Set()) {
     visited.add(id);
     dependentsMap[id].forEach(dep => {
-      if (!visited.has(dep)) {
-        countAllDownstream(dep, visited);
-      }
+      if (!visited.has(dep)) countAllDownstream(dep, visited);
     });
     return visited;
   }
 
-  // 3. Asignar el conteo a cada materia
   SUBJECTS.forEach(s => {
     const downstream = countAllDownstream(s.id);
-    downstream.delete(s.id); // Quitarse a sí mismo
+    downstream.delete(s.id); 
     s.bottleneckCount = downstream.size;
   });
 }
@@ -589,7 +581,7 @@ function renderGrid() {
 }
 
 /* ─────────────────────────────────────────────
-   DISEÑO DE TARJETA CON ATRIBUTOS DATA Y BADGE RUTA CRÍTICA
+   DISEÑO DE TARJETA
 ───────────────────────────────────────────── */
 function createCard(subject) {
   const card = document.createElement('div');
@@ -597,7 +589,6 @@ function createCard(subject) {
   card.dataset.state = 'locked';
   card.id = `card-${subject.id}`;
   
-  // Badge de Ruta Crítica (si traba 3 o más materias)
   const isBottleneck = subject.bottleneckCount >= 3;
   const bottleneckHtml = isBottleneck 
     ? `<span class="bg-red-100 text-red-700 border border-red-200 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shadow-sm ml-2" title="Esta materia traba el cursado de otras ${subject.bottleneckCount} materias">🔥 Ruta Crítica</span>` 
@@ -713,13 +704,8 @@ function updateAllCards() {
 
 function applyFilterStyles() {
   const q = state.searchQuery;
-  
-  // Revisar si los checkbox existen (podrían no haberse renderizado aún)
   const toggleEnabledEl = document.getElementById('toggle-enabled-only');
-  const toggleBottlenecksEl = document.getElementById('toggle-bottlenecks');
-  
   const showOnlyEnabled = toggleEnabledEl ? toggleEnabledEl.checked : false;
-  const showBottlenecks = toggleBottlenecksEl ? toggleBottlenecksEl.checked : false;
 
   SUBJECTS.forEach(subject => {
     const card = document.getElementById(`card-${subject.id}`);
@@ -727,19 +713,11 @@ function applyFilterStyles() {
     
     let visible = true;
     
-    // Filtro Texto
     if (q && !subject.name.toLowerCase().includes(q)) visible = false;
     
-    // Filtro Modo Inscripción: Solo habilitadas (ni aprobadas ni bloqueadas)
+    // CORRECCIÓN MODO INSCRIPCIÓN: Oculta aprobadas y bloqueadas
     if (showOnlyEnabled) {
       if (!isSubjectEnabled(subject.id) || state.approved.has(subject.id)) {
-        visible = false;
-      }
-    }
-
-    // Filtro Ruta Crítica: Solo las que traban 3 o más y aún NO están aprobadas
-    if (showBottlenecks) {
-      if (subject.bottleneckCount < 3 || state.approved.has(subject.id)) {
         visible = false;
       }
     }
@@ -748,8 +726,7 @@ function applyFilterStyles() {
       card.classList.remove('hidden', 'filter-dimmed');
       card.classList.add('filter-active');
     } else {
-      // Si hay un toggle activado o búsqueda, ocultamos las que no sirven
-      if(q || showOnlyEnabled || showBottlenecks) {
+      if(q || showOnlyEnabled) {
          card.classList.add('hidden');
       } else {
          card.classList.add('filter-dimmed');
@@ -877,7 +854,6 @@ function openSchedule() {
   const modal = document.getElementById('schedule-modal');
   modal.classList.remove('hidden'); 
   
-  // Poblar el select de materias (Solo habilitadas que no estén aprobadas)
   const sel = document.getElementById('sched-subject');
   sel.innerHTML = '<option value="" disabled selected>Seleccioná una materia habilitada...</option>';
   
@@ -885,7 +861,6 @@ function openSchedule() {
   available.sort((a, b) => a.year - b.year);
   
   available.forEach(s => {
-    // Le agregamos la llamita al texto si es cuello de botella
     const fire = s.bottleneckCount >= 3 ? '🔥 ' : '';
     sel.innerHTML += `<option value="${s.id}">${fire}${s.name} (Año ${s.year})</option>`;
   });
@@ -920,7 +895,6 @@ function addScheduleItem() {
     return;
   }
 
-  // Prevenir duplicados
   let exists = false;
   Object.keys(state.schedule).forEach(d => {
     if (state.schedule[d].some(item => item.id === subId)) exists = true;
@@ -964,7 +938,6 @@ function renderScheduleGrid() {
         const subject = SUBJECTS.find(x => x.id === item.id);
         if (!subject) return;
         
-        // Colores según el campo para mantener la identidad
         const borderCol = subject.campo === 'CFG' ? 'border-blue-500' : subject.campo === 'CFE' ? 'border-emerald-500' : 'border-amber-500';
 
         html += `
@@ -996,14 +969,15 @@ function closeSimulador(e) {
   const modal = document.getElementById('simulador-modal');
   modal.children[0].classList.remove('scale-100');
   modal.children[0].classList.add('scale-95');
-  setTimeout(() => { modal.classList.add('hidden'); }, 150);
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 150);
 }
 
 function runSimulador() {
   const qty = parseInt(document.getElementById('sim-qty').value) || 3;
   const enabled = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.approved.has(s.id));
   
-  // Sort: Priorizar materias que son "Cuello de botella", luego por año menor.
   enabled.sort((a,b) => {
     if (b.bottleneckCount !== a.bottleneckCount) return b.bottleneckCount - a.bottleneckCount;
     return a.year - b.year;
