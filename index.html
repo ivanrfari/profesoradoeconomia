@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="">
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,13 +9,19 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            cfg: '#1e3a5f',
-            cfe: '#7c3d11',
-            cpd: '#14532d'
+            cfg: '#1e3a8a', /* Azul Corporativo */
+            cfe: '#059669', /* Verde Esmeralda / Dinero */
+            cpd: '#d97706', /* Ámbar / Oro */
+            approved: '#10b981', /* Verde Aprobado */
+            enabled: '#3b82f6', /* Azul Habilitado */
+            locked: '#64748b' /* Gris Pizarra */
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
           }
         }
       }
@@ -28,66 +34,72 @@
 
   <style>
     /* ============================================================
-       CUSTOM CSS & ANIMACIONES
+       CUSTOM CSS & ANIMACIONES TEMA ECONOMÍA
     ============================================================ */
     body {
-      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #f8fafc;
+      /* Patrón de puntos tipo planilla de cálculo/cuaderno financiero */
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 20px 20px;
       scroll-behavior: smooth;
     }
 
     .year-col { min-width: 260px; max-width: 280px; }
 
-    /* ── Tarjetas Minimalistas ── */
+    /* ── Tarjetas Estilo "Nota de Crédito/Dashboard" ── */
     .subject-card {
-      transition: transform .15s ease, box-shadow .15s ease, opacity .3s ease, border-color .2s ease;
+      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, opacity .3s ease;
       cursor: pointer;
     }
-    .subject-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+    .subject-card:hover { 
+      transform: translateY(-4px); 
+      box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04); 
+    }
 
     .filter-active  { opacity: 1 !important; }
-    .filter-dimmed  { opacity: .20 !important; }
+    .filter-dimmed  { opacity: .25 !important; filter: grayscale(80%); }
 
-    /* ── Animación Desbloqueo ── */
+    /* ── Animación Desbloqueo (Pop verde inversión) ── */
     @keyframes unlockPop {
       0% { transform: scale(1); }
-      50% { transform: scale(1.04); box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+      50% { transform: scale(1.04); box-shadow: 0 0 25px rgba(16, 185, 129, 0.4); border-color: #10b981; }
       100% { transform: scale(1); }
     }
-    .animate-unlock { animation: unlockPop 0.5s ease-out; }
+    .animate-unlock { animation: unlockPop 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
 
     /* ── Barra Progreso ── */
-    #progress-bar { transition: width .5s cubic-bezier(0.4, 0, 0.2, 1); }
+    #progress-bar { transition: width .6s cubic-bezier(0.4, 0, 0.2, 1); }
 
     /* ── Modales ── */
-    .modal-backdrop { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); }
+    .modal-backdrop { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
 
     /* Custom Scrollbar */
     ::-webkit-scrollbar { height: 8px; width: 8px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    .dark ::-webkit-scrollbar-thumb { background: #475569; }
+    ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.5); }
+    ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
   </style>
 </head>
 
-<body class="min-h-screen bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-200">
+<body class="min-h-screen text-slate-800">
 
   <!-- ══════════════════════════════════════════
        ONBOARDING MODAL
   ══════════════════════════════════════════ -->
   <div id="onboarding-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-md p-6 shadow-2xl text-center transform scale-95 transition-transform duration-200">
-      <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
-        <span class="text-3xl">🚀</span>
+    <div class="bg-white rounded-2xl max-w-md p-8 shadow-2xl text-center border border-slate-100 transform scale-95 transition-transform duration-200">
+      <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-5 border-4 border-emerald-100">
+        <span class="text-4xl">🏦</span>
       </div>
-      <h2 class="text-2xl font-black mb-2 dark:text-white">¡Bienvenido al Mapa Curricular!</h2>
-      <p class="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
-        El diseño fue optimizado para que planifiques tu cursada fácilmente.<br><br>
-        ✅ <b>Aprobadas:</b> Hacé clic en las materias para marcarlas.<br>
-        🟢 <b>Habilitadas:</b> Listas para cursar según tus aprobadas.<br>
-        🔒 <b>Bloqueadas:</b> En la tarjeta te indicará qué requisitos te faltan para habilitarla.
+      <h2 class="text-2xl font-black mb-3 text-slate-800">Portal de Planificación</h2>
+      <p class="text-sm text-slate-600 mb-6 leading-relaxed">
+        Gestioná tu progreso académico como un portafolio de inversiones.<br><br>
+        ✅ <b>Aprobadas:</b> Ingresan a tu capital formativo.<br>
+        🟢 <b>Habilitadas:</b> Oportunidades disponibles para cursar.<br>
+        🔒 <b>Bloqueadas:</b> Requieren liquidar correlatividades previas.
       </p>
-      <button onclick="closeOnboarding()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition">
-        ¡Entendido, a cursar!
+      <button onclick="closeOnboarding()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl transition shadow-md">
+        Comenzar a planificar
       </button>
     </div>
   </div>
@@ -96,14 +108,14 @@
        MODAL DE CONFIRMACIÓN DE REINICIO
   ══════════════════════════════════════════ -->
   <div id="confirm-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
-      <h2 class="text-xl font-black mb-2 dark:text-white flex items-center gap-2">⚠️ Mapa Curricular</h2>
-      <p class="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
-        ¿Reiniciar el progreso? Se desmarcarán todas las materias que marcaste como aprobadas.
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
+      <h2 class="text-xl font-black mb-2 text-slate-800 flex items-center gap-2">⚠️ Liquidar Datos</h2>
+      <p class="text-sm text-slate-600 mb-6 leading-relaxed">
+        ¿Estás seguro de reiniciar tu balance? Se borrará todo tu historial de materias aprobadas.
       </p>
       <div class="flex gap-3 justify-end">
-        <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition">Cancelar</button>
-        <button onclick="executeReset()" class="px-4 py-2 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 transition">Sí, reiniciar</button>
+        <button onclick="closeConfirmModal()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
+        <button onclick="executeReset()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition">Sí, reiniciar</button>
       </div>
     </div>
   </div>
@@ -112,59 +124,70 @@
        MODAL DE ALERTA (Dependencias)
   ══════════════════════════════════════════ -->
   <div id="alert-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
-      <h2 class="text-xl font-black mb-3 text-amber-600 dark:text-amber-500 flex items-center gap-2">🔒 Mapa Curricular</h2>
-      <p id="alert-message" class="text-sm text-slate-600 dark:text-slate-300 mb-6 leading-relaxed"></p>
-      <button onclick="closeAlertModal()" class="w-full px-4 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 transition">Entendido</button>
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
+      <h2 class="text-xl font-black mb-3 text-amber-600 flex items-center gap-2">🔒 Movimiento Bloqueado</h2>
+      <p id="alert-message" class="text-sm text-slate-600 mb-6 leading-relaxed"></p>
+      <button onclick="closeAlertModal()" class="w-full px-4 py-3 rounded-xl text-sm font-bold text-white bg-slate-800 hover:bg-slate-900 transition">Entendido</button>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════
-       SIMULADOR MODAL
+       SIMULADOR MODAL (Proyecciones)
   ══════════════════════════════════════════ -->
   <div id="simulador-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden" onclick="closeSimulador(event)">
-    <div class="bg-white dark:bg-slate-800 rounded-2xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
-      <h2 class="text-lg font-black dark:text-white flex items-center gap-2">
-        <span>🔮</span> Simulador de Cursada
+    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-slate-800 flex items-center gap-2">
+        <span class="text-blue-600">📈</span> Proyección de Cursada
       </h2>
-      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-4">Ingresá cuántas materias querés hacer el próximo ciclo y te sugerimos opciones habilitadas óptimas.</p>
+      <p class="text-xs text-slate-500 mt-2 mb-5 leading-relaxed">Optimizá tu tiempo. Ingresá la cantidad de materias que podés cursar y el sistema calculará las opciones más estratégicas.</p>
       
-      <div class="flex items-center gap-3 mb-4">
-        <input type="number" id="sim-qty" value="3" min="1" max="10" class="w-20 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none">
-        <button onclick="runSimulador()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-lg transition">Generar Plan</button>
+      <div class="flex items-center gap-3 mb-5">
+        <input type="number" id="sim-qty" value="3" min="1" max="10" class="w-20 px-3 py-2.5 border-2 border-slate-200 rounded-xl text-center font-bold text-slate-700 focus:border-blue-500 focus:ring-0 outline-none">
+        <button onclick="runSimulador()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow-md transition">Calcular Plan</button>
       </div>
       
-      <div id="sim-results" class="space-y-2 mt-4 max-h-60 overflow-y-auto pr-1"></div>
+      <div id="sim-results" class="space-y-3 mt-4 max-h-60 overflow-y-auto pr-1"></div>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════
-       HEADER PRINCIPAL
+       HEADER PRINCIPAL TIPO DASHBOARD
   ══════════════════════════════════════════ -->
-  <header class="bg-[#1e3a5f] dark:bg-slate-950 text-white py-4 px-6 shadow-lg relative z-30 transition-colors">
-    <div class="max-w-screen-xl mx-auto flex flex-col md:flex-row items-center gap-4">
-      <div class="flex-1 text-center md:text-left">
-        <p class="text-xs uppercase tracking-widest text-blue-300 font-semibold mb-1">ISFD N°100 · DGCyE</p>
-        <h1 class="text-2xl sm:text-3xl font-black mt-0.5 flex items-center justify-center md:justify-start gap-2 tracking-tight">
-          Mapa Curricular <span class="font-light text-blue-200 hidden sm:inline">Economía</span>
-        </h1>
+  <header class="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-5 px-6 shadow-xl relative z-30">
+    <div class="max-w-screen-xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-5">
+      <div class="flex items-center gap-4 w-full lg:w-auto">
+        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center border border-white/20 hidden sm:flex">
+          <span class="text-2xl">📊</span>
+        </div>
+        <div class="flex-1 text-center sm:text-left">
+          <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">DGCyE · ISFD N°100</p>
+          <h1 class="text-2xl sm:text-3xl font-black mt-0.5 tracking-tight text-white">
+            Mapa Curricular <span class="font-light text-slate-300">Economía</span>
+          </h1>
+        </div>
       </div>
       
-      <!-- Panel de Estadísticas Header -->
-      <div class="flex items-center gap-6 bg-black/30 rounded-xl px-5 py-2.5 backdrop-blur-sm border border-white/10">
-        <div class="text-right">
-          <span class="text-2xl font-black text-cyan-400" id="pct-label">0%</span>
-          <p class="text-[10px] text-blue-200 uppercase tracking-widest font-bold">Progreso</p>
+      <!-- Panel de Estadísticas Financieras / KPIs -->
+      <div class="flex flex-wrap justify-center sm:justify-end items-center gap-4 sm:gap-8 bg-black/20 rounded-2xl px-6 py-3 border border-white/10 w-full lg:w-auto">
+        
+        <div class="text-center sm:text-right flex flex-col">
+          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-0.5">Avance Global</p>
+          <div class="flex items-baseline gap-1 justify-center sm:justify-end">
+            <span class="text-3xl font-black text-emerald-400 font-mono tracking-tighter" id="pct-label">0</span>
+            <span class="text-lg font-bold text-emerald-400/70">%</span>
+          </div>
         </div>
-        <div class="w-px h-8 bg-white/20"></div>
-        <div class="text-right">
-          <span class="text-2xl font-black text-amber-400" id="hs-count">0</span>
-          <p class="text-[10px] text-blue-200 uppercase tracking-widest font-bold">Horas</p>
+        
+        <div class="w-px h-10 bg-white/10 hidden sm:block"></div>
+        
+        <div class="text-center sm:text-right flex flex-col">
+          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-0.5">Carga Horaria</p>
+          <div class="flex items-baseline gap-1 justify-center sm:justify-end">
+            <span class="text-3xl font-black text-blue-400 font-mono tracking-tighter" id="hs-count">0</span>
+            <span class="text-xs font-bold text-blue-400/70">HS</span>
+          </div>
         </div>
-        <div class="w-px h-8 bg-white/20"></div>
-        <button onclick="toggleDarkMode()" class="p-2 bg-white/10 hover:bg-white/20 rounded-full transition" title="Alternar Modo Oscuro">
-          <span id="dark-icon" class="text-lg">🌙</span>
-        </button>
+
       </div>
     </div>
   </header>
@@ -172,41 +195,42 @@
   <!-- ══════════════════════════════════════════
        BARRA DE HERRAMIENTAS
   ══════════════════════════════════════════ -->
-  <div class="sticky top-0 z-20 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+  <div class="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
     <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
 
       <!-- Búsqueda y Filtros de Campo -->
       <div class="flex flex-wrap items-center gap-3 flex-1">
         <div class="relative w-full sm:w-64">
-          <input type="text" id="search-input" placeholder="🔍 Buscar por nombre..." class="w-full pl-4 pr-4 py-2 text-sm rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 focus:ring-2 focus:ring-blue-500 outline-none dark:text-white transition-colors" onkeyup="applyFilterStyles()">
+          <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
+          <input type="text" id="search-input" placeholder="Buscar por asignatura..." class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-700 transition-all font-medium" onkeyup="applyFilterStyles()">
         </div>
 
-        <div class="w-px h-6 bg-slate-300 dark:bg-slate-700 hidden lg:block"></div>
+        <div class="w-px h-6 bg-slate-300 hidden lg:block"></div>
 
-        <div class="flex gap-1.5" id="field-filters">
-          <button onclick="applyFilter('all')" id="btn-all" class="filter-btn active px-4 py-1.5 rounded-lg text-xs font-bold border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-700 transition">Todos</button>
-          <button onclick="applyFilter('CFG')" id="btn-CFG" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-[#1e3a5f] hover:bg-blue-800 transition">CFG</button>
-          <button onclick="applyFilter('CFE')" id="btn-CFE" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-[#7c3d11] hover:bg-orange-800 transition">CFE</button>
-          <button onclick="applyFilter('CPD')" id="btn-CPD" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-white bg-[#14532d] hover:bg-green-800 transition">CPD</button>
+        <div class="flex gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200" id="field-filters">
+          <button onclick="applyFilter('all')" id="btn-all" class="filter-btn active px-4 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-white shadow-sm transition">Todos</button>
+          <button onclick="applyFilter('CFG')" id="btn-CFG" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-blue-800 transition">CFG</button>
+          <button onclick="applyFilter('CFE')" id="btn-CFE" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-emerald-700 transition">CFE</button>
+          <button onclick="applyFilter('CPD')" id="btn-CPD" class="filter-btn px-4 py-1.5 rounded-lg text-xs font-bold text-slate-500 hover:text-amber-700 transition">CPD</button>
         </div>
       </div>
 
       <!-- Herramientas de Acción -->
       <div class="flex items-center gap-2">
-        <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-700 dark:text-slate-300 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 px-3 py-2 rounded-xl border border-blue-200 dark:border-blue-800 transition">
+        <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-2 rounded-xl border border-emerald-200 transition" title="Muestra únicamente las materias que ya podés cursar">
           <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
-          <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer dark:bg-slate-600 peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
-          Modo Inscripción
+          <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-emerald-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
+          Modo Habilitadas
         </label>
         
-        <div class="flex bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-700">
-          <button onclick="setViewMode('year')" id="btn-view-year" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white dark:bg-slate-600 shadow-sm text-slate-800 dark:text-white transition">Por Año</button>
-          <button onclick="setViewMode('campo')" id="btn-view-campo" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition">Por Campo</button>
+        <div class="flex bg-slate-100 rounded-xl p-1 border border-slate-200">
+          <button onclick="setViewMode('year')" id="btn-view-year" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-white shadow-sm text-slate-800 transition">Por Año</button>
+          <button onclick="setViewMode('campo')" id="btn-view-campo" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-500 hover:text-slate-800 transition">Por Campo</button>
         </div>
         
-        <button onclick="openSimulador()" class="text-xs bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300 px-3 py-2 rounded-xl font-bold hover:bg-indigo-200 transition" title="Simulador de cursada">🔮</button>
-        <button onclick="exportMap()" id="btn-export" class="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300 px-3 py-2 rounded-xl font-bold hover:bg-emerald-200 transition flex items-center gap-1">📸 <span class="hidden sm:inline">Exportar</span></button>
-        <button onclick="confirmReset()" class="text-xs text-red-500 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 px-3 py-2 rounded-xl font-bold transition" title="Reiniciar progreso">↺</button>
+        <button onclick="openSimulador()" class="text-xs bg-blue-50 text-blue-700 px-3 py-2 rounded-xl font-bold border border-blue-100 hover:bg-blue-100 hover:border-blue-200 transition flex items-center gap-1.5" title="Proyectar Cursada"><span>📈</span> <span class="hidden sm:inline">Proyectar</span></button>
+        <button onclick="exportMap()" id="btn-export" class="text-xs bg-slate-100 text-slate-700 px-3 py-2 rounded-xl font-bold border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5"><span>📄</span> <span class="hidden sm:inline">Reporte</span></button>
+        <button onclick="confirmReset()" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5" title="Liquidar Datos"><span>🔄</span></button>
       </div>
 
     </div>
@@ -215,17 +239,22 @@
   <!-- ══════════════════════════════════════════
        LEYENDA & PROGRESS BAR
   ══════════════════════════════════════════ -->
-  <div class="max-w-screen-xl mx-auto px-4 pt-5 pb-2 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-    <div class="flex flex-wrap gap-4 text-xs font-bold text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 px-4 py-2 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-      <span class="flex items-center gap-1.5"><span class="text-base">✅</span> Aprobada</span>
-      <span class="flex items-center gap-1.5"><span class="text-base">🟢</span> Habilitada</span>
-      <span class="flex items-center gap-1.5"><span class="text-base opacity-70">🔒</span> Bloqueada</span>
+  <div class="max-w-screen-xl mx-auto px-4 pt-6 pb-2 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+    <div class="flex flex-wrap gap-4 text-xs font-bold text-slate-600 bg-white px-5 py-2.5 rounded-xl shadow-sm border border-slate-200">
+      <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500 border border-emerald-600 shadow-inner"></span> Capitalizado (Aprobada)</span>
+      <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500 border border-blue-600 shadow-inner"></span> Disponible (Habilitada)</span>
+      <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-300 border border-slate-400 shadow-inner"></span> Restringida (Bloqueada)</span>
     </div>
     
-    <div class="flex items-center gap-4 w-full md:w-80 bg-white dark:bg-slate-800 px-4 py-2.5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-      <span class="text-xs font-black text-slate-500 dark:text-slate-400 whitespace-nowrap"><span id="approved-count" class="text-blue-600 dark:text-blue-400 text-sm">0</span> / <span id="total-count">0</span> mat.</span>
-      <div class="flex-1 bg-slate-100 dark:bg-slate-900 rounded-full h-3 overflow-hidden inset-shadow-sm border border-slate-200 dark:border-slate-700">
-        <div id="progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-cyan-400" style="width:0%"></div>
+    <div class="flex items-center gap-4 w-full md:w-96 bg-white px-5 py-3 rounded-xl shadow-sm border border-slate-200">
+      <span class="text-xs font-black text-slate-400 whitespace-nowrap uppercase tracking-wide">
+        <span id="approved-count" class="text-slate-800 text-sm font-mono">0</span> / <span id="total-count" class="font-mono">0</span> MAT.
+      </span>
+      <div class="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner border border-slate-200">
+        <!-- Barra estilo financiero (verde) -->
+        <div id="progress-bar" class="h-full bg-emerald-500 relative" style="width:0%">
+          <div class="absolute inset-0 bg-white/20" style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -233,8 +262,8 @@
   <!-- ══════════════════════════════════════════
        GRILLA CURRICULAR
   ══════════════════════════════════════════ -->
-  <div id="export-area" class="bg-slate-50 dark:bg-slate-900 transition-colors">
-    <main class="max-w-screen-xl mx-auto px-4 pb-16 pt-4 overflow-x-auto min-h-[60vh]">
+  <div id="export-area" class="transition-colors pb-8">
+    <main class="max-w-screen-xl mx-auto px-4 pb-16 pt-5 overflow-x-auto min-h-[60vh]">
       <div class="flex gap-6 min-w-max" id="grid-container">
         <!-- Generado por JS -->
       </div>
@@ -245,46 +274,50 @@
        MODAL DE INFORMACIÓN MATERIA
   ══════════════════════════════════════════ -->
   <div id="modal-backdrop" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden" onclick="closeModal(event)">
-    <div id="modal-box" class="bg-white dark:bg-slate-800 w-full max-w-lg shadow-2xl rounded-2xl overflow-hidden transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+    <div id="modal-box" class="bg-white w-full max-w-lg shadow-2xl rounded-2xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-200" onclick="event.stopPropagation()">
       <div id="modal-header" class="p-6 text-white relative overflow-hidden">
-        <div class="absolute inset-0 bg-black/10"></div>
+        <!-- Patrón sutil para el header del modal -->
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 10px 10px;"></div>
         <div class="relative z-10 flex justify-between items-start">
           <div>
-            <span id="modal-badge" class="text-[10px] uppercase tracking-widest font-black bg-white/20 px-3 py-1 rounded-full shadow-sm"></span>
-            <h2 id="modal-title" class="text-2xl font-black mt-3 leading-tight tracking-tight"></h2>
+            <span id="modal-badge" class="text-[10px] uppercase tracking-widest font-black bg-white/20 px-3 py-1 rounded-full shadow-sm backdrop-blur-sm border border-white/20"></span>
+            <h2 id="modal-title" class="text-2xl font-black mt-3 leading-tight tracking-tight drop-shadow-md"></h2>
           </div>
-          <button onclick="closeModal()" class="text-white/70 hover:text-white bg-black/20 hover:bg-black/40 rounded-full w-8 h-8 flex items-center justify-center transition ml-4">✕</button>
+          <button onclick="closeModal()" class="text-white hover:text-slate-200 bg-white/20 hover:bg-white/30 border border-white/20 rounded-full w-8 h-8 flex items-center justify-center transition ml-4 shadow-sm">✕</button>
         </div>
       </div>
-      <div class="p-6 space-y-5 text-sm text-slate-700 dark:text-slate-300">
+      <div class="p-6 space-y-5 text-sm text-slate-700 bg-slate-50">
+        
+        <!-- KPIs de la Materia -->
         <div class="grid grid-cols-3 gap-4 text-center">
-          <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
+          <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
             <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Formato</p>
-            <p class="font-black mt-1 dark:text-white text-base" id="modal-formato">—</p>
+            <p class="font-black mt-1 text-slate-800 text-sm" id="modal-formato">—</p>
           </div>
-          <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
+          <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
             <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Régimen</p>
-            <p class="font-black mt-1 dark:text-white text-base" id="modal-regimen">—</p>
+            <p class="font-black mt-1 text-slate-800 text-sm" id="modal-regimen">—</p>
           </div>
-          <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3 border border-slate-100 dark:border-slate-700">
-            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Carga</p>
-            <p class="font-black mt-1 dark:text-white text-base" id="modal-hs">—</p>
+          <div class="bg-white rounded-xl p-3 border border-slate-200 shadow-sm">
+            <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Inversión Hs</p>
+            <p class="font-black mt-1 text-slate-800 text-base font-mono text-blue-600" id="modal-hs">—</p>
           </div>
         </div>
         
-        <div id="modal-corr-section" class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl p-4">
-          <h3 class="text-[10px] uppercase tracking-widest font-black text-amber-700 dark:text-amber-500 mb-1.5 flex items-center gap-1"><span>🔑</span> Requisitos para cursar</h3>
-          <p id="modal-corr" class="text-sm font-bold text-amber-900 dark:text-amber-200"></p>
+        <!-- Requisitos -->
+        <div id="modal-corr-section" class="bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-sm">
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-amber-700 mb-1.5 flex items-center gap-1.5"><span>🔑</span> Requisitos para cursar</h3>
+          <p id="modal-corr" class="text-sm font-bold text-amber-900"></p>
         </div>
 
-        <div>
-          <h3 class="text-xs uppercase tracking-widest font-black text-slate-400 dark:text-slate-500 mb-2 border-b border-slate-100 dark:border-slate-700 pb-1">Finalidad Formativa</h3>
-          <p id="modal-finalidades" class="leading-relaxed text-sm"></p>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="text-xs uppercase tracking-widest font-black text-slate-400 mb-2 border-b border-slate-100 pb-1.5">Finalidad Formativa</h3>
+          <p id="modal-finalidades" class="leading-relaxed text-sm text-slate-600 font-medium"></p>
         </div>
         
-        <div>
-          <h3 class="text-xs uppercase tracking-widest font-black text-slate-400 dark:text-slate-500 mb-2 border-b border-slate-100 dark:border-slate-700 pb-1">Núcleos de Contenido</h3>
-          <ul id="modal-contenidos" class="list-none space-y-1.5 text-sm"></ul>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h3 class="text-xs uppercase tracking-widest font-black text-slate-400 mb-2 border-b border-slate-100 pb-1.5">Núcleos de Contenido</h3>
+          <ul id="modal-contenidos" class="list-none space-y-2 text-sm text-slate-600 font-medium"></ul>
         </div>
       </div>
     </div>
@@ -358,19 +391,12 @@ const state = {
 };
 
 const CAMPO_COLORS = {
-  CFG: { bg: 'bg-[#1e3a5f]', label: 'CFG', title: 'Formación General' },
-  CFE: { bg: 'bg-[#7c3d11]', label: 'CFE', title: 'Formación Específica' },
-  CPD: { bg: 'bg-[#14532d]', label: 'CPD', title: 'Práctica Docente' },
+  CFG: { bg: 'bg-[#1e3a8a]', label: 'CFG', title: 'Formación General' },
+  CFE: { bg: 'bg-[#059669]', label: 'CFE', title: 'Formación Específica' },
+  CPD: { bg: 'bg-[#d97706]', label: 'CPD', title: 'Práctica Docente' },
 };
 
 function init() {
-  if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-    document.documentElement.classList.add('dark');
-  }
-  const isDark = document.documentElement.classList.contains('dark');
-  const darkIcon = document.getElementById('dark-icon');
-  if (darkIcon) darkIcon.textContent = isDark ? '☀️' : '🌙';
-  
   const saved = localStorage.getItem('isfd100_aprobadas');
   if (saved) state.approved = new Set(JSON.parse(saved));
   
@@ -402,9 +428,12 @@ function saveState() {
 ───────────────────────────────────────────── */
 function setViewMode(mode) {
   state.viewMode = mode;
-  document.getElementById('btn-view-year').className = `px-3 py-1.5 text-xs font-bold rounded-lg transition ${mode==='year'?'bg-white dark:bg-slate-600 shadow-sm text-slate-800 dark:text-white':'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'}`;
-  document.getElementById('btn-view-campo').className = `px-3 py-1.5 text-xs font-bold rounded-lg transition ${mode==='campo'?'bg-white dark:bg-slate-600 shadow-sm text-slate-800 dark:text-white':'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white'}`;
   
+  // Update Buttons
+  document.getElementById('btn-view-year').className = `px-3 py-1.5 text-xs font-bold rounded-lg transition ${mode==='year'?'bg-white shadow-sm text-slate-800':'text-slate-500 hover:text-slate-800'}`;
+  document.getElementById('btn-view-campo').className = `px-3 py-1.5 text-xs font-bold rounded-lg transition ${mode==='campo'?'bg-white shadow-sm text-slate-800':'text-slate-500 hover:text-slate-800'}`;
+  
+  // Manejo de filtros
   document.getElementById('field-filters').style.opacity = mode === 'campo' ? '0.3' : '1';
   document.getElementById('field-filters').style.pointerEvents = mode === 'campo' ? 'none' : 'auto';
   if(mode === 'campo' && state.activeFilter !== 'all') applyFilter('all');
@@ -420,12 +449,18 @@ function renderGrid() {
   if (state.viewMode === 'year') {
     const byYear = { 1: [], 2: [], 3: [], 4: [] };
     SUBJECTS.forEach(s => byYear[s.year].push(s));
-    const yearColors = ['border-blue-500', 'border-amber-500', 'border-emerald-500', 'border-red-500'];
+    
+    // Paleta de años más sobria y profesional
+    const yearColors = ['border-blue-700', 'border-emerald-600', 'border-amber-600', 'border-purple-700'];
 
     [1, 2, 3, 4].forEach(yr => {
       const col = document.createElement('div');
       col.className = 'year-col flex flex-col gap-4';
-      col.innerHTML = `<div class="border-b-4 ${yearColors[yr-1]} pb-2 mb-2 font-black text-lg text-slate-800 dark:text-slate-100 flex items-center justify-between"><span>${yr}er Año</span> <span class="text-xs font-bold bg-slate-200 dark:bg-slate-800 px-2 py-1 rounded-md text-slate-500">${byYear[yr].length} Mat.</span></div>`;
+      col.innerHTML = `
+        <div class="border-b-[3px] ${yearColors[yr-1]} pb-2 mb-2 font-black text-lg text-slate-800 flex items-center justify-between">
+          <span>${yr}er Año</span> 
+          <span class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-1 rounded-md uppercase tracking-wider">${byYear[yr].length} Mat.</span>
+        </div>`;
       byYear[yr].forEach(s => col.appendChild(createCard(s)));
       container.appendChild(col);
     });
@@ -436,7 +471,12 @@ function renderGrid() {
     ['CFG', 'CFE', 'CPD'].forEach(c => {
       const col = document.createElement('div');
       col.className = 'year-col flex flex-col gap-4';
-      col.innerHTML = `<div class="border-b-4 pb-2 mb-2 font-black text-lg text-slate-800 dark:text-slate-100" style="border-color:${c==='CFG'?'#1e3a5f':c==='CFE'?'#7c3d11':'#14532d'}">${CAMPO_COLORS[c].title}</div>`;
+      // Match exact hex code to bottom border
+      const bColor = c==='CFG' ? '#1e3a8a' : c==='CFE' ? '#059669' : '#d97706';
+      col.innerHTML = `
+        <div class="border-b-[3px] pb-2 mb-2 font-black text-lg text-slate-800" style="border-color:${bColor}">
+          ${CAMPO_COLORS[c].title}
+        </div>`;
       byCampo[c].forEach(s => col.appendChild(createCard(s)));
       container.appendChild(col);
     });
@@ -444,24 +484,24 @@ function renderGrid() {
 }
 
 /* ─────────────────────────────────────────────
-   NUEVO DISEÑO DE TARJETA
+   NUEVO DISEÑO DE TARJETA TIPO "NOTA FINANCIERA"
 ───────────────────────────────────────────── */
 function createCard(subject) {
   const card = document.createElement('div');
-  card.className = 'subject-card p-4 flex flex-col h-full bg-white dark:bg-slate-800 border-2 rounded-xl transition-all';
+  card.className = 'subject-card p-4 flex flex-col h-full bg-white border-2 rounded-xl transition-all';
   card.id = `card-${subject.id}`;
   
   card.innerHTML = `
     <div class="flex justify-between items-start mb-3">
       <span class="${CAMPO_COLORS[subject.campo].bg} px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-sm">${CAMPO_COLORS[subject.campo].label}</span>
-      <span class="status-icon text-lg leading-none filter drop-shadow-sm"></span>
+      <span class="status-icon w-6 h-6 flex items-center justify-center rounded-full bg-slate-100 text-xs"></span>
     </div>
-    <h3 class="font-black text-[15px] leading-tight text-slate-800 dark:text-slate-100 mb-1 pr-2">${subject.name}</h3>
-    <p class="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-4">${subject.regimen} · ${subject.hs}hs</p>
+    <h3 class="font-black text-[15px] leading-snug text-slate-800 mb-2 pr-2">${subject.name}</h3>
+    <p class="text-[11px] font-bold text-slate-400 mb-4 tracking-wide uppercase font-mono">${subject.regimen} · ${subject.hs}hs</p>
     
-    <div class="mt-auto pt-3 border-t border-slate-100 dark:border-slate-700/60 flex justify-between items-center bg-transparent">
+    <div class="mt-auto pt-3 border-t border-slate-100 flex justify-between items-center">
       <span class="status-text transition-colors duration-200"></span>
-      <button onclick="openModal(event, '${subject.id}')" class="info-btn w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 text-xs font-black flex items-center justify-center transition" title="Ver información de la materia">i</button>
+      <button onclick="openModal(event, '${subject.id}')" class="info-btn w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 border border-slate-200 text-sm font-bold flex items-center justify-center transition shadow-sm" title="Ver Info">i</button>
     </div>
   `;
   card.addEventListener('click', (e) => {
@@ -486,7 +526,7 @@ function toggleApproved(id) {
   if (isApproved) {
     const dependents = SUBJECTS.filter(s => s.prereqs.includes(id) && state.approved.has(s.id));
     if (dependents.length > 0) {
-      showAlert(`No podés desmarcar esta materia. Dependen de ella:<br><br><b>${dependents.map(d=>d.name).join('<br>')}</b>`);
+      showAlert(`Transacción denegada. Las siguientes materias dependen de <b>${subject.name}</b> para su validez:<br><br><span class="text-xs text-amber-800">▪ ${dependents.map(d=>d.name).join('<br>▪ ')}</span>`);
       return;
     }
     state.approved.delete(id);
@@ -529,35 +569,38 @@ function updateAllCards() {
     const textEl = card.querySelector('.status-text');
     
     card.classList.remove(
-      'border-slate-200', 'bg-slate-50', 'dark:border-slate-700', 'dark:bg-slate-800/40', 'opacity-60',
-      'border-blue-400', 'bg-blue-50', 'dark:border-blue-500/50', 'dark:bg-blue-900/20',
-      'border-cyan-500', 'bg-cyan-50', 'dark:border-cyan-500/50', 'dark:bg-cyan-900/20'
+      'border-slate-200', 'bg-slate-50', 'opacity-60',
+      'border-blue-400', 'bg-blue-50',
+      'border-emerald-500', 'bg-emerald-50'
     );
 
     if (state.approved.has(subject.id)) {
-      card.classList.add('border-cyan-500', 'bg-cyan-50', 'dark:border-cyan-500/50', 'dark:bg-cyan-900/20');
+      card.classList.add('border-emerald-500', 'bg-emerald-50');
       iconEl.innerHTML = '✅';
+      iconEl.className = 'status-icon w-6 h-6 flex items-center justify-center rounded-full bg-emerald-200 text-xs shadow-sm';
       textEl.innerHTML = 'Aprobada';
-      textEl.className = 'status-text text-xs font-black text-cyan-700 dark:text-cyan-400 tracking-wide';
+      textEl.className = 'status-text text-xs font-black text-emerald-700 tracking-wide';
       textEl.removeAttribute('title');
     } 
     else if (isSubjectEnabled(subject.id)) {
-      card.classList.add('border-blue-400', 'bg-blue-50', 'dark:border-blue-500/50', 'dark:bg-blue-900/20');
+      card.classList.add('border-blue-400', 'bg-blue-50');
       iconEl.innerHTML = '🟢';
+      iconEl.className = 'status-icon w-6 h-6 flex items-center justify-center rounded-full bg-blue-200 text-[10px] shadow-sm';
       textEl.innerHTML = 'Habilitada';
-      textEl.className = 'status-text text-xs font-black text-blue-700 dark:text-blue-400 tracking-wide';
+      textEl.className = 'status-text text-xs font-black text-blue-700 tracking-wide';
       textEl.removeAttribute('title');
     } 
     else {
-      card.classList.add('border-slate-200', 'bg-slate-50', 'dark:border-slate-700', 'dark:bg-slate-800/40', 'opacity-60');
+      card.classList.add('border-slate-200', 'bg-slate-50', 'opacity-60');
       iconEl.innerHTML = '🔒';
+      iconEl.className = 'status-icon w-6 h-6 flex items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-500';
       
       const missingIds = subject.prereqs.filter(pid => !state.approved.has(pid));
       const missingNames = missingIds.map(pid => SUBJECTS.find(x=>x.id===pid).name);
       
       textEl.innerHTML = `Req: ${missingIds.length} mat.`;
       textEl.title = `Falta aprobar:\n• ${missingNames.join('\n• ')}`;
-      textEl.className = 'status-text text-[11px] font-bold text-slate-500 dark:text-slate-400 truncate max-w-[140px] cursor-help border-b border-dashed border-slate-400';
+      textEl.className = 'status-text text-[11px] font-bold text-slate-500 truncate max-w-[140px] cursor-help border-b border-dashed border-slate-400';
     }
   });
   applyFilterStyles();
@@ -565,8 +608,18 @@ function updateAllCards() {
 
 function applyFilter(campo) {
   state.activeFilter = campo;
-  document.querySelectorAll('#field-filters .filter-btn').forEach(btn => btn.classList.remove('ring-2', 'ring-offset-2', 'dark:ring-offset-slate-900', 'ring-blue-400'));
-  document.getElementById(`btn-${campo}`).classList.add('ring-2', 'ring-offset-2', 'dark:ring-offset-slate-900', 'ring-blue-400');
+  document.querySelectorAll('#field-filters .filter-btn').forEach(btn => {
+    btn.classList.remove('bg-white', 'shadow-sm', 'text-slate-700');
+    // Si no es el activo, ponerlo grisáceo
+    if(!btn.classList.contains('active')) {
+      btn.classList.add('text-slate-500');
+    }
+  });
+  
+  const activeBtn = document.getElementById(`btn-${campo}`);
+  activeBtn.classList.remove('text-slate-500');
+  activeBtn.classList.add('bg-white', 'shadow-sm', 'text-slate-700');
+  
   applyFilterStyles();
 }
 
@@ -583,6 +636,7 @@ function applyFilterStyles() {
     if (campo !== 'all' && subject.campo !== campo) visible = false;
     if (q && !subject.name.toLowerCase().includes(q)) visible = false;
     
+    // Filtro Inversión (Qué cursar)
     if (showOnlyEnabled && (!isSubjectEnabled(subject.id) || state.approved.has(subject.id))) {
        visible = false;
     }
@@ -606,13 +660,13 @@ function updateProgress() {
   state.approved.forEach(id => approvedHs += SUBJECTS.find(x=>x.id===id).hs);
 
   document.getElementById('progress-bar').style.width = pct + '%';
-  document.getElementById('pct-label').textContent = pct + '%';
+  document.getElementById('pct-label').textContent = pct;
   document.getElementById('approved-count').textContent = approvedCount;
   document.getElementById('total-count').textContent = total;
   document.getElementById('hs-count').textContent = approvedHs;
 
   if (pct === 100 && total > 0) {
-    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999 });
+    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999, colors: ['#059669', '#10b981', '#fbbf24', '#f59e0b'] });
   }
 }
 
@@ -624,20 +678,20 @@ function openModal(event, id) {
   const subject = SUBJECTS.find(s => s.id === id);
   if (!subject) return;
 
-  const ccBg = subject.campo === 'CFG' ? '#1e3a5f' : subject.campo === 'CFE' ? '#7c3d11' : '#14532d';
+  const ccBg = subject.campo === 'CFG' ? '#1e3a8a' : subject.campo === 'CFE' ? '#059669' : '#d97706';
   document.getElementById('modal-header').style.backgroundColor = ccBg;
   
   document.getElementById('modal-badge').textContent = `${CAMPO_COLORS[subject.campo].label} — ${CAMPO_COLORS[subject.campo].title}`;
   document.getElementById('modal-title').textContent = subject.name;
   document.getElementById('modal-formato').textContent = subject.formato;
   document.getElementById('modal-regimen').textContent = subject.regimen;
-  document.getElementById('modal-hs').textContent = subject.hs + ' hs';
+  document.getElementById('modal-hs').textContent = subject.hs;
   document.getElementById('modal-finalidades').textContent = subject.finalidades;
   
   const ul = document.getElementById('modal-contenidos');
-  ul.innerHTML = subject.contenidos.map(c => `<li><span class="text-blue-500 mr-1">▪</span> ${c}</li>`).join('');
+  ul.innerHTML = subject.contenidos.map(c => `<li><span class="text-blue-500 mr-2 font-black">»</span> ${c}</li>`).join('');
 
-  const corrText = subject.prereqs.length === 0 ? 'Libre (Sin requisitos previos)' : subject.prereqs.map(pid => `• ${SUBJECTS.find(x=>x.id===pid).name}`).join('<br>');
+  const corrText = subject.prereqs.length === 0 ? 'Materia de libre acceso' : subject.prereqs.map(pid => `<span class="text-amber-600 mr-1">▪</span> ${SUBJECTS.find(x=>x.id===pid).name}`).join('<br>');
   document.getElementById('modal-corr').innerHTML = corrText;
 
   const backdrop = document.getElementById('modal-backdrop');
@@ -675,7 +729,6 @@ function closeOnboarding() {
   }, 150);
 }
 
-/* ── Custom Confirm Reset ── */
 function confirmReset() {
   const modal = document.getElementById('confirm-modal');
   modal.classList.remove('hidden');
@@ -702,7 +755,6 @@ function executeReset() {
   updateProgress();
 }
 
-/* ── Custom Alert ── */
 function showAlert(msg) {
   document.getElementById('alert-message').innerHTML = msg;
   const modal = document.getElementById('alert-modal');
@@ -750,17 +802,17 @@ function runSimulador() {
 
   const container = document.getElementById('sim-results');
   if(selected.length === 0) {
-    container.innerHTML = '<p class="text-sm text-emerald-600 dark:text-emerald-400 font-bold text-center py-4">¡Felicidades! No tenés materias pendientes habilitadas.</p>';
+    container.innerHTML = '<p class="text-sm text-emerald-600 font-bold text-center py-4">¡Excelente balance! No hay materias pendientes en este momento.</p>';
     return;
   }
 
   container.innerHTML = selected.map(s => `
-    <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600 flex justify-between items-center">
+    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm">
       <div>
-        <p class="text-sm font-bold dark:text-white leading-tight">${s.name}</p>
-        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1 font-medium">${s.regimen} · ${s.year}er Año</p>
+        <p class="text-sm font-black text-slate-800 leading-tight">${s.name}</p>
+        <p class="text-[11px] text-slate-500 mt-1 font-mono">${s.regimen} · Año ${s.year}</p>
       </div>
-      <button onclick="toggleApproved('${s.id}'); closeSimulador();" class="text-[10px] uppercase font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 px-2 py-1 rounded-md hover:bg-blue-200 transition">Aprobar</button>
+      <button onclick="toggleApproved('${s.id}'); closeSimulador();" class="text-[10px] uppercase font-bold bg-blue-100 text-blue-700 border border-blue-200 px-2 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition shadow-sm">Cursar</button>
     </div>
   `).join('');
 }
@@ -769,7 +821,7 @@ function runSimulador() {
 function exportMap() {
   const btn = document.getElementById('btn-export');
   const originalHTML = btn.innerHTML;
-  btn.innerHTML = '⏳ <span class="hidden sm:inline">Procesando...</span>';
+  btn.innerHTML = '⏳ <span class="hidden sm:inline">Calculando...</span>';
   btn.disabled = true;
 
   const scrollX = window.scrollX;
@@ -794,7 +846,7 @@ function exportMap() {
 
   setTimeout(() => {
     html2canvas(area, { 
-      backgroundColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#f8fafc',
+      backgroundColor: '#f8fafc',
       scale: isMobile ? 1 : 2, 
       scrollX: 0,
       scrollY: 0,
@@ -807,7 +859,7 @@ function exportMap() {
       window.scrollTo(scrollX, scrollY);
       
       const link = document.createElement('a');
-      link.download = 'mapa-curricular-isfd100.png';
+      link.download = 'Reporte-ISFD100.png';
       link.href = canvas.toDataURL('image/png');
       link.click();
       
@@ -824,14 +876,6 @@ function exportMap() {
       btn.disabled = false;
     });
   }, 400);
-}
-
-/* ── Modo Oscuro ── */
-function toggleDarkMode() {
-  document.documentElement.classList.toggle('dark');
-  const isDark = document.documentElement.classList.contains('dark');
-  localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  document.getElementById('dark-icon').textContent = isDark ? '☀️' : '🌙';
 }
 
 document.addEventListener('keydown', e => { 
