@@ -737,12 +737,55 @@ function runSimulador() {
 
 /* ── Exportar a Imagen ── */
 function exportMap() {
+  // 1. Cambiamos el texto del botón para dar feedback de carga
+  const btn = document.querySelector('button[onclick="exportMap()"]');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳ Procesando...';
+  btn.disabled = true;
+
   const area = document.getElementById('export-area');
-  html2canvas(area, { backgroundColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#f8fafc' }).then(canvas => {
+  const main = area.querySelector('main');
+  
+  // 2. Guardamos los estilos originales para restaurarlos después
+  const origAreaWidth = area.style.width;
+  const origMainOverflow = main.style.overflow;
+  const origMainMaxWidth = main.style.maxWidth;
+  const origMainWidth = main.style.width;
+  
+  // 3. Forzamos al contenedor a expandirse al 100% de su contenido
+  area.style.width = 'max-content';
+  main.style.overflow = 'visible';
+  main.style.maxWidth = 'none';
+  main.style.width = 'max-content';
+  
+  // 4. Redibujamos las líneas para que se adapten al nuevo ancho expandido
+  drawLines();
+
+  // 5. Capturamos el canvas con mejor calidad (scale: 2)
+  html2canvas(area, { 
+    backgroundColor: document.documentElement.classList.contains('dark') ? '#0f172a' : '#f8fafc',
+    scale: 2 
+  }).then(canvas => {
+    // 6. Restauramos la web a la normalidad
+    area.style.width = origAreaWidth;
+    main.style.overflow = origMainOverflow;
+    main.style.maxWidth = origMainMaxWidth;
+    main.style.width = origMainWidth;
+    drawLines(); 
+    
+    // 7. Descargamos la imagen
     const link = document.createElement('a');
     link.download = 'mapa-curricular-isfd100.png';
-    link.href = canvas.toDataURL();
+    link.href = canvas.toDataURL('image/png');
     link.click();
+    
+    // Restauramos el botón
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }).catch(err => {
+    console.error("Error al exportar:", err);
+    btn.innerHTML = originalText;
+    btn.disabled = false;
   });
 }
 
