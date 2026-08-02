@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mapa Curricular · Economía · ISFD N°100</title>
   
-  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Fxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -311,25 +311,29 @@
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
         
+        <!-- Búsqueda con ancho completo -->
         <div class="flex w-full lg:w-auto flex-1 gap-3">
           <div class="relative flex-1">
             <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
             <input type="text" id="search-input" placeholder="Buscar materia..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-800 transition-all font-medium truncate" onkeyup="applyFilterStyles()">
           </div>
-          
-          <label class="flex shrink-0 items-center gap-2 cursor-pointer text-[11px] sm:text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl border border-blue-200 transition shadow-sm" title="Muestra únicamente las materias que ya podés cursar">
-            <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
-            <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
-            <span class="hidden sm:inline">Modo Inscripción</span>
-          </label>
         </div>
 
-        <div class="flex items-center justify-start md:justify-end gap-2 w-full lg:w-auto overflow-x-auto hide-scrollbar pb-1 md:pb-0 pt-1 md:pt-0">
-          <button id="btn-install" onclick="installApp()" class="hidden shrink-0 text-xs bg-slate-900 text-white px-3 sm:px-4 py-2 rounded-xl font-bold hover:bg-slate-800 transition shadow-sm flex items-center gap-1.5">
+        <!-- Botones de Acción y Modo Inscripción (Barra Horizontal Deslizable) -->
+        <div class="flex items-center justify-start lg:justify-end gap-2 w-full lg:w-auto overflow-x-auto hide-scrollbar pb-1 lg:pb-0 pt-1 lg:pt-0">
+          
+          <button id="btn-install" onclick="installApp()" class="hidden shrink-0 text-xs bg-slate-900 text-white px-3 py-2 rounded-xl font-bold hover:bg-slate-800 transition shadow-sm flex items-center gap-1.5">
             <span>📱</span> App
           </button>
+
+          <!-- MODO INSCRIPCIÓN INTEGRADO ACÁ -->
+          <label class="flex shrink-0 items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl border border-blue-200 transition shadow-sm">
+            <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
+            <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
+            <span>Modo Inscripción</span>
+          </label>
           
-          <div class="w-px h-6 bg-slate-300 hidden md:block mx-1"></div>
+          <div class="w-px h-6 bg-slate-300 hidden lg:block shrink-0 mx-1"></div>
           
           <button onclick="openSchedule()" class="shrink-0 text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📅</span> Horarios
@@ -343,8 +347,8 @@
           <button onclick="exportMap()" id="btn-export" class="shrink-0 text-xs bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📄</span> Reporte
           </button>
-          <button onclick="confirmReset()" class="shrink-0 text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm">
-            <span>🔄</span> <span class="md:hidden">Reset</span>
+          <button onclick="confirmReset()" class="shrink-0 text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm" title="Liquidar Datos">
+            <span>🔄</span> <span class="lg:hidden">Reset</span>
           </button>
         </div>
 
@@ -522,7 +526,7 @@ const SUBJECTS = [
   { id: 'economia-politica-iii', name: 'Economía Política III', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: ['economia-politica-ii'], finalidades: 'Profundizar en grandes debates: financiarización, trabajo, Estado y poscapitalismo.', contenidos: ['El debate sobre el fin del trabajo','Economía popular, social y solidaria','Renta básica universal y redistribución','Perspectivas ecosocialistas y feministas'] },
   { id: 'diseno-proyectos', name: 'Diseño de Proyectos Organizacionales', year: 4, campo: 'CFE', formato: 'Taller', regimen: 'Anual', hs: 96, prereqs: ['administracion'], finalidades: 'Desarrollar competencias para el diseño y evaluación de proyectos en contextos reales.', contenidos: ['Marco lógico para la planificación de proyectos','Estudio de prefactibilidad técnica y financiera','Formulación de proyectos de economía social','Monitoreo, evaluación y sistematización de proyectos'] },
   { id: 'eoi-cfe', name: 'Espacio de Opción Institucional (CFE)', year: 4, campo: 'CFE', formato: 'A definir', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Espacio de definición institucional para profundizar en Ciencias Económicas.', contenidos: ['Definido por el ISFD N°100 según su proyecto institucional'] },
-  { id: 'practica-iv', name: 'Práctica Docente IV — Residencia', year: 4, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['practica-iii'], finalidades: 'Asumir la conducción del proceso de enseñanza de manera integral completando la residencia.', contenidos: ['Residencia docente autónoma en nivel secundario','Elaboración del portfolio de residencia','Reflexión crítica sobre la práctica profesional','Coloquio integrador y presentation final'] }
+  { id: 'practica-iv', name: 'Práctica Docente IV — Residencia', year: 4, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['practica-iii'], finalidades: 'Asumir la conducción del proceso de enseñanza de manera integral completando la residencia.', contenidos: ['Residencia docente autónoma en nivel secundario','Elaboración del portfolio de residencia','Reflexión crítica sobre la práctica profesional','Coloquio integrador y presentación final'] }
 ];
 
 /* ─────────────────────────────────────────────
@@ -598,7 +602,7 @@ function saveState() {
 }
 
 /* ─────────────────────────────────────────────
-   ALGORITMO COMPRESOR DE CODIGO RUTA CRITICA Y SINCRONIZACION
+   ALGORITMO DE RUTA CRÍTICA
 ───────────────────────────────────────────── */
 function calculateDependencies() {
   const dependentsMap = {};
@@ -625,7 +629,7 @@ function calculateDependencies() {
   });
 }
 
-// NUEVO: Algoritmo de Compresión a base de índices
+// Algoritmo de Compresión de Código Corto
 function generateShortCode() {
   const uParts = [];
   Object.keys(state.userSubjects).forEach(id => {
@@ -651,20 +655,16 @@ function generateShortCode() {
   const sStr = sParts.join(',');
 
   const finalStr = `v3|${uStr}|${sStr}`;
-  // Quitamos los padding "=" para hacerlo un poquito más corto
   return btoa(finalStr).replace(/=/g, '');
 }
 
-// NUEVO: Algoritmo de Descompresión a base de índices
 function decodeShortCode(encoded) {
   let str = encoded;
-  // Devolvemos el padding si le falta
   while (str.length % 4 !== 0) str += '=';
   
   const decoded = atob(str);
   const parts = decoded.split('|');
   
-  // Regla de compatibilidad si nos pegan el código de versión 2 o inferior
   if (parts[0] !== 'v3') {
      const data = JSON.parse(atob(encoded));
      if (data.v === 2) {
@@ -703,7 +703,6 @@ function decodeShortCode(encoded) {
   }
   return { u: newU, s: newS };
 }
-
 
 /* ─────────────────────────────────────────────
    RENDERIZADO DE GRILLA (Solo Año)
