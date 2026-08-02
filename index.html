@@ -6,7 +6,7 @@
   <title>Mapa Curricular · Economía · ISFD N°100</title>
   
   <!-- Manifest dinámico para PWA -->
-  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%231e3a8a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzFlM2E4YSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,12 +15,10 @@
       theme: {
         extend: {
           colors: {
-            cfg: '#1e3a8a', 
-            cfe: '#059669', 
-            cpd: '#d97706', 
-            approved: '#10b981', 
-            enabled: '#3b82f6', 
-            locked: '#64748b' 
+            cfg: '#334155', /* Slate 700 */
+            cfe: '#0f172a', /* Slate 900 */
+            cpd: '#475569', /* Slate 600 */
+            brand: '#2563eb' /* Azul vibrante financiero */
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -37,45 +35,83 @@
 
   <style>
     /* ============================================================
-       CUSTOM CSS & ANIMACIONES TEMA ECONOMÍA
+       DISEÑO ESTRUCTURAL Y ACCESIBILIDAD (A11Y)
     ============================================================ */
     body {
       background-color: #f8fafc;
       background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-      background-size: 20px 20px;
+      background-size: 24px 24px;
       scroll-behavior: smooth;
     }
 
-    .year-col { min-width: 260px; max-width: 280px; }
+    .year-col { min-width: 280px; max-width: 300px; }
 
-    /* ── Tarjetas Estilo "Nota de Crédito/Dashboard" ── */
+    /* ── SISTEMA DE TARJETAS ACCESIBLE (Por Atributo Data) ── */
     .subject-card {
-      transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, opacity .3s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
-    }
-    .subject-card:hover { 
-      transform: translateY(-4px); 
-      box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04); 
+      border-radius: 1rem;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
     }
 
-    .filter-active  { opacity: 1 !important; }
-    .filter-dimmed  { opacity: .25 !important; filter: grayscale(80%); }
+    /* ESTADO 1: APROBADA (Oscura, Sólida, Asegurada) */
+    .subject-card[data-state="approved"] {
+      background-color: #0f172a; /* Fondo casi negro */
+      border: 2px solid #0f172a;
+      color: #ffffff;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+    .subject-card[data-state="approved"] h3 { color: #ffffff; }
+    .subject-card[data-state="approved"] .subtitle { color: #94a3b8; }
+    .subject-card[data-state="approved"] .card-divider { border-color: #334155; }
+    .subject-card[data-state="approved"] .status-label { color: #38bdf8; } /* Azul claro */
+    .subject-card[data-state="approved"] .info-btn { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155;}
+    .subject-card[data-state="approved"]:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
 
-    /* ── Animación Desbloqueo (Pop verde inversión) ── */
+    /* ESTADO 2: HABILITADA (Blanca, Borde Grueso, Brillante) */
+    .subject-card[data-state="enabled"] {
+      background-color: #ffffff;
+      border: 2px solid #2563eb; /* Borde azul fuerte */
+      color: #0f172a;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15);
+    }
+    .subject-card[data-state="enabled"] h3 { color: #0f172a; }
+    .subject-card[data-state="enabled"] .subtitle { color: #64748b; }
+    .subject-card[data-state="enabled"] .card-divider { border-color: #e2e8f0; }
+    .subject-card[data-state="enabled"] .status-label { color: #2563eb; } /* Azul fuerte */
+    .subject-card[data-state="enabled"] .info-btn { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;}
+    .subject-card[data-state="enabled"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.2); }
+
+    /* ESTADO 3: BLOQUEADA (Grisácea, Borde Punteado, Inactiva) */
+    .subject-card[data-state="locked"] {
+      background-color: #f8fafc;
+      border: 2px dashed #cbd5e1; /* Borde punteado */
+      color: #64748b;
+    }
+    .subject-card[data-state="locked"] h3 { color: #475569; }
+    .subject-card[data-state="locked"] .subtitle { color: #94a3b8; }
+    .subject-card[data-state="locked"] .card-divider { border-color: #e2e8f0; border-style: dashed; }
+    .subject-card[data-state="locked"] .status-label { color: #94a3b8; }
+    .subject-card[data-state="locked"] .info-btn { background-color: #ffffff; color: #94a3b8; border: 1px solid #e2e8f0;}
+    .subject-card[data-state="locked"]:hover { background-color: #f1f5f9; border-color: #94a3b8; }
+
+    /* Filtro de Búsqueda / Modo Inscripción */
+    .filter-active  { opacity: 1 !important; display: flex !important; }
+    .filter-dimmed  { opacity: 0.15 !important; filter: grayscale(100%); pointer-events: none; }
+
+    /* Animación Desbloqueo */
     @keyframes unlockPop {
       0% { transform: scale(1); }
-      50% { transform: scale(1.04); box-shadow: 0 0 25px rgba(16, 185, 129, 0.4); border-color: #10b981; }
+      50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(37, 99, 235, 0.4); border-color: #2563eb; }
       100% { transform: scale(1); }
     }
-    .animate-unlock { animation: unlockPop 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+    .animate-unlock { animation: unlockPop 0.5s ease-out; }
 
-    /* ── Barra Progreso ── */
-    #progress-bar { transition: width .6s cubic-bezier(0.4, 0, 0.2, 1); }
-
-    /* ── Modales ── */
-    .modal-backdrop { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
-
-    /* Custom Scrollbar */
+    /* Modales y Scroll */
+    .modal-backdrop { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px); }
     ::-webkit-scrollbar { height: 8px; width: 8px; }
     ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.5); }
     ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
@@ -83,9 +119,9 @@
   </style>
 </head>
 
-<body class="min-h-screen text-slate-800">
+<body class="min-h-screen text-slate-800 flex flex-col">
 
-  <!-- Service Worker para PWA (Script inline para instalación) -->
+  <!-- Service Worker para PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       const swCode = "self.addEventListener('fetch', function(event) {});";
@@ -98,18 +134,18 @@
        ONBOARDING MODAL
   ══════════════════════════════════════════ -->
   <div id="onboarding-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-md p-8 shadow-2xl text-center border border-slate-100 transform scale-95 transition-transform duration-200">
-      <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-5 border-4 border-emerald-100">
-        <span class="text-4xl">🏦</span>
+    <div class="bg-white rounded-3xl max-w-md p-8 shadow-2xl text-center border border-slate-100 transform scale-95 transition-transform duration-200">
+      <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-5 border-4 border-blue-100">
+        <span class="text-4xl">📊</span>
       </div>
-      <h2 class="text-2xl font-black mb-3 text-slate-800">Portal de Planificación</h2>
+      <h2 class="text-2xl font-black mb-3 text-slate-900 tracking-tight">Portal de Planificación</h2>
       <p class="text-sm text-slate-600 mb-6 leading-relaxed">
-        Gestioná tu progreso académico en el ISFD N°100 como un portafolio de inversiones.<br><br>
-        ✅ <b>Aprobadas:</b> Ingresan a tu capital formativo.<br>
-        🟢 <b>Habilitadas:</b> Oportunidades disponibles para cursar.<br>
-        🔒 <b>Bloqueadas:</b> Requieren liquidar correlatividades previas.
+        Gestioná tu progreso académico con un diseño optimizado para la claridad visual.<br><br>
+        <span class="inline-block bg-slate-900 text-white px-2 py-0.5 rounded text-xs font-bold mb-1">CAPITALIZADAS</span> — Materias aprobadas.<br>
+        <span class="inline-block bg-white border-2 border-blue-500 text-blue-700 px-2 py-0.5 rounded text-xs font-bold mb-1">DISPONIBLES</span> — Listas para cursar.<br>
+        <span class="inline-block bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-2 py-0.5 rounded text-xs font-bold">RESTRINGIDAS</span> — Faltan correlativas.
       </p>
-      <button onclick="closeOnboarding()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-3.5 rounded-xl transition shadow-md">
+      <button onclick="closeOnboarding()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-md">
         Comenzar a planificar
       </button>
     </div>
@@ -119,8 +155,8 @@
        MODAL DE CONFIRMACIÓN DE REINICIO
   ══════════════════════════════════════════ -->
   <div id="confirm-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
-      <h2 class="text-xl font-black mb-2 text-slate-800 flex items-center gap-2">⚠️ Liquidar Datos</h2>
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
+      <h2 class="text-xl font-black mb-2 text-slate-900 flex items-center gap-2">⚠️ Liquidar Datos</h2>
       <p class="text-sm text-slate-600 mb-6 leading-relaxed">
         ¿Estás seguro de reiniciar tu balance? Se borrará todo tu historial de materias aprobadas.
       </p>
@@ -135,10 +171,10 @@
        MODAL DE ALERTA (Dependencias)
   ══════════════════════════════════════════ -->
   <div id="alert-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
-      <h2 class="text-xl font-black mb-3 text-amber-600 flex items-center gap-2">🔒 Movimiento Bloqueado</h2>
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
+      <h2 class="text-xl font-black mb-3 text-slate-900 flex items-center gap-2">🛑 Movimiento Bloqueado</h2>
       <p id="alert-message" class="text-sm text-slate-600 mb-6 leading-relaxed"></p>
-      <button onclick="closeAlertModal()" class="w-full px-4 py-3 rounded-xl text-sm font-bold text-white bg-slate-800 hover:bg-slate-900 transition">Entendido</button>
+      <button onclick="closeAlertModal()" class="w-full px-4 py-3 rounded-xl text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 transition">Entendido</button>
     </div>
   </div>
 
@@ -146,69 +182,69 @@
        SIMULADOR MODAL (Proyecciones)
   ══════════════════════════════════════════ -->
   <div id="simulador-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden" onclick="closeSimulador(event)">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
-      <h2 class="text-xl font-black text-slate-800 flex items-center gap-2">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 tracking-tight">
         <span class="text-blue-600">📈</span> Proyección de Cursada
       </h2>
-      <p class="text-xs text-slate-500 mt-2 mb-5 leading-relaxed">Optimizá tu tiempo. Ingresá la cantidad de materias que podés cursar y el sistema calculará las opciones más estratégicas (priorizando destrabar materias correlativas de años siguientes).</p>
+      <p class="text-xs text-slate-500 mt-2 mb-5 leading-relaxed">Optimizá tu tiempo. Ingresá la cantidad de materias que podés cursar y el sistema calculará las opciones estratégicas para destrabar la carrera.</p>
       
       <div class="flex items-center gap-3 mb-5">
-        <input type="number" id="sim-qty" value="3" min="1" max="10" class="w-20 px-3 py-2.5 border-2 border-slate-200 rounded-xl text-center font-bold text-slate-700 focus:border-blue-500 focus:ring-0 outline-none">
+        <input type="number" id="sim-qty" value="3" min="1" max="10" class="w-20 px-3 py-2.5 border-2 border-slate-200 rounded-xl text-center font-bold text-slate-700 font-mono focus:border-blue-500 focus:ring-0 outline-none transition">
         <button onclick="runSimulador()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow-md transition">Calcular Plan</button>
       </div>
       
-      <div id="sim-results" class="mt-4 max-h-60 overflow-y-auto pr-1"></div>
+      <div id="sim-results" class="mt-4 max-h-[50vh] overflow-y-auto pr-2 space-y-3"></div>
     </div>
   </div>
 
   <!-- ══════════════════════════════════════════
        HEADER PRINCIPAL TIPO DASHBOARD
   ══════════════════════════════════════════ -->
-  <header class="bg-gradient-to-r from-slate-900 to-slate-800 text-white py-5 px-6 shadow-xl relative z-30">
-    <div class="max-w-screen-xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-5">
-      <div class="flex items-center gap-4 w-full lg:w-auto">
-        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center border border-white/20 hidden sm:flex">
-          <span class="text-2xl">📊</span>
+  <header class="bg-slate-900 text-white py-6 px-6 shadow-xl relative z-30">
+    <div class="max-w-screen-xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
+      
+      <div class="flex items-center gap-5 w-full lg:w-auto">
+        <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-inner hidden sm:flex">
+          <span class="text-2xl font-black font-mono">Ec</span>
         </div>
         <div class="flex-1 text-center sm:text-left">
           <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">DGCyE · ISFD N°100</p>
           <h1 class="text-2xl sm:text-3xl font-black mt-0.5 tracking-tight text-white">
-            Mapa Curricular <span class="font-light text-slate-300">Economía</span>
+            Planificador Curricular
           </h1>
         </div>
       </div>
       
-      <!-- Panel de Estadísticas Financieras / KPIs -->
-      <div class="flex flex-wrap justify-center sm:justify-end items-center gap-4 sm:gap-8 bg-black/20 rounded-2xl px-6 py-3 border border-white/10 w-full lg:w-auto">
-        
+      <!-- Panel de Estadísticas / KPIs -->
+      <div class="flex flex-wrap justify-center sm:justify-end items-center gap-6 sm:gap-10 bg-slate-800/50 rounded-2xl px-8 py-4 border border-slate-700 w-full lg:w-auto">
         <div class="text-center sm:text-right flex flex-col">
-          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-0.5">Avance Global</p>
+          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Avance Global</p>
           <div class="flex items-baseline gap-1 justify-center sm:justify-end">
-            <span class="text-3xl font-black text-emerald-400 font-mono tracking-tighter" id="pct-label">0</span>
-            <span class="text-lg font-bold text-emerald-400/70">%</span>
+            <span class="text-4xl font-black text-white font-mono tracking-tighter" id="pct-label">0</span>
+            <span class="text-lg font-bold text-blue-400">%</span>
           </div>
         </div>
         
-        <div class="w-px h-10 bg-white/10 hidden sm:block"></div>
+        <div class="w-px h-12 bg-slate-700 hidden sm:block"></div>
         
         <div class="text-center sm:text-right flex flex-col">
-          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-0.5">Carga Horaria</p>
+          <p class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Carga Horaria</p>
           <div class="flex items-baseline gap-1 justify-center sm:justify-end">
-            <span class="text-3xl font-black text-blue-400 font-mono tracking-tighter" id="hs-count">0</span>
-            <span class="text-xs font-bold text-blue-400/70">HS</span>
+            <span class="text-4xl font-black text-white font-mono tracking-tighter" id="hs-count">0</span>
+            <span class="text-xs font-bold text-slate-400">HS</span>
           </div>
         </div>
-
       </div>
+
     </div>
   </header>
 
   <!-- ══════════════════════════════════════════
        BARRA STICKY: HERRAMIENTAS Y PROGRESO
   ══════════════════════════════════════════ -->
-  <div class="sticky top-0 z-20 flex flex-col shadow-md">
+  <div class="sticky top-0 z-20 flex flex-col shadow-sm">
     
-    <!-- 1. Barra de Herramientas -->
+    <!-- Barra de Herramientas -->
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
         
@@ -216,47 +252,63 @@
         <div class="flex flex-wrap items-center gap-3 flex-1">
           <div class="relative w-full sm:max-w-sm flex-1">
             <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
-            <input type="text" id="search-input" placeholder="Buscar materia..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-700 transition-all font-medium truncate" onkeyup="applyFilterStyles()">
+            <input type="text" id="search-input" placeholder="Buscar materia..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-800 transition-all font-medium truncate" onkeyup="applyFilterStyles()">
           </div>
         </div>
 
         <!-- Herramientas de Acción -->
         <div class="flex items-center gap-2">
           
-          <button id="btn-install" onclick="installApp()" class="hidden text-xs bg-purple-50 text-purple-700 px-3 py-2 rounded-xl font-bold border border-purple-200 hover:bg-purple-100 transition flex items-center gap-1.5" title="Instalar como aplicación nativa"><span>📱</span> <span class="hidden sm:inline">Instalar App</span></button>
+          <button id="btn-install" onclick="installApp()" class="hidden text-xs bg-slate-900 text-white px-4 py-2 rounded-xl font-bold hover:bg-slate-800 transition shadow-md flex items-center gap-1.5" title="Instalar como aplicación nativa">
+            <span>📱</span> <span class="hidden sm:inline">Instalar App</span>
+          </button>
 
-          <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 px-3 py-2 rounded-xl border border-emerald-200 transition" title="Muestra únicamente las materias que ya podés cursar">
+          <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-xl border border-blue-200 transition" title="Muestra únicamente las materias que ya podés cursar">
             <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
-            <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-emerald-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
+            <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
             Modo Inscripción
           </label>
           
-          <button onclick="openSimulador()" class="text-xs bg-blue-50 text-blue-700 px-3 py-2 rounded-xl font-bold border border-blue-100 hover:bg-blue-100 transition flex items-center gap-1.5" title="Proyectar Cursada"><span>📈</span> <span class="hidden sm:inline">Proyectar</span></button>
-          <button onclick="exportMap()" id="btn-export" class="text-xs bg-slate-100 text-slate-700 px-3 py-2 rounded-xl font-bold border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5"><span>📄</span> <span class="hidden sm:inline">Reporte</span></button>
-          <button onclick="confirmReset()" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5" title="Liquidar Datos"><span>🔄</span></button>
+          <button onclick="openSimulador()" class="text-xs bg-slate-100 text-slate-700 px-3 sm:px-4 py-2 rounded-xl font-bold border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5 shadow-sm" title="Proyectar Cursada">
+            <span>📈</span> <span class="hidden sm:inline">Proyectar</span>
+          </button>
+          
+          <button onclick="exportMap()" id="btn-export" class="text-xs bg-slate-100 text-slate-700 px-3 sm:px-4 py-2 rounded-xl font-bold border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5 shadow-sm">
+            <span>📄</span> <span class="hidden sm:inline">Reporte</span>
+          </button>
+          
+          <button onclick="confirmReset()" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm" title="Liquidar Datos">
+            <span>🔄</span>
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- 2. Barra de Progreso Sticky -->
+    <!-- Barra de Leyenda Estructural (Reemplaza los puntitos de color por la estructura real) -->
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
-      <div class="max-w-screen-xl mx-auto px-4 py-2 flex flex-col md:flex-row gap-4 items-center justify-between">
-        <div class="flex flex-wrap gap-4 text-xs font-bold text-slate-600">
-          <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-emerald-500 border border-emerald-600 shadow-inner"></span> Aprobada</span>
-          <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-blue-500 border border-blue-600 shadow-inner"></span> Habilitada</span>
-          <span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-slate-300 border border-slate-400 shadow-inner"></span> Bloqueada</span>
+      <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-col md:flex-row gap-4 items-center justify-between">
+        
+        <div class="flex flex-wrap gap-3 text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wide">
+          <div class="flex items-center gap-2 bg-slate-900 text-white px-3 py-1.5 rounded-lg">
+            <span>✓</span> Capitalizado
+          </div>
+          <div class="flex items-center gap-2 bg-white border-2 border-blue-500 text-slate-800 px-3 py-1 rounded-lg">
+            <span class="text-blue-600">▶</span> Disponible
+          </div>
+          <div class="flex items-center gap-2 bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-3 py-1 rounded-lg">
+            <span>🔒</span> Restringida
+          </div>
         </div>
         
         <div class="flex items-center gap-4 w-full md:w-96">
-          <span class="text-xs font-black text-slate-400 whitespace-nowrap uppercase tracking-wide">
+          <span class="text-[10px] font-black text-slate-400 whitespace-nowrap uppercase tracking-widest">
             <span id="approved-count" class="text-slate-800 text-sm font-mono">0</span> / <span id="total-count" class="font-mono">0</span> MAT.
           </span>
-          <div class="flex-1 bg-slate-100 rounded-full h-3 overflow-hidden shadow-inner border border-slate-200">
-            <div id="progress-bar" class="h-full bg-emerald-500 relative" style="width:0%">
-              <div class="absolute inset-0 bg-white/20" style="background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); background-size: 1rem 1rem;"></div>
-            </div>
+          <div class="flex-1 bg-slate-100 rounded-full h-2.5 overflow-hidden shadow-inner border border-slate-200">
+            <div id="progress-bar" class="h-full bg-blue-600 relative" style="width:0%"></div>
           </div>
         </div>
+
       </div>
     </div>
 
@@ -265,24 +317,24 @@
   <!-- ══════════════════════════════════════════
        GRILLA CURRICULAR & ZONA DE EXPORTACIÓN
   ══════════════════════════════════════════ -->
-  <div id="export-area" class="pb-8 bg-slate-50">
+  <div id="export-area" class="pb-8 flex-1">
     
     <!-- Encabezado oculto que SOLO sale en la foto exportada -->
     <div id="export-watermark" class="hidden mx-auto max-w-screen-xl px-4 pt-8 pb-4">
-      <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-xl flex justify-between items-center border-l-4 border-emerald-500">
+      <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-xl flex justify-between items-center border-l-8 border-blue-500">
         <div>
-          <h2 class="text-2xl font-black mb-1">Reporte de Avance Académico</h2>
-          <p class="text-sm text-slate-300">Profesorado en Economía — ISFD N°100 — DGCyE</p>
+          <h2 class="text-3xl font-black mb-2 tracking-tight">Reporte de Avance Académico</h2>
+          <p class="text-base text-slate-300">Profesorado en Economía — ISFD N°100 — DGCyE</p>
         </div>
         <div class="text-right">
           <p class="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Fecha de Emisión</p>
-          <p id="export-date" class="text-lg font-mono text-emerald-400 font-bold"></p>
+          <p id="export-date" class="text-xl font-mono text-white font-bold bg-white/10 px-4 py-2 rounded-xl"></p>
         </div>
       </div>
     </div>
 
-    <main class="max-w-screen-xl mx-auto px-4 pb-16 pt-5 overflow-x-auto min-h-[60vh]">
-      <div class="flex gap-6 min-w-max" id="grid-container">
+    <main class="max-w-screen-xl mx-auto px-4 pb-16 pt-8 overflow-x-auto min-h-[50vh]">
+      <div class="flex gap-8 min-w-max" id="grid-container">
         <!-- Generado por JS -->
       </div>
     </main>
@@ -292,53 +344,52 @@
        MODAL DE INFORMACIÓN MATERIA
   ══════════════════════════════════════════ -->
   <div id="modal-backdrop" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 hidden" onclick="closeModal(event)">
-    <div id="modal-box" class="bg-white w-full max-w-lg shadow-2xl rounded-2xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
+    <div id="modal-box" class="bg-white w-full max-w-lg shadow-2xl rounded-3xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
       
-      <!-- Header fijo del modal -->
-      <div id="modal-header" class="p-4 sm:p-6 text-white relative overflow-hidden shrink-0">
-        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 10px 10px;"></div>
+      <!-- Header del modal -->
+      <div id="modal-header" class="p-5 sm:p-7 text-slate-900 bg-slate-50 border-b border-slate-200 relative overflow-hidden shrink-0">
         <div class="relative z-10 flex justify-between items-start gap-3">
           <div>
-            <span id="modal-badge" class="text-[9px] sm:text-[10px] uppercase tracking-widest font-black bg-white/20 px-2.5 py-1 rounded-full shadow-sm backdrop-blur-sm border border-white/20 inline-block"></span>
-            <h2 id="modal-title" class="text-xl sm:text-2xl font-black mt-2.5 leading-tight tracking-tight drop-shadow-md"></h2>
+            <span id="modal-badge" class="text-[10px] uppercase tracking-widest font-black text-white px-3 py-1 rounded-md shadow-sm inline-block mb-3"></span>
+            <h2 id="modal-title" class="text-2xl sm:text-3xl font-black leading-tight tracking-tight text-slate-900"></h2>
           </div>
-          <button onclick="closeModal()" class="text-white hover:text-slate-200 bg-white/20 hover:bg-white/30 border border-white/20 rounded-full w-8 h-8 shrink-0 flex items-center justify-center transition shadow-sm">✕</button>
+          <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-full w-10 h-10 shrink-0 flex items-center justify-center transition shadow-sm text-lg">✕</button>
         </div>
       </div>
       
-      <!-- Contenedor con Scroll para el contenido del modal -->
-      <div class="p-4 sm:p-6 space-y-4 sm:space-y-5 text-sm text-slate-700 bg-slate-50 overflow-y-auto">
+      <!-- Contenedor con Scroll -->
+      <div class="p-5 sm:p-7 space-y-6 text-sm text-slate-700 overflow-y-auto">
         
-        <!-- KPIs de la Materia Responsivos -->
-        <div class="grid grid-cols-3 gap-2 sm:gap-4">
-          <div class="bg-white rounded-xl p-2 sm:p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
-            <p class="text-[8px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold leading-tight">Formato</p>
-            <p class="font-black mt-1 text-slate-800 text-[11px] sm:text-sm leading-tight break-words" id="modal-formato">—</p>
+        <!-- KPIs -->
+        <div class="grid grid-cols-3 gap-3 sm:gap-4">
+          <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <p class="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Formato</p>
+            <p class="font-black text-slate-800 text-[11px] sm:text-sm leading-tight break-words" id="modal-formato">—</p>
           </div>
-          <div class="bg-white rounded-xl p-2 sm:p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
-            <p class="text-[8px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold leading-tight">Régimen</p>
-            <p class="font-black mt-1 text-slate-800 text-[11px] sm:text-sm leading-tight break-words" id="modal-regimen">—</p>
+          <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <p class="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Régimen</p>
+            <p class="font-black text-slate-800 text-[11px] sm:text-sm leading-tight break-words" id="modal-regimen">—</p>
           </div>
-          <div class="bg-white rounded-xl p-2 sm:p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
-            <p class="text-[8px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold leading-tight">Inversión Hs</p>
-            <p class="font-black mt-1 text-slate-800 text-sm sm:text-base font-mono text-blue-600 leading-tight" id="modal-hs">—</p>
+          <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <p class="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Inversión Hs</p>
+            <p class="font-black text-blue-600 text-base sm:text-lg font-mono leading-tight" id="modal-hs">—</p>
           </div>
         </div>
         
         <!-- Requisitos -->
-        <div id="modal-corr-section" class="bg-amber-50 border border-amber-200 rounded-xl p-3 sm:p-4 shadow-sm">
-          <h3 class="text-[9px] sm:text-[10px] uppercase tracking-widest font-black text-amber-700 mb-1.5 flex items-center gap-1.5"><span>🔑</span> Requisitos para cursar</h3>
-          <p id="modal-corr" class="text-xs sm:text-sm font-bold text-amber-900 leading-snug"></p>
+        <div id="modal-corr-section" class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-4 sm:p-5">
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-slate-500 mb-2 flex items-center gap-2"><span>🔒</span> Requisitos Previos</h3>
+          <p id="modal-corr" class="text-sm font-bold text-slate-700 leading-snug"></p>
         </div>
 
-        <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h3 class="text-[10px] sm:text-xs uppercase tracking-widest font-black text-slate-400 mb-2 border-b border-slate-100 pb-1.5">Finalidad Formativa</h3>
-          <p id="modal-finalidades" class="leading-relaxed text-xs sm:text-sm text-slate-600 font-medium"></p>
+        <div>
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-blue-600 mb-2">Finalidad Formativa</h3>
+          <p id="modal-finalidades" class="leading-relaxed text-sm text-slate-600 font-medium"></p>
         </div>
         
-        <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h3 class="text-[10px] sm:text-xs uppercase tracking-widest font-black text-slate-400 mb-2 border-b border-slate-100 pb-1.5">Núcleos de Contenido</h3>
-          <ul id="modal-contenidos" class="list-none space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-slate-600 font-medium"></ul>
+        <div>
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-blue-600 mb-3">Núcleos de Contenido</h3>
+          <ul id="modal-contenidos" class="list-none space-y-2 text-sm text-slate-600 font-medium bg-slate-50 p-4 rounded-2xl border border-slate-100"></ul>
         </div>
         
       </div>
@@ -347,7 +398,7 @@
 
 <script>
 /* ─────────────────────────────────────────────
-   DATOS DEL PLAN DE ESTUDIOS
+   DATOS DEL PLAN DE ESTUDIOS (Completo)
 ───────────────────────────────────────────── */
 const SUBJECTS = [
   // 1ER AÑO
@@ -411,9 +462,9 @@ const state = {
 };
 
 const CAMPO_COLORS = {
-  CFG: { bg: 'bg-[#1e3a8a]', label: 'CFG', title: 'Formación General' },
-  CFE: { bg: 'bg-[#059669]', label: 'CFE', title: 'Formación Específica' },
-  CPD: { bg: 'bg-[#d97706]', label: 'CPD', title: 'Práctica Docente' },
+  CFG: { bg: 'bg-[#334155]', label: 'CFG', title: 'Formación General' },
+  CFE: { bg: 'bg-[#0f172a]', label: 'CFE', title: 'Formación Específica' },
+  CPD: { bg: 'bg-[#475569]', label: 'CPD', title: 'Práctica Docente' },
 };
 
 /* Instalación PWA (App Nativa) */
@@ -470,16 +521,14 @@ function renderGrid() {
 
   const byYear = { 1: [], 2: [], 3: [], 4: [] };
   SUBJECTS.forEach(s => byYear[s.year].push(s));
-  
-  const yearColors = ['border-blue-700', 'border-emerald-600', 'border-amber-600', 'border-purple-700'];
 
   [1, 2, 3, 4].forEach(yr => {
     const col = document.createElement('div');
-    col.className = 'year-col flex flex-col gap-4';
+    col.className = 'year-col flex flex-col gap-5';
     col.innerHTML = `
-      <div class="border-b-[3px] ${yearColors[yr-1]} pb-2 mb-2 font-black text-lg text-slate-800 flex items-center justify-between">
+      <div class="border-b-[3px] border-slate-300 pb-2 mb-1 font-black text-xl text-slate-800 flex items-center justify-between">
         <span>${yr}er Año</span> 
-        <span class="text-[10px] font-bold bg-slate-200 text-slate-600 px-2 py-1 rounded-md uppercase tracking-wider">${byYear[yr].length} Mat.</span>
+        <span class="text-[10px] font-bold bg-white border border-slate-200 text-slate-500 px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm">${byYear[yr].length} Mat.</span>
       </div>`;
     byYear[yr].forEach(s => col.appendChild(createCard(s)));
     container.appendChild(col);
@@ -487,30 +536,34 @@ function renderGrid() {
 }
 
 /* ─────────────────────────────────────────────
-   NUEVO DISEÑO DE TARJETA TIPO "NOTA FINANCIERA"
+   NUEVO DISEÑO DE TARJETA CON ATRIBUTOS DATA
 ───────────────────────────────────────────── */
 function createCard(subject) {
   const card = document.createElement('div');
-  card.className = 'subject-card p-4 flex flex-col h-full bg-white border-2 rounded-xl transition-all';
+  // Usamos data-state="locked" por defecto, updateAllCards() lo cambiará.
+  card.className = 'subject-card group';
+  card.dataset.state = 'locked';
   card.id = `card-${subject.id}`;
   
   card.innerHTML = `
     <div class="flex justify-between items-start mb-3">
-      <span class="${CAMPO_COLORS[subject.campo].bg} px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-sm">${CAMPO_COLORS[subject.campo].label}</span>
-      <span class="status-icon w-6 h-6 flex items-center justify-center rounded-full bg-slate-100 text-xs"></span>
+      <span class="campo-badge ${CAMPO_COLORS[subject.campo].bg} px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-sm">${CAMPO_COLORS[subject.campo].label}</span>
+      <span class="status-icon text-lg leading-none"></span>
     </div>
-    <h3 class="font-black text-[15px] leading-snug text-slate-800 mb-2 pr-2">${subject.name}</h3>
-    <p class="text-[11px] font-bold text-slate-400 mb-4 tracking-wide uppercase font-mono">${subject.regimen} · ${subject.hs}hs</p>
+    <h3 class="font-black text-[15px] leading-snug mb-1.5 pr-2 transition-colors">${subject.name}</h3>
+    <p class="subtitle text-[11px] font-bold tracking-wide uppercase font-mono transition-colors">${subject.regimen} · ${subject.hs}hs</p>
     
-    <div class="mt-auto pt-3 border-t border-slate-100 flex justify-between items-center">
-      <span class="status-text transition-colors duration-200"></span>
-      <button onclick="openModal(event, '${subject.id}')" class="info-btn w-8 h-8 rounded-full bg-slate-50 hover:bg-slate-100 text-slate-400 hover:text-slate-600 border border-slate-200 text-sm font-bold flex items-center justify-center transition shadow-sm" title="Ver Info">i</button>
+    <div class="card-divider mt-auto pt-3.5 border-t flex justify-between items-center transition-colors">
+      <span class="status-label text-[10px] font-black uppercase tracking-widest transition-colors"></span>
+      <button onclick="openModal(event, '${subject.id}')" class="info-btn w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center transition shadow-sm" title="Ver Info">i</button>
     </div>
   `;
+  
   card.addEventListener('click', (e) => {
     if (e.target.closest('.info-btn')) return;
     toggleApproved(subject.id);
   });
+  
   return card;
 }
 
@@ -523,13 +576,12 @@ function toggleApproved(id) {
 
   const isEnabled = isSubjectEnabled(id);
   const isApproved = state.approved.has(id);
-
   const previouslyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
 
   if (isApproved) {
     const dependents = SUBJECTS.filter(s => s.prereqs.includes(id) && state.approved.has(s.id));
     if (dependents.length > 0) {
-      showAlert(`Transacción denegada. Las siguientes materias dependen de <b>${subject.name}</b> para su validez:<br><br><span class="text-xs text-amber-800">▪ ${dependents.map(d=>d.name).join('<br>▪ ')}</span>`);
+      showAlert(`Las siguientes materias dependen de <b>${subject.name}</b> para su validez:<br><br><span class="text-xs text-slate-500 font-mono">▪ ${dependents.map(d=>d.name).join('<br>▪ ')}</span>`);
       return;
     }
     state.approved.delete(id);
@@ -569,41 +621,33 @@ function updateAllCards() {
     if (!card) return;
     
     const iconEl = card.querySelector('.status-icon');
-    const textEl = card.querySelector('.status-text');
-    
-    card.classList.remove(
-      'border-slate-200', 'bg-slate-50', 'opacity-60',
-      'border-blue-400', 'bg-blue-50',
-      'border-emerald-500', 'bg-emerald-50'
-    );
+    const labelEl = card.querySelector('.status-label');
 
     if (state.approved.has(subject.id)) {
-      card.classList.add('border-emerald-500', 'bg-emerald-50');
-      iconEl.innerHTML = '✅';
-      iconEl.className = 'status-icon w-6 h-6 flex items-center justify-center rounded-full bg-emerald-200 text-xs shadow-sm';
-      textEl.innerHTML = 'Aprobada';
-      textEl.className = 'status-text text-xs font-black text-emerald-700 tracking-wide';
-      textEl.removeAttribute('title');
+      // Estado: APROBADA
+      card.dataset.state = 'approved';
+      iconEl.innerHTML = '✓';
+      labelEl.innerHTML = 'Capitalizado';
+      labelEl.removeAttribute('title');
     } 
     else if (isSubjectEnabled(subject.id)) {
-      card.classList.add('border-blue-400', 'bg-blue-50');
-      iconEl.innerHTML = '🟢';
-      iconEl.className = 'status-icon w-6 h-6 flex items-center justify-center rounded-full bg-blue-200 text-[10px] shadow-sm';
-      textEl.innerHTML = 'Habilitada';
-      textEl.className = 'status-text text-xs font-black text-blue-700 tracking-wide';
-      textEl.removeAttribute('title');
+      // Estado: HABILITADA
+      card.dataset.state = 'enabled';
+      iconEl.innerHTML = '▶';
+      labelEl.innerHTML = 'Disponible';
+      labelEl.removeAttribute('title');
     } 
     else {
-      card.classList.add('border-slate-200', 'bg-slate-50', 'opacity-60');
+      // Estado: BLOQUEADA
+      card.dataset.state = 'locked';
       iconEl.innerHTML = '🔒';
-      iconEl.className = 'status-icon w-6 h-6 flex items-center justify-center rounded-full bg-slate-200 text-[10px] text-slate-500';
-      
       const missingIds = subject.prereqs.filter(pid => !state.approved.has(pid));
       const missingNames = missingIds.map(pid => SUBJECTS.find(x=>x.id===pid).name);
       
-      textEl.innerHTML = `Req: ${missingIds.length} mat.`;
-      textEl.title = `Falta aprobar:\n• ${missingNames.join('\n• ')}`;
-      textEl.className = 'status-text text-[11px] font-bold text-slate-500 truncate max-w-[140px] cursor-help border-b border-dashed border-slate-400';
+      labelEl.innerHTML = `Req: ${missingIds.length} mat.`;
+      labelEl.title = `Falta aprobar:\n• ${missingNames.join('\n• ')}`;
+      labelEl.style.cursor = 'help';
+      labelEl.style.textDecoration = 'underline dashed';
     }
   });
   applyFilterStyles();
@@ -620,17 +664,21 @@ function applyFilterStyles() {
     let visible = true;
     if (q && !subject.name.toLowerCase().includes(q)) visible = false;
     
-    // Filtro Inversión (Qué cursar)
     if (showOnlyEnabled && (!isSubjectEnabled(subject.id) || state.approved.has(subject.id))) {
        visible = false;
     }
 
     if (visible) {
-      card.classList.remove('filter-dimmed');
+      card.classList.remove('filter-dimmed', 'hidden');
       card.classList.add('filter-active');
     } else {
-      card.classList.add('filter-dimmed');
-      card.classList.remove('filter-active');
+      // Si estamos buscando, mejor ocultar las que no coinciden en vez de atenuarlas
+      if(q || showOnlyEnabled) {
+         card.classList.add('hidden');
+      } else {
+         card.classList.add('filter-dimmed');
+         card.classList.remove('filter-active');
+      }
     }
   });
 }
@@ -650,7 +698,7 @@ function updateProgress() {
   document.getElementById('hs-count').textContent = approvedHs;
 
   if (pct === 100 && total > 0) {
-    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999, colors: ['#059669', '#10b981', '#fbbf24', '#f59e0b'] });
+    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999, colors: ['#2563eb', '#1e40af', '#60a5fa'] });
   }
 }
 
@@ -662,7 +710,7 @@ function openModal(event, id) {
   const subject = SUBJECTS.find(s => s.id === id);
   if (!subject) return;
 
-  const ccBg = subject.campo === 'CFG' ? '#1e3a8a' : subject.campo === 'CFE' ? '#059669' : '#d97706';
+  const ccBg = CAMPO_COLORS[subject.campo].bg.replace('bg-[', '').replace(']', '');
   document.getElementById('modal-header').style.backgroundColor = ccBg;
   
   document.getElementById('modal-badge').textContent = `${CAMPO_COLORS[subject.campo].label} — ${CAMPO_COLORS[subject.campo].title}`;
@@ -675,7 +723,7 @@ function openModal(event, id) {
   const ul = document.getElementById('modal-contenidos');
   ul.innerHTML = subject.contenidos.map(c => `<li><span class="text-blue-500 mr-2 font-black">»</span> ${c}</li>`).join('');
 
-  const corrText = subject.prereqs.length === 0 ? 'Materia de libre acceso' : subject.prereqs.map(pid => `<span class="text-amber-600 mr-1">▪</span> ${SUBJECTS.find(x=>x.id===pid).name}`).join('<br>');
+  const corrText = subject.prereqs.length === 0 ? 'Materia de libre acceso' : subject.prereqs.map(pid => `<span class="text-slate-400 mr-1">▪</span> ${SUBJECTS.find(x=>x.id===pid).name}`).join('<br>');
   document.getElementById('modal-corr').innerHTML = corrText;
 
   const backdrop = document.getElementById('modal-backdrop');
@@ -786,12 +834,11 @@ function runSimulador() {
 
   const container = document.getElementById('sim-results');
   if(selected.length === 0) {
-    container.innerHTML = '<p class="text-sm text-emerald-600 font-bold text-center py-4">¡Excelente balance! No hay materias pendientes en este momento.</p>';
+    container.innerHTML = '<p class="text-sm text-blue-600 font-bold text-center py-4">¡Excelente balance! No hay materias pendientes en este momento.</p>';
     return;
   }
 
-  // Texto descriptivo en el simulador
-  let html = `<p class="text-[11px] text-slate-500 font-medium mb-3">A continuación, se detalla tu plan de ruta sugerido. Estas materias están libres de trabas y priorizan destrabar contenidos de años superiores para evitar estancamientos en la carrera:</p>`;
+  let html = `<p class="text-[11px] text-slate-500 font-medium mb-3">Plan de ruta sugerido. Estas materias están libres de trabas y priorizan destrabar años superiores:</p>`;
 
   html += selected.map(s => `
     <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm">
@@ -799,7 +846,7 @@ function runSimulador() {
         <p class="text-sm font-black text-slate-800 leading-tight">${s.name}</p>
         <p class="text-[11px] text-slate-500 mt-1 font-mono">${s.regimen} · Año ${s.year}</p>
       </div>
-      <button onclick="toggleApproved('${s.id}'); closeSimulador();" class="text-[10px] uppercase font-bold bg-blue-100 text-blue-700 border border-blue-200 px-2 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition shadow-sm">Cursar</button>
+      <button onclick="toggleApproved('${s.id}'); closeSimulador();" class="text-[10px] uppercase font-bold bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition shadow-sm">Cursar</button>
     </div>
   `).join('');
   
@@ -832,7 +879,6 @@ function exportMap() {
   main.style.maxWidth = 'none';
   main.style.width = fullWidth + 'px';
   
-  // Mostrar la marca de agua y ponerle la fecha actual
   document.getElementById('export-date').textContent = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
   watermark.classList.remove('hidden');
 
@@ -850,7 +896,7 @@ function exportMap() {
       main.style.overflow = origMainOverflow;
       main.style.maxWidth = origMainMaxWidth;
       main.style.width = origMainWidth;
-      watermark.classList.add('hidden'); // Ocultar de nuevo
+      watermark.classList.add('hidden');
       window.scrollTo(scrollX, scrollY);
       
       const link = document.createElement('a');
