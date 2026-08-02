@@ -34,19 +34,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
-    /* ============================================================
-       DISEÑO ESTRUCTURAL Y ACCESIBILIDAD (A11Y)
-    ============================================================ */
     body {
       background-color: #f8fafc;
       background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
       background-size: 24px 24px;
       scroll-behavior: smooth;
     }
-
     .year-col { min-width: 280px; max-width: 300px; }
 
-    /* ── SISTEMA DE TARJETAS ACCESIBLE (Por Atributo Data) ── */
+    /* ── Tarjetas ── */
     .subject-card {
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
@@ -55,13 +51,12 @@
       display: flex;
       flex-direction: column;
       height: 100%;
+      position: relative;
     }
-
-    /* ESTADO 1: APROBADA */
+    
+    /* APROBADA */
     .subject-card[data-state="approved"] {
-      background-color: #0f172a;
-      border: 2px solid #0f172a;
-      color: #ffffff;
+      background-color: #0f172a; border: 2px solid #0f172a; color: #ffffff;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
     }
     .subject-card[data-state="approved"] h3 { color: #ffffff; }
@@ -71,11 +66,9 @@
     .subject-card[data-state="approved"] .info-btn { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155;}
     .subject-card[data-state="approved"]:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
 
-    /* ESTADO 2: HABILITADA */
+    /* HABILITADA */
     .subject-card[data-state="enabled"] {
-      background-color: #ffffff;
-      border: 2px solid #2563eb;
-      color: #0f172a;
+      background-color: #ffffff; border: 2px solid #2563eb; color: #0f172a;
       box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15);
     }
     .subject-card[data-state="enabled"] h3 { color: #0f172a; }
@@ -85,11 +78,9 @@
     .subject-card[data-state="enabled"] .info-btn { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;}
     .subject-card[data-state="enabled"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.2); }
 
-    /* ESTADO 3: BLOQUEADA */
+    /* BLOQUEADA */
     .subject-card[data-state="locked"] {
-      background-color: #f8fafc;
-      border: 2px dashed #cbd5e1;
-      color: #64748b;
+      background-color: #f8fafc; border: 2px dashed #cbd5e1; color: #64748b;
     }
     .subject-card[data-state="locked"] h3 { color: #475569; }
     .subject-card[data-state="locked"] .subtitle { color: #94a3b8; }
@@ -98,7 +89,9 @@
     .subject-card[data-state="locked"] .info-btn { background-color: #ffffff; color: #94a3b8; border: 1px solid #e2e8f0;}
     .subject-card[data-state="locked"]:hover { background-color: #f1f5f9; border-color: #94a3b8; }
 
-    /* Animación Desbloqueo */
+    .filter-active  { opacity: 1 !important; display: flex !important; }
+    .filter-dimmed  { opacity: 0.15 !important; filter: grayscale(100%); pointer-events: none; }
+
     @keyframes unlockPop {
       0% { transform: scale(1); }
       50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(37, 99, 235, 0.4); border-color: #2563eb; }
@@ -126,7 +119,7 @@
   </script>
 
   <!-- ══════════════════════════════════════════
-       ONBOARDING MODAL
+       MODAL: ONBOARDING
   ══════════════════════════════════════════ -->
   <div id="onboarding-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-md p-8 shadow-2xl text-center border border-slate-100 transform scale-95 transition-transform duration-200">
@@ -138,7 +131,8 @@
         Gestioná tu progreso académico con un diseño optimizado para la claridad visual.<br><br>
         <span class="inline-block bg-slate-900 text-white px-2 py-0.5 rounded text-xs font-bold mb-1">APROBADA</span> — Materias superadas.<br>
         <span class="inline-block bg-white border-2 border-blue-500 text-blue-700 px-2 py-0.5 rounded text-xs font-bold mb-1">DISPONIBLE</span> — Listas para cursar.<br>
-        <span class="inline-block bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-2 py-0.5 rounded text-xs font-bold">RESTRINGIDA</span> — Faltan correlativas.
+        <span class="inline-block bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-2 py-0.5 rounded text-xs font-bold mb-1">RESTRINGIDA</span> — Faltan correlativas.<br>
+        <span class="inline-block bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs font-bold">🔥 RUTA CRÍTICA</span> — Traba 3 o más materias.
       </p>
       <button onclick="closeOnboarding()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-md">
         Comenzar a planificar
@@ -147,14 +141,12 @@
   </div>
 
   <!-- ══════════════════════════════════════════
-       MODAL DE CONFIRMACIÓN DE REINICIO
+       MODAL: REINICIO DE DATOS
   ══════════════════════════════════════════ -->
   <div id="confirm-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
       <h2 class="text-xl font-black mb-2 text-slate-900 flex items-center gap-2">⚠️ Liquidar Datos</h2>
-      <p class="text-sm text-slate-600 mb-6 leading-relaxed">
-        ¿Estás seguro de reiniciar tu balance? Se borrará todo tu historial de materias aprobadas.
-      </p>
+      <p class="text-sm text-slate-600 mb-6 leading-relaxed">¿Estás seguro de reiniciar tu balance? Se borrará todo tu historial de materias aprobadas y horarios.</p>
       <div class="flex gap-3 justify-end">
         <button onclick="closeConfirmModal()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
         <button onclick="executeReset()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition">Sí, reiniciar</button>
@@ -163,7 +155,7 @@
   </div>
 
   <!-- ══════════════════════════════════════════
-       MODAL DE ALERTA (Dependencias)
+       MODAL: ALERTA DE DEPENDENCIAS
   ══════════════════════════════════════════ -->
   <div id="alert-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
@@ -174,21 +166,43 @@
   </div>
 
   <!-- ══════════════════════════════════════════
-       SIMULADOR MODAL (Proyecciones)
+       MODAL: ARMADOR DE HORARIOS (NUEVO)
   ══════════════════════════════════════════ -->
-  <div id="simulador-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden" onclick="closeSimulador(event)">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
-      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 tracking-tight">
-        <span class="text-blue-600">📈</span> Proyección de Cursada
-      </h2>
-      <p class="text-xs text-slate-500 mt-2 mb-5 leading-relaxed">Optimizá tu tiempo. Ingresá la cantidad de materias que podés cursar y el sistema calculará las opciones estratégicas para destrabar la carrera.</p>
+  <div id="schedule-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 hidden" onclick="closeSchedule(event)">
+    <div class="bg-white rounded-3xl w-full max-w-5xl h-[90vh] sm:h-[85vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation()">
       
-      <div class="flex items-center gap-3 mb-5">
-        <input type="number" id="sim-qty" value="3" min="1" max="10" class="w-20 px-3 py-2.5 border-2 border-slate-200 rounded-xl text-center font-bold text-slate-700 font-mono focus:border-blue-500 focus:ring-0 outline-none transition">
-        <button onclick="runSimulador()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow-md transition">Calcular Plan</button>
+      <!-- Header -->
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
+        <div>
+          <h2 class="text-xl font-black flex items-center gap-2 tracking-tight"><span>📅</span> Planificador de Horarios</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Organizá tu semana con las materias que tenés habilitadas.</p>
+        </div>
+        <button onclick="closeSchedule()" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
       </div>
       
-      <div id="sim-results" class="mt-4 max-h-[50vh] overflow-y-auto pr-2 space-y-3"></div>
+      <!-- Formulario de carga -->
+      <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row gap-3 shrink-0">
+        <select id="sched-subject" class="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none truncate"></select>
+        <div class="flex gap-3">
+          <select id="sched-day" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none w-1/3 sm:w-auto">
+            <option value="Lunes">Lunes</option>
+            <option value="Martes">Martes</option>
+            <option value="Miércoles">Miércoles</option>
+            <option value="Jueves">Jueves</option>
+            <option value="Viernes">Viernes</option>
+          </select>
+          <input type="text" id="sched-time" placeholder="Ej: 18:00 a 20:00" class="w-1/3 sm:w-36 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+          <button onclick="addScheduleItem()" class="w-1/3 sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition">Agregar</button>
+        </div>
+      </div>
+      
+      <!-- Grilla Semanal (Kanban) -->
+      <div class="flex-1 overflow-x-auto p-4 bg-slate-100">
+        <div class="flex gap-4 min-w-max h-full" id="schedule-grid">
+          <!-- Renderizado por JS -->
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -243,7 +257,7 @@
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
         
-        <!-- Búsqueda sin cortes en móvil -->
+        <!-- Búsqueda -->
         <div class="flex flex-wrap items-center gap-3 flex-1 min-w-[200px]">
           <div class="relative w-full flex-1">
             <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
@@ -252,50 +266,55 @@
         </div>
 
         <!-- Herramientas de Acción -->
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto">
           
-          <button id="btn-install" onclick="installApp()" class="hidden text-xs bg-slate-900 text-white px-4 py-2 rounded-xl font-bold hover:bg-slate-800 transition shadow-md flex items-center gap-1.5" title="Instalar como aplicación nativa">
+          <button id="btn-install" onclick="installApp()" class="hidden text-xs bg-slate-900 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-slate-800 transition shadow-md flex items-center gap-1.5" title="Instalar como aplicación nativa">
             <span>📱</span> <span class="hidden sm:inline">Instalar App</span>
           </button>
 
-          <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 sm:px-4 py-2 rounded-xl border border-blue-200 transition" title="Muestra únicamente las materias que ya podés cursar">
-            <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
-            <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
-            Modo Inscripción
-          </label>
+          <!-- Toggles (Ruta Crítica e Inscripción) -->
+          <div class="flex gap-2">
+            <label class="flex items-center justify-center cursor-pointer text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 px-3 py-2.5 rounded-xl border border-red-200 transition shadow-sm" title="Destaca las materias que traban 3 o más asignaturas posteriores.">
+              <input type="checkbox" id="toggle-bottlenecks" class="sr-only" onchange="applyFilterStyles()">
+              <span>🔥 <span class="hidden md:inline">Ruta Crítica</span></span>
+            </label>
+
+            <label class="flex items-center justify-center cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2.5 rounded-xl border border-blue-200 transition shadow-sm" title="Muestra únicamente las materias que ya podés cursar">
+              <input type="checkbox" id="toggle-enabled-only" class="sr-only" onchange="applyFilterStyles()">
+              <span>🎯 <span class="hidden md:inline">Modo Inscripción</span></span>
+            </label>
+          </div>
           
-          <button onclick="openSimulador()" class="text-xs bg-slate-100 text-slate-700 px-3 sm:px-4 py-2 rounded-xl font-bold border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5 shadow-sm" title="Proyectar Cursada">
-            <span>📈</span> <span class="hidden sm:inline">Proyectar</span>
-          </button>
+          <div class="w-px h-6 bg-slate-300 hidden md:block"></div>
           
-          <button onclick="exportMap()" id="btn-export" class="text-xs bg-slate-100 text-slate-700 px-3 sm:px-4 py-2 rounded-xl font-bold border border-slate-200 hover:bg-slate-200 transition flex items-center gap-1.5 shadow-sm">
-            <span>📄</span> <span class="hidden sm:inline">Reporte</span>
-          </button>
-          
-          <button onclick="confirmReset()" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm" title="Liquidar Datos">
-            <span>🔄</span>
-          </button>
+          <!-- Botones de Acción -->
+          <div class="flex gap-2">
+            <button onclick="openSchedule()" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-2.5 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm" title="Armar horario semanal">
+              <span>📅</span> <span class="hidden xl:inline">Horarios</span>
+            </button>
+            <button onclick="exportMap()" id="btn-export" class="text-xs bg-emerald-50 text-emerald-700 px-3 py-2.5 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
+              <span>📄</span> <span class="hidden xl:inline">Reporte</span>
+            </button>
+            <button onclick="confirmReset()" class="text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2.5 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm" title="Liquidar Datos">
+              <span>🔄</span>
+            </button>
+          </div>
+
         </div>
       </div>
     </div>
 
-    <!-- Barra de Leyenda con los nombres solicitados: Aprobada, Habilitada, Bloqueada -->
+    <!-- Barra de Leyenda Estructural -->
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
-      <div class="max-w-screen-xl mx-auto px-4 py-2.5 flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div class="max-w-screen-xl mx-auto px-4 py-2.5 flex flex-col lg:flex-row gap-4 items-center justify-between">
         
-        <div class="flex flex-wrap gap-3 text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wide">
-          <div class="flex items-center gap-2 bg-slate-900 text-white px-3 py-1 rounded-lg">
-            <span>✓</span> Aprobada
-          </div>
-          <div class="flex items-center gap-2 bg-white border-2 border-blue-500 text-slate-800 px-3 py-0.5 rounded-lg">
-            <span class="text-blue-600">▶</span> Habilitada
-          </div>
-          <div class="flex items-center gap-2 bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-3 py-0.5 rounded-lg">
-            <span>🔒</span> Bloqueada
-          </div>
+        <div class="flex flex-wrap gap-2 text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wide">
+          <div class="flex items-center gap-1.5 bg-slate-900 text-white px-2.5 py-1 rounded-lg"><span>✓</span> Aprobada</div>
+          <div class="flex items-center gap-1.5 bg-white border-2 border-blue-500 text-slate-800 px-2.5 py-0.5 rounded-lg"><span class="text-blue-600">▶</span> Habilitada</div>
+          <div class="flex items-center gap-1.5 bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-2.5 py-0.5 rounded-lg"><span>🔒</span> Restringida</div>
         </div>
         
-        <div class="flex items-center gap-4 w-full md:w-96">
+        <div class="flex items-center gap-4 w-full lg:w-96">
           <span class="text-[10px] font-black text-slate-400 whitespace-nowrap uppercase tracking-widest">
             <span id="approved-count" class="text-slate-800 text-sm font-mono">0</span> / <span id="total-count" class="font-mono">0</span> MAT.
           </span>
@@ -307,14 +326,13 @@
       </div>
     </div>
 
-  </div> <!-- Fin Contenedor Sticky -->
+  </div>
 
   <!-- ══════════════════════════════════════════
        GRILLA CURRICULAR & ZONA DE EXPORTACIÓN
   ══════════════════════════════════════════ -->
   <div id="export-area" class="pb-8 flex-1">
     
-    <!-- Encabezado oculto que SOLO sale en la foto exportada -->
     <div id="export-watermark" class="hidden mx-auto max-w-screen-xl px-4 pt-8 pb-4">
       <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-xl flex justify-between items-center border-l-8 border-blue-500">
         <div>
@@ -336,13 +354,13 @@
   </div>
 
   <!-- ══════════════════════════════════════════
-       MODAL DE INFORMACIÓN MATERIA (Con visibilidad corregida)
+       MODAL DE INFORMACIÓN MATERIA
   ══════════════════════════════════════════ -->
   <div id="modal-backdrop" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 hidden" onclick="closeModal(event)">
     <div id="modal-box" class="bg-white w-full max-w-lg shadow-2xl rounded-3xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
       
-      <!-- Header fijo con texto blanco visible -->
       <div id="modal-header" class="p-5 sm:p-6 text-white bg-slate-900 border-b border-slate-700 relative overflow-hidden shrink-0">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 10px 10px;"></div>
         <div class="relative z-10 flex justify-between items-start gap-3">
           <div>
             <span id="modal-badge" class="text-[9px] sm:text-[10px] uppercase tracking-widest font-black bg-white/20 text-white px-3 py-1 rounded-full shadow-sm backdrop-blur-sm border border-white/20 inline-block mb-3"></span>
@@ -352,10 +370,7 @@
         </div>
       </div>
       
-      <!-- Contenedor con Scroll -->
       <div class="p-5 sm:p-7 space-y-5 text-sm text-slate-700 bg-slate-50 overflow-y-auto">
-        
-        <!-- KPIs -->
         <div class="grid grid-cols-3 gap-3 sm:gap-4">
           <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
             <p class="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Formato</p>
@@ -371,7 +386,6 @@
           </div>
         </div>
         
-        <!-- Requisitos -->
         <div id="modal-corr-section" class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-4 sm:p-5">
           <h3 class="text-[10px] uppercase tracking-widest font-black text-slate-500 mb-2 flex items-center gap-2"><span>🔒</span> Requisitos Previos</h3>
           <p id="modal-corr" class="text-sm font-bold text-slate-700 leading-snug"></p>
@@ -384,9 +398,8 @@
         
         <div>
           <h3 class="text-[10px] uppercase tracking-widest font-black text-blue-600 mb-3">Núcleos de Contenido</h3>
-          <ul id="modal-contenidos" class="list-none space-y-2 text-sm text-slate-600 font-medium bg-slate-50 p-4 rounded-2xl border border-slate-100"></ul>
+          <ul id="modal-contenidos" class="list-none space-y-2 text-sm text-slate-600 font-medium bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-sm"></ul>
         </div>
-        
       </div>
     </div>
   </div>
@@ -453,13 +466,14 @@ const SUBJECTS = [
 const state = {
   approved: new Set(),
   searchQuery: '',
-  totalHs: 0
+  totalHs: 0,
+  schedule: { 'Lunes': [], 'Martes': [], 'Miércoles': [], 'Jueves': [], 'Viernes': [] }
 };
 
 const CAMPO_COLORS = {
-  CFG: { bg: 'bg-[#334155]', label: 'CFG', title: 'Formación General' },
-  CFE: { bg: 'bg-[#0f172a]', label: 'CFE', title: 'Formación Específica' },
-  CPD: { bg: 'bg-[#475569]', label: 'CPD', title: 'Práctica Docente' },
+  CFG: { bg: 'bg-[#1e3a8a]', label: 'CFG', title: 'Formación General' },
+  CFE: { bg: 'bg-[#059669]', label: 'CFE', title: 'Formación Específica' },
+  CPD: { bg: 'bg-[#d97706]', label: 'CPD', title: 'Práctica Docente' },
 };
 
 /* Instalación PWA (App Nativa) */
@@ -481,10 +495,18 @@ function installApp() {
 }
 
 function init() {
+  // Cargar Aprobadas
   const saved = localStorage.getItem('isfd100_aprobadas');
   if (saved) state.approved = new Set(JSON.parse(saved));
   
+  // Cargar Horario
+  const savedSchedule = localStorage.getItem('isfd100_horarios');
+  if (savedSchedule) state.schedule = JSON.parse(savedSchedule);
+
   state.totalHs = SUBJECTS.reduce((acc, s) => acc + s.hs, 0);
+
+  // Calcular dependencias "aguas abajo" (Ruta Crítica)
+  calculateDependencies();
 
   if (!localStorage.getItem('isfd100_onboarding')) {
     document.getElementById('onboarding-modal').classList.remove('hidden');
@@ -505,6 +527,42 @@ function init() {
 
 function saveState() {
   localStorage.setItem('isfd100_aprobadas', JSON.stringify([...state.approved]));
+  localStorage.setItem('isfd100_horarios', JSON.stringify(state.schedule));
+}
+
+/* ─────────────────────────────────────────────
+   ALGORITMO DE RUTA CRÍTICA (Cuellos de Botella)
+───────────────────────────────────────────── */
+function calculateDependencies() {
+  // 1. Armar grafo invertido (quién depende de mí)
+  const dependentsMap = {};
+  SUBJECTS.forEach(s => dependentsMap[s.id] = []);
+  
+  SUBJECTS.forEach(s => {
+    s.prereqs.forEach(pre => {
+      if (dependentsMap[pre]) {
+        dependentsMap[pre].push(s.id);
+      }
+    });
+  });
+
+  // 2. Función recursiva para contar todas las ramas (directas e indirectas)
+  function countAllDownstream(id, visited = new Set()) {
+    visited.add(id);
+    dependentsMap[id].forEach(dep => {
+      if (!visited.has(dep)) {
+        countAllDownstream(dep, visited);
+      }
+    });
+    return visited;
+  }
+
+  // 3. Asignar el conteo a cada materia
+  SUBJECTS.forEach(s => {
+    const downstream = countAllDownstream(s.id);
+    downstream.delete(s.id); // Quitarse a sí mismo
+    s.bottleneckCount = downstream.size;
+  });
 }
 
 /* ─────────────────────────────────────────────
@@ -531,7 +589,7 @@ function renderGrid() {
 }
 
 /* ─────────────────────────────────────────────
-   NUEVO DISEÑO DE TARJETA CON ATRIBUTOS DATA
+   DISEÑO DE TARJETA CON ATRIBUTOS DATA Y BADGE RUTA CRÍTICA
 ───────────────────────────────────────────── */
 function createCard(subject) {
   const card = document.createElement('div');
@@ -539,9 +597,18 @@ function createCard(subject) {
   card.dataset.state = 'locked';
   card.id = `card-${subject.id}`;
   
+  // Badge de Ruta Crítica (si traba 3 o más materias)
+  const isBottleneck = subject.bottleneckCount >= 3;
+  const bottleneckHtml = isBottleneck 
+    ? `<span class="bg-red-100 text-red-700 border border-red-200 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shadow-sm ml-2" title="Esta materia traba el cursado de otras ${subject.bottleneckCount} materias">🔥 Ruta Crítica</span>` 
+    : '';
+
   card.innerHTML = `
     <div class="flex justify-between items-start mb-3">
-      <span class="campo-badge ${CAMPO_COLORS[subject.campo].bg} px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-sm">${CAMPO_COLORS[subject.campo].label}</span>
+      <div class="flex items-center">
+        <span class="campo-badge ${CAMPO_COLORS[subject.campo].bg} px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-sm">${CAMPO_COLORS[subject.campo].label}</span>
+        ${bottleneckHtml}
+      </div>
       <span class="status-icon text-lg leading-none"></span>
     </div>
     <h3 class="font-black text-[15px] leading-snug mb-1.5 pr-2 transition-colors">${subject.name}</h3>
@@ -646,28 +713,48 @@ function updateAllCards() {
 
 function applyFilterStyles() {
   const q = state.searchQuery;
-  const showOnlyEnabled = document.getElementById('toggle-enabled-only').checked;
+  
+  // Revisar si los checkbox existen (podrían no haberse renderizado aún)
+  const toggleEnabledEl = document.getElementById('toggle-enabled-only');
+  const toggleBottlenecksEl = document.getElementById('toggle-bottlenecks');
+  
+  const showOnlyEnabled = toggleEnabledEl ? toggleEnabledEl.checked : false;
+  const showBottlenecks = toggleBottlenecksEl ? toggleBottlenecksEl.checked : false;
 
   SUBJECTS.forEach(subject => {
     const card = document.getElementById(`card-${subject.id}`);
     if (!card) return;
     
     let visible = true;
+    
+    // Filtro Texto
     if (q && !subject.name.toLowerCase().includes(q)) visible = false;
     
-    // CORREGIDO: Modo Inscripción muestra únicamente las habilitadas que aún NO están aprobadas
+    // Filtro Modo Inscripción: Solo habilitadas (ni aprobadas ni bloqueadas)
     if (showOnlyEnabled) {
       if (!isSubjectEnabled(subject.id) || state.approved.has(subject.id)) {
         visible = false;
       }
     }
 
+    // Filtro Ruta Crítica: Solo las que traban 3 o más y aún NO están aprobadas
+    if (showBottlenecks) {
+      if (subject.bottleneckCount < 3 || state.approved.has(subject.id)) {
+        visible = false;
+      }
+    }
+
     if (visible) {
-      card.style.display = 'flex';
-      card.classList.remove('filter-dimmed');
+      card.classList.remove('hidden', 'filter-dimmed');
       card.classList.add('filter-active');
     } else {
-      card.style.display = 'none';
+      // Si hay un toggle activado o búsqueda, ocultamos las que no sirven
+      if(q || showOnlyEnabled || showBottlenecks) {
+         card.classList.add('hidden');
+      } else {
+         card.classList.add('filter-dimmed');
+         card.classList.remove('filter-active');
+      }
     }
   });
 }
@@ -692,7 +779,7 @@ function updateProgress() {
 }
 
 /* ─────────────────────────────────────────────
-   MODALES Y UTILIDADES CUSTOM
+   MODALES DE AYUDA Y REINICIO
 ───────────────────────────────────────────── */
 function openModal(event, id) {
   event.stopPropagation();
@@ -733,11 +820,7 @@ function closeModal(event) {
     box.classList.remove('scale-100');
     box.classList.add('scale-95');
   }
-  
-  setTimeout(() => {
-    document.getElementById('modal-backdrop').classList.add('hidden');
-    document.body.style.overflow = '';
-  }, 150);
+  setTimeout(() => { document.getElementById('modal-backdrop').classList.add('hidden'); document.body.style.overflow = ''; }, 150);
 }
 
 function closeOnboarding() {
@@ -745,57 +828,160 @@ function closeOnboarding() {
   const box = document.getElementById('onboarding-modal').children[0];
   box.classList.remove('scale-100');
   box.classList.add('scale-95');
-  setTimeout(() => {
-    document.getElementById('onboarding-modal').classList.add('hidden');
-  }, 150);
+  setTimeout(() => { document.getElementById('onboarding-modal').classList.add('hidden'); }, 150);
 }
 
 function confirmReset() {
   const modal = document.getElementById('confirm-modal');
   modal.classList.remove('hidden');
-  setTimeout(() => {
-    modal.children[0].classList.remove('scale-95');
-    modal.children[0].classList.add('scale-100');
-  }, 10);
+  setTimeout(() => { modal.children[0].classList.remove('scale-95'); modal.children[0].classList.add('scale-100'); }, 10);
 }
 
 function closeConfirmModal() {
   const modal = document.getElementById('confirm-modal');
   modal.children[0].classList.remove('scale-100');
   modal.children[0].classList.add('scale-95');
-  setTimeout(() => {
-    modal.classList.add('hidden');
-  }, 150);
+  setTimeout(() => { modal.classList.add('hidden'); }, 150);
 }
 
 function executeReset() {
   closeConfirmModal();
   state.approved.clear();
+  state.schedule = { 'Lunes': [], 'Martes': [], 'Miércoles': [], 'Jueves': [], 'Viernes': [] };
   saveState();
   updateAllCards();
   updateProgress();
+  if(!document.getElementById('schedule-modal').classList.contains('hidden')) {
+    renderScheduleGrid();
+  }
 }
 
 function showAlert(msg) {
   document.getElementById('alert-message').innerHTML = msg;
   const modal = document.getElementById('alert-modal');
   modal.classList.remove('hidden');
-  setTimeout(() => {
-    modal.children[0].classList.remove('scale-95');
-    modal.children[0].classList.add('scale-100');
-  }, 10);
+  setTimeout(() => { modal.children[0].classList.remove('scale-95'); modal.children[0].classList.add('scale-100'); }, 10);
 }
 
 function closeAlertModal() {
   const modal = document.getElementById('alert-modal');
   modal.children[0].classList.remove('scale-100');
   modal.children[0].classList.add('scale-95');
+  setTimeout(() => { modal.classList.add('hidden'); }, 150);
+}
+
+/* ─────────────────────────────────────────────
+   ARMADOR DE HORARIOS & SIMULADOR
+───────────────────────────────────────────── */
+function openSchedule() { 
+  const modal = document.getElementById('schedule-modal');
+  modal.classList.remove('hidden'); 
+  
+  // Poblar el select de materias (Solo habilitadas que no estén aprobadas)
+  const sel = document.getElementById('sched-subject');
+  sel.innerHTML = '<option value="" disabled selected>Seleccioná una materia habilitada...</option>';
+  
+  const available = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.approved.has(s.id));
+  available.sort((a, b) => a.year - b.year);
+  
+  available.forEach(s => {
+    // Le agregamos la llamita al texto si es cuello de botella
+    const fire = s.bottleneckCount >= 3 ? '🔥 ' : '';
+    sel.innerHTML += `<option value="${s.id}">${fire}${s.name} (Año ${s.year})</option>`;
+  });
+
+  renderScheduleGrid();
+
+  setTimeout(() => {
+    modal.children[0].classList.remove('scale-95');
+    modal.children[0].classList.add('scale-100');
+  }, 10);
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSchedule(e) {
+  if (e && e.target !== document.getElementById('schedule-modal') && e.type === 'click') return;
+  const modal = document.getElementById('schedule-modal');
+  modal.children[0].classList.remove('scale-100');
+  modal.children[0].classList.add('scale-95');
   setTimeout(() => {
     modal.classList.add('hidden');
+    document.body.style.overflow = '';
   }, 150);
 }
 
-/* ── Simulador ── */
+function addScheduleItem() {
+  const subId = document.getElementById('sched-subject').value;
+  const day = document.getElementById('sched-day').value;
+  const time = document.getElementById('sched-time').value || 'Sin horario definido';
+
+  if (!subId) {
+    alert("Por favor, seleccioná una materia primero.");
+    return;
+  }
+
+  // Prevenir duplicados
+  let exists = false;
+  Object.keys(state.schedule).forEach(d => {
+    if (state.schedule[d].some(item => item.id === subId)) exists = true;
+  });
+
+  if (exists) {
+    alert("Ya agregaste esta materia a tu semana.");
+    return;
+  }
+
+  if (!state.schedule[day]) state.schedule[day] = [];
+  state.schedule[day].push({ id: subId, time: time });
+  
+  saveState();
+  renderScheduleGrid();
+}
+
+function removeScheduleItem(day, index) {
+  state.schedule[day].splice(index, 1);
+  saveState();
+  renderScheduleGrid();
+}
+
+function renderScheduleGrid() {
+  const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+  const grid = document.getElementById('schedule-grid');
+  grid.innerHTML = '';
+  
+  days.forEach(day => {
+    const items = state.schedule[day] || [];
+    let html = `
+      <div class="bg-white border border-slate-200 rounded-xl flex flex-col min-w-[200px] w-[200px] shadow-sm">
+        <h4 class="font-black text-slate-800 bg-slate-100 p-3 rounded-t-xl border-b border-slate-200">${day}</h4>
+        <div class="p-3 flex flex-col gap-3 min-h-[150px]">
+    `;
+    
+    if (items.length === 0) {
+      html += `<p class="text-xs text-slate-400 text-center mt-4 italic">Día libre</p>`;
+    } else {
+      items.forEach((item, index) => {
+        const subject = SUBJECTS.find(x => x.id === item.id);
+        if (!subject) return;
+        
+        // Colores según el campo para mantener la identidad
+        const borderCol = subject.campo === 'CFG' ? 'border-blue-500' : subject.campo === 'CFE' ? 'border-emerald-500' : 'border-amber-500';
+
+        html += `
+          <div class="bg-slate-50 p-3 rounded-lg border-l-4 ${borderCol} border-y border-r border-slate-200 shadow-sm relative group">
+            <p class="text-[11px] font-bold text-slate-800 leading-tight pr-4">${subject.name}</p>
+            <p class="text-[10px] text-blue-600 font-mono mt-1 font-bold">${item.time}</p>
+            <button onclick="removeScheduleItem('${day}', ${index})" class="absolute top-1.5 right-1.5 w-6 h-6 bg-red-100 text-red-600 rounded-md opacity-100 sm:opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-xs font-black shadow-sm">✕</button>
+          </div>
+        `;
+      });
+    }
+    
+    html += `</div></div>`;
+    grid.innerHTML += html;
+  });
+}
+
 function openSimulador() { 
   const modal = document.getElementById('simulador-modal');
   modal.classList.remove('hidden'); 
@@ -810,15 +996,19 @@ function closeSimulador(e) {
   const modal = document.getElementById('simulador-modal');
   modal.children[0].classList.remove('scale-100');
   modal.children[0].classList.add('scale-95');
-  setTimeout(() => {
-    modal.classList.add('hidden');
-  }, 150);
+  setTimeout(() => { modal.classList.add('hidden'); }, 150);
 }
 
 function runSimulador() {
   const qty = parseInt(document.getElementById('sim-qty').value) || 3;
   const enabled = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.approved.has(s.id));
-  enabled.sort((a,b) => a.year - b.year);
+  
+  // Sort: Priorizar materias que son "Cuello de botella", luego por año menor.
+  enabled.sort((a,b) => {
+    if (b.bottleneckCount !== a.bottleneckCount) return b.bottleneckCount - a.bottleneckCount;
+    return a.year - b.year;
+  });
+  
   const selected = enabled.slice(0, qty);
 
   const container = document.getElementById('sim-results');
@@ -827,12 +1017,15 @@ function runSimulador() {
     return;
   }
 
-  let html = `<p class="text-[11px] text-slate-500 font-medium mb-3">Plan de ruta sugerido. Estas materias están libres de trabas y priorizan destrabar años superiores:</p>`;
+  let html = `<p class="text-[11px] text-slate-500 font-medium mb-3">Plan sugerido. Estas materias están libres de trabas y priorizan la <b>Ruta Crítica</b> para destrabar correlativas posteriores:</p>`;
 
   html += selected.map(s => `
     <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm">
       <div>
-        <p class="text-sm font-black text-slate-800 leading-tight">${s.name}</p>
+        <div class="flex items-center gap-1.5">
+          <p class="text-sm font-black text-slate-800 leading-tight">${s.name}</p>
+          ${s.bottleneckCount >= 3 ? '<span title="Ruta Crítica">🔥</span>' : ''}
+        </div>
         <p class="text-[11px] text-slate-500 mt-1 font-mono">${s.regimen} · Año ${s.year}</p>
       </div>
       <button onclick="toggleApproved('${s.id}'); closeSimulador();" class="text-[10px] uppercase font-bold bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition shadow-sm">Cursar</button>
@@ -846,7 +1039,7 @@ function runSimulador() {
 function exportMap() {
   const btn = document.getElementById('btn-export');
   const originalHTML = btn.innerHTML;
-  btn.innerHTML = '⏳ <span class="hidden sm:inline">Calculando...</span>';
+  btn.innerHTML = '⏳ <span class="hidden xl:inline">Calculando...</span>';
   btn.disabled = true;
 
   const scrollX = window.scrollX;
@@ -915,6 +1108,7 @@ document.addEventListener('keydown', e => {
     closeSimulador(); 
     closeConfirmModal();
     closeAlertModal();
+    closeSchedule();
   } 
 });
 window.addEventListener('DOMContentLoaded', init);
