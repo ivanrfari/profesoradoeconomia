@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mapa Curricular · Economía · ISFD N°100</title>
   
+  <!-- Manifest dinámico para PWA -->
   <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
 
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -24,6 +26,7 @@
     }
   </script>
 
+  <!-- Librerías Externas -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -47,6 +50,11 @@
       display: flex; flex-direction: column; height: 100%; position: relative;
     }
     
+    /* CRÍTICO: Fuerza a ocultar la tarjeta para que los filtros funcionen */
+    .subject-card.hidden {
+      display: none !important;
+    }
+
     /* Aprobada */
     .subject-card[data-state="approved"] {
       background-color: #0f172a; border: 2px solid #0f172a; color: #ffffff;
@@ -110,6 +118,7 @@
 
 <body class="min-h-screen text-slate-800 flex flex-col">
 
+  <!-- Service Worker para PWA -->
   <script>
     if ('serviceWorker' in navigator) {
       const swCode = "self.addEventListener('fetch', function(event) {});";
@@ -139,7 +148,6 @@
     </div>
   </div>
 
-  <!-- ESTADO DE LA MATERIA (CON VALIDACIÓN EN TIEMPO REAL) -->
   <div id="status-modal" class="modal-backdrop fixed inset-0 z-[80] flex items-center justify-center p-4 hidden" onclick="closeStatusModal(event)">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
       <h2 class="text-xl font-black mb-1 text-slate-900 leading-tight" id="status-subject-name">Nombre Materia</h2>
@@ -209,7 +217,7 @@
 
   <div id="alert-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
-      <h2 class="text-xl font-black mb-3 text-slate-900 flex items-center gap-2">🛑 Movimiento Bloqueado</h2>
+      <h2 id="alert-title" class="text-xl font-black mb-3 text-slate-900 flex items-center gap-2"></h2>
       <p id="alert-message" class="text-sm text-slate-600 mb-6 leading-relaxed"></p>
       <button onclick="closeAlertModal()" class="w-full px-4 py-3 rounded-xl text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 transition">Entendido</button>
     </div>
@@ -308,40 +316,46 @@
   ══════════════════════════════════════════ -->
   <div class="sticky top-0 z-20 flex flex-col shadow-sm">
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
-      <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
+      <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-col md:flex-row gap-3 items-center justify-between">
         
-        <div class="flex w-full lg:w-auto flex-1 gap-3">
+        <!-- Búsqueda y Filtros en móvil (Nueva estructura) -->
+        <div class="flex w-full md:w-auto flex-1 gap-3">
           <div class="relative flex-1">
             <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
             <input type="text" id="search-input" placeholder="Buscar materia..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-800 transition-all font-medium truncate" onkeyup="applyFilterStyles()">
           </div>
-          
-          <label class="flex shrink-0 items-center gap-2 cursor-pointer text-[11px] sm:text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl border border-blue-200 transition shadow-sm" title="Muestra únicamente las materias que ya podés cursar">
-            <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
-            <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
-            <span class="hidden sm:inline">Modo Inscripción</span>
-          </label>
         </div>
 
-        <div class="flex items-center gap-2 w-full lg:w-auto overflow-x-auto hide-scrollbar pb-1 lg:pb-0">
-          <button id="btn-install" onclick="installApp()" class="hidden shrink-0 text-xs bg-slate-900 text-white px-3 py-2 rounded-xl font-bold hover:bg-slate-800 transition shadow-sm flex items-center gap-1.5">
-            <span>📱</span> Instalar App
-          </button>
+        <!-- Botones de Acción (Scroll Horizontal Asegurado) -->
+        <div class="flex items-center justify-start md:justify-end gap-2 w-full md:w-auto overflow-x-auto hide-scrollbar pb-1 md:pb-0 pt-1 md:pt-0">
           
-          <button onclick="openSchedule()" class="shrink-0 text-xs bg-indigo-50 text-indigo-700 px-3 sm:px-4 py-2 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm">
+          <button id="btn-install" onclick="installApp()" class="hidden shrink-0 text-xs bg-slate-900 text-white px-3 sm:px-4 py-2 rounded-xl font-bold hover:bg-slate-800 transition shadow-sm flex items-center gap-1.5">
+            <span>📱</span> App
+          </button>
+
+          <!-- Toggle Modo Inscripción Movido acá -->
+          <label class="flex shrink-0 items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl border border-blue-200 transition shadow-sm">
+            <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
+            <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
+            <span>Modo Inscripción</span>
+          </label>
+          
+          <div class="w-px h-6 bg-slate-300 hidden md:block shrink-0 mx-1"></div>
+          
+          <button onclick="openSchedule()" class="shrink-0 text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📅</span> Horarios
           </button>
-          <button onclick="openSimulador()" class="shrink-0 text-xs bg-cyan-50 text-cyan-700 px-3 sm:px-4 py-2 rounded-xl font-bold border border-cyan-200 hover:bg-cyan-100 transition flex items-center gap-1.5 shadow-sm">
+          <button onclick="openSimulador()" class="shrink-0 text-xs bg-cyan-50 text-cyan-700 px-3 py-2 rounded-xl font-bold border border-cyan-200 hover:bg-cyan-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📈</span> Proyectar
           </button>
-          <button onclick="openSyncModal()" class="shrink-0 text-xs bg-amber-50 text-amber-700 px-3 sm:px-4 py-2 rounded-xl font-bold border border-amber-200 hover:bg-amber-100 transition flex items-center gap-1.5 shadow-sm">
+          <button onclick="openSyncModal()" class="shrink-0 text-xs bg-amber-50 text-amber-700 px-3 py-2 rounded-xl font-bold border border-amber-200 hover:bg-amber-100 transition flex items-center gap-1.5 shadow-sm">
             <span>💾</span> Sincronizar
           </button>
-          <button onclick="exportMap()" id="btn-export" class="shrink-0 text-xs bg-emerald-50 text-emerald-700 px-3 sm:px-4 py-2 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
+          <button onclick="exportMap()" id="btn-export" class="shrink-0 text-xs bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📄</span> Reporte
           </button>
-          <button onclick="confirmReset()" class="shrink-0 text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm" title="Liquidar Datos">
-            <span>🔄</span> <span class="lg:hidden">Reset</span>
+          <button onclick="confirmReset()" class="shrink-0 text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm">
+            <span>🔄</span> <span class="md:hidden">Reset</span>
           </button>
         </div>
 
@@ -480,12 +494,12 @@ const SUBJECTS = [
   { id: 'intro-economia-politica', name: 'Introducción a la Economía Política', year: 1, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: [], finalidades: 'Introducir los conceptos fundamentales de la Economía Política como ciencia social crítica.', contenidos: ['El objeto de la Economía Política','Valor, trabajo y mercancía','Oferta, demanda y formación de precios','Distribución del ingreso y clases sociales','El rol del Estado en la economía'] },
   { id: 'teoria-organizaciones', name: 'Teoría de las organizaciones', year: 1, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Estudiar las organizaciones como fenómeno social complejo.', contenidos: ['Concepto y tipología de organizaciones','Escuelas del pensamiento organizacional','Cultura y clima organizacional','Organizaciones y entorno: enfoque sistémico'] },
   { id: 'sic-i', name: 'Sistemas de Información Contable I', year: 1, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Introducir los fundamentos de la contabilidad como sistema de información.', contenidos: ['Partida doble y ecuación patrimonial','El ciclo contable','Registración de operaciones básicas','Estados contables básicos'] },
-  { id: 'practica-i', name: 'Práctica Docente I', year: 1, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 128, prereqs: [], finalidades: 'Iniciar el recorrido por instituciones educativas para observar el trabajo docente.', contenidos: ['El rol docente y la construcción de la identidad profesional','Observación participante en instituciones escolares','Análisis del contexto institucional y comunitario','Primeras intervenciones pedagógicas supervisadas'] },
+  { id: 'practica-i', name: 'Práctica Docente I', year: 1, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 128, prereqs: [], finalidades: 'Iniciar el recorrido por instituciones educativas para observar el trabajo docente.', contenidos: ['El rol docente y la construcción de la identidad profesional','Observación participante en institutions escolares','Análisis del contexto institucional y comunitario','Primeras intervenciones pedagógicas supervisadas'] },
   
   // 2DO AÑO
   { id: 'didactica-curriculum', name: 'Didáctica y currículum', year: 2, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['pedagogia'], finalidades: 'Analizar la Didáctica como campo de conocimiento y el currículum como construcción social.', contenidos: ['La Didáctica: objeto, enfoques y tradiciones','Diseño curricular: niveles y componentes','Programación de la enseñanza','Evaluación: concepciones y prácticas'] },
   { id: 'psicologia-aprendizaje', name: 'Psicología del aprendizaje', year: 2, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Comprender los procesos psicológicos involucrados en el aprendizaje escolar.', contenidos: ['Teorías del aprendizaje: conductismo, cognitivismo, socioconstructivismo','Desarrollo cognitivo y aprendizaje escolar','Motivación, emoción y aprendizaje','Atención a la diversidad en el aula'] },
-  { id: 'analisis-instituciones', name: 'Análisis de las instituciones educativas', year: 2, campo: 'CFG', formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Analizar las instituciones educativas desde enfoques organizacionales y sociológicos.', contenidos: ['La institución educativa como organización','Cultura, clima y malestar institucional','Poder, autoridad y conflicto en la escuela','El proyecto institucional como herramienta de gestión'] },
+  { id: 'analisis-instituciones', name: 'Análisis de las institutions educativas', year: 2, campo: 'CFG', formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Analizar las instituciones educativas desde enfoques organizacionales y sociológicos.', contenidos: ['La institución educativa como organización','Cultura, clima y malestar institucional','Poder, autoridad y conflicto en la escuela','El proyecto institucional como herramienta de gestión'] },
   { id: 'pensamiento-politico', name: 'Pensamiento político pedagógico latinoamericano', year: 2, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['pedagogia'], finalidades: 'Recuperar el pensamiento pedagógico latinoamericano desde una perspectiva descolonizadora.', contenidos: ['Simón Rodríguez y la educación popular','Paulo Freire: pedagogía del oprimido','Pedagogías críticas en América Latina','Educación, Estado e identidad nacional en Argentina'] },
   { id: 'sic-ii', name: 'Sistemas de Información Contable II', year: 2, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: ['sic-i'], finalidades: 'Profundizar en los sistemas contables de mayor complejidad.', contenidos: ['Ajuste por inflación en contabilidad','Bienes de cambio, bienes de uso e intangibles','Estado de resultados y flujo de fondos','Normas contables profesionales argentinas'] },
   { id: 'historia-argentina', name: 'Historia Económica y Social Argentina', year: 2, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['historia-mundial'], finalidades: 'Analizar el desarrollo histórico de la economía argentina en el contexto mundial.', contenidos: ['Economía colonial y independencia','Modelo agroexportador (1880–1930)','Industrialización por sustitución de importaciones','Neoliberalismo, crisis de 2001 y pos-convertibilidad'] },
@@ -742,7 +756,7 @@ function saveSubjectStatus() {
   if (newStatus === 'approved' && gradeInput) {
     grade = parseFloat(gradeInput);
     if (grade < 0 || grade > 10) {
-      showAlert("La nota debe estar comprendida entre 0 y 10.");
+      showAlert('⚠️ Atención', "La nota debe estar comprendida entre 0 y 10.");
       return;
     }
   }
@@ -753,7 +767,7 @@ function saveSubjectStatus() {
   if (currentStatus === 'approved' && newStatus !== 'approved') {
     const dependents = SUBJECTS.filter(s => s.prereqs.includes(id) && state.userSubjects[s.id]);
     if (dependents.length > 0) {
-      showAlert(`Transacción denegada. Las siguientes materias dependen de <b>${subject.name}</b> para su validez:<br><br><span class="text-xs text-amber-800">▪ ${dependents.map(d=>d.name).join('<br>▪ ')}</span>`);
+      showAlert('🛑 Movimiento Bloqueado', `Transacción denegada. Las siguientes materias dependen de <b>${subject.name}</b> para su validez:<br><br><span class="text-xs text-slate-500 font-mono">▪ ${dependents.map(d=>d.name).join('<br>▪ ')}</span>`);
       return;
     }
   }
@@ -851,6 +865,7 @@ function applyFilterStyles() {
       card.classList.remove('hidden', 'filter-dimmed');
       card.classList.add('filter-active');
     } else {
+      card.classList.remove('filter-active');
       if(q || showOnlyEnabled) {
          card.classList.add('hidden');
          card.classList.remove('filter-dimmed');
@@ -944,12 +959,12 @@ function importSyncCode() {
       updateAllCards();
       updateProgress();
       closeSyncModal();
-      showAlert("¡Perfil sincronizado exitosamente!");
+      showAlert('✅ ¡Éxito!', "Perfil sincronizado exitosamente.");
     } else {
-      alert("Código inválido o versión no soportada.");
+      showAlert('❌ Error', "Código inválido o versión no soportada.");
     }
   } catch(err) {
-    alert("Código incorrecto. Asegurate de haber copiado todo el texto.");
+    showAlert('❌ Error', "Código incorrecto. Asegurate de haber copiado todo el texto.");
   }
 }
 
@@ -1039,7 +1054,8 @@ function executeReset() {
   if(!document.getElementById('schedule-modal').classList.contains('hidden')) renderScheduleGrid();
 }
 
-function showAlert(msg) {
+function showAlert(title, msg) {
+  document.getElementById('alert-title').innerHTML = title;
   document.getElementById('alert-message').innerHTML = msg;
   const modal = document.getElementById('alert-modal');
   modal.classList.remove('hidden');
@@ -1099,14 +1115,14 @@ function addScheduleItem() {
   const day = document.getElementById('sched-day').value;
   const time = document.getElementById('sched-time').value || 'Sin horario definido';
 
-  if (!subId) { alert("Por favor, seleccioná una materia primero."); return; }
+  if (!subId) { showAlert('⚠️ Atención', "Por favor, seleccioná una materia primero."); return; }
 
   let exists = false;
   Object.keys(state.schedule).forEach(d => {
     if (state.schedule[d].some(item => item.id === subId)) exists = true;
   });
 
-  if (exists) { alert("Ya agregaste esta materia a tu semana."); return; }
+  if (exists) { showAlert('⚠️ Atención', "Ya agregaste esta materia a tu semana."); return; }
 
   if (!state.schedule[day]) state.schedule[day] = [];
   state.schedule[day].push({ id: subId, time: time });
