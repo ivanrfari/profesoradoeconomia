@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapa Curricular · Profesorado en Economía · ISFD N°100</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* ============================================================
+       DESIGN TOKENS
+       Paleta basada en el azul institucional de la DGCyE/PBA
+       con acento cobre para "aprobado" y gris grafito para bloqueado.
+    ============================================================ */
+    :root {
+      --col-cfg:  #1e3a5f;   /* Azul marino  — CFG */
+      --col-cfe:  #7c3d11;   /* Cobre oscuro — CFE */
+      --col-cpd:  #14532d;   /* Verde foresta — CPD */
+      --col-approved:  #0e7490;  /* Cian profundo — aprobada */
+      --col-enabled:   #1d4ed8;  /* Azul medio   — habilitada */
+      --col-locked:    #374151;  /* Gris grafito  — bloqueada */
+      --col-bg:        #f8fafc;
+      --col-surface:   #ffffff;
+      --radius:        0.5rem;
+      --shadow:        0 2px 8px rgba(0,0,0,.12);
+    }
+
+    /* ── tipografía ── */
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--col-bg);
+      color: #1e293b;
+    }
+
+    /* ── columna de año ── */
+    .year-col { min-width: 220px; }
+
+    /* ── nodo de materia ── */
+    .subject-card {
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition: transform .15s, box-shadow .15s, opacity .2s;
+      cursor: pointer;
+      position: relative;
+    }
+    .subject-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+
+    /* estados visuales del nodo */
+    .state-locked   { background: #1e293b; opacity: .55; cursor: not-allowed; }
+    .state-enabled  { background: var(--col-enabled); opacity: 1; }
+    .state-approved { background: var(--col-approved); opacity: 1; }
+
+    /* filtro activo resalta, el resto baja opacity */
+    .filter-active  { opacity: 1 !important; }
+    .filter-dimmed  { opacity: .18 !important; }
+
+    /* ── líneas de correlatividad (SVG overlay) ── */
+    #lines-svg {
+      position: absolute; top: 0; left: 0;
+      pointer-events: none;
+      z-index: 0;
+      width: 100%; height: 100%;
+      overflow: visible;
+    }
+    .corr-line { stroke: #94a3b8; stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; opacity: .6; }
+    .corr-line.active { stroke: #06b6d4; opacity: .9; stroke-dasharray: none; }
+
+    /* ── barra de progreso ── */
+    #progress-bar {
+      height: 10px; border-radius: 999px;
+      background: linear-gradient(90deg, #0e7490, #06b6d4);
+      transition: width .4s ease;
+    }
+
+    /* ── modal ── */
+    #modal-backdrop {
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(2px);
+    }
+    #modal-box {
+      max-height: 85vh;
+      overflow-y: auto;
+      border-radius: 1rem;
+    }
+
+    /* ── badge de campo ── */
+    .badge-cfg { background: #1e3a5f; }
+    .badge-cfe { background: #7c3d11; }
+    .badge-cpd { background: #14532d; }
+
+    /* ── año header ── */
+    .year-header {
+      writing-mode: horizontal-tb;
+      border-bottom: 3px solid;
+    }
+    .year-header-1 { border-color: #3b82f6; }
+    .year-header-2 { border-color: #f59e0b; }
+    .year-header-3 { border-color: #10b981; }
+    .year-header-4 { border-color: #ef4444; }
+
+    /* scroll suave */
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+
+<body class="min-h-screen">
+
+  <!-- ══════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════ -->
+  <header class="bg-[#1e3a5f] text-white py-5 px-6 shadow-lg">
+    <div class="max-w-screen-xl mx-auto flex flex-col sm:flex-row items-start sm:items-center gap-3">
+      <div class="flex-1">
+        <p class="text-xs uppercase tracking-widest text-blue-300 font-semibold">ISFD N°100 · DGCyE · Pcia. de Buenos Aires</p>
+        <h1 class="text-xl sm:text-2xl font-black leading-tight mt-0.5">
+          Mapa Curricular
+          <span class="font-light">— Profesorado de Educación Secundaria en Economía</span>
+        </h1>
+      </div>
+      <!-- indicador de progreso compacto en el header -->
+      <div class="text-right shrink-0">
+        <span class="text-3xl font-black text-cyan-300" id="pct-label">0%</span>
+        <p class="text-xs text-blue-300">materias aprobadas</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════
+       CONTROLES: filtros + progreso
+  ══════════════════════════════════════════ -->
+  <div class="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
+    <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-wrap items-center gap-3">
+
+      <!-- Filtros por campo -->
+      <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Filtrar por campo:</span>
+      <button onclick="applyFilter('all')"  id="btn-all" class="filter-btn active px-3 py-1 rounded-full text-xs font-bold border border-slate-300 bg-slate-100 hover:bg-slate-200 transition">Todos</button>
+      <button onclick="applyFilter('CFG')"  id="btn-CFG" class="filter-btn px-3 py-1 rounded-full text-xs font-bold text-white bg-[#1e3a5f] hover:opacity-80 transition">CFG</button>
+      <button onclick="applyFilter('CFE')"  id="btn-CFE" class="filter-btn px-3 py-1 rounded-full text-xs font-bold text-white bg-[#7c3d11] hover:opacity-80 transition">CFE</button>
+      <button onclick="applyFilter('CPD')"  id="btn-CPD" class="filter-btn px-3 py-1 rounded-full text-xs font-bold text-white bg-[#14532d] hover:opacity-80 transition">CPD</button>
+
+      <div class="flex-1"></div>
+
+      <!-- barra de progreso expandida -->
+      <div class="flex items-center gap-2 min-w-[200px]">
+        <div class="flex-1 bg-slate-200 rounded-full overflow-hidden h-2.5">
+          <div id="progress-bar" style="width:0%"></div>
+        </div>
+        <span class="text-xs text-slate-500 whitespace-nowrap">
+          <span id="approved-count">0</span> / <span id="total-count">0</span>
+        </span>
+      </div>
+
+      <!-- botón reset -->
+      <button onclick="resetAll()" class="text-xs text-red-500 hover:text-red-700 font-semibold transition">↺ Reiniciar</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       LEYENDA
+  ══════════════════════════════════════════ -->
+  <div class="max-w-screen-xl mx-auto px-4 pt-4 pb-1 flex flex-wrap gap-4 text-xs text-slate-600">
+    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#374151] inline-block"></span>Bloqueada</span>
+    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#1d4ed8] inline-block"></span>Habilitada</span>
+    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#0e7490] inline-block"></span>Aprobada</span>
+    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm badge-cfg inline-block"></span>CFG — Formación General</span>
+    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm badge-cfe inline-block"></span>CFE — Formación Específica</span>
+    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm badge-cpd inline-block"></span>CPD — Práctica Docente</span>
+    <span class="ml-auto text-slate-400 italic">Hacé clic en una materia habilitada para marcarla como aprobada · Botón "i" para más info</span>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       GRILLA CURRICULAR
+  ══════════════════════════════════════════ -->
+  <main class="max-w-screen-xl mx-auto px-4 pb-16 pt-2 overflow-x-auto relative">
+    <!-- SVG de líneas de correlatividad (renderizado por JS) -->
+    <svg id="lines-svg" aria-hidden="true"></svg>
+
+    <div class="flex gap-4 min-w-max relative z-10" id="grid-container">
+      <!-- Las columnas de año se generan con JS -->
+    </div>
+  </main>
+
+  <!-- ══════════════════════════════════════════
+       MODAL DE INFORMACIÓN
+  ══════════════════════════════════════════ -->
+  <div id="modal-backdrop" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden" onclick="closeModal(event)">
+    <div id="modal-box" class="bg-white w-full max-w-lg shadow-2xl" onclick="event.stopPropagation()">
+      <!-- header del modal con color del campo -->
+      <div id="modal-header" class="p-5 text-white rounded-t-2xl">
+        <div class="flex justify-between items-start">
+          <div>
+            <span id="modal-badge" class="text-[10px] uppercase tracking-widest font-bold bg-white/20 px-2 py-0.5 rounded-full"></span>
+            <h2 id="modal-title" class="text-lg font-black mt-1 leading-tight"></h2>
+          </div>
+          <button onclick="closeModal()" class="text-white/70 hover:text-white text-2xl leading-none ml-3">✕</button>
+        </div>
+      </div>
+      <!-- body del modal -->
+      <div class="p-5 space-y-4 text-sm text-slate-700">
+        <div class="grid grid-cols-3 gap-3 text-center">
+          <div class="bg-slate-50 rounded-lg p-2">
+            <p class="text-[10px] uppercase text-slate-400 font-semibold">Formato</p>
+            <p class="font-bold mt-0.5" id="modal-formato">—</p>
+          </div>
+          <div class="bg-slate-50 rounded-lg p-2">
+            <p class="text-[10px] uppercase text-slate-400 font-semibold">Régimen</p>
+            <p class="font-bold mt-0.5" id="modal-regimen">—</p>
+          </div>
+          <div class="bg-slate-50 rounded-lg p-2">
+            <p class="text-[10px] uppercase text-slate-400 font-semibold">Carga horaria</p>
+            <p class="font-bold mt-0.5" id="modal-hs">—</p>
+          </div>
+        </div>
+        <div>
+          <h3 class="text-xs uppercase tracking-wide font-bold text-slate-400 mb-1">Finalidades formativas</h3>
+          <p id="modal-finalidades" class="text-slate-600 leading-relaxed text-xs"></p>
+        </div>
+        <div>
+          <h3 class="text-xs uppercase tracking-wide font-bold text-slate-400 mb-1">Núcleos de contenido</h3>
+          <ul id="modal-contenidos" class="list-disc list-inside text-slate-600 space-y-0.5 text-xs"></ul>
+        </div>
+        <div id="modal-corr-section">
+          <h3 class="text-xs uppercase tracking-wide font-bold text-slate-400 mb-1">Correlatividades (para cursar)</h3>
+          <p id="modal-corr" class="text-slate-600 text-xs"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- ══════════════════════════════════════════
+     DATOS DEL PLAN DE ESTUDIOS
+     ► Fuente: Diseño Curricular 2022 — DGCyE PBA
+     ► NOTA: Para el motor de demostración se incluyen
+       las 4 materias conectadas entre 1° y 2° año
+       que muestran la lógica de correlatividades.
+       Expandí el array SUBJECTS para el plan completo.
+══════════════════════════════════════════ -->
+<script>
+/* ─────────────────────────────────────────────
+   MODELO DE DATOS
+   Cada objeto representa una unidad curricular.
+   Propiedades:
+     id        — identificador único (string)
+     name      — nombre completo
+     year      — 1 | 2 | 3 | 4
+     campo     — 'CFG' | 'CFE' | 'CPD'
+     formato   — texto libre
+     regimen   — 'Anual' | 'Cuatrimestral'
+     hs        — carga horaria total (número)
+     prereqs   — array de ids que deben estar aprobadas
+                 para HABILITAR esta materia
+     finalidades — texto breve de finalidades formativas
+     contenidos  — array de strings con núcleos temáticos
+───────────────────────────────────────────── */
+const SUBJECTS = [
+
+  /* ═══════════════ PRIMER AÑO ═══════════════ */
+
+  {
+    id: 'pedagogia',
+    name: 'Pedagogía',
+    year: 1, campo: 'CFG',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: [],   // sin correlativas previas → habilitada desde el inicio
+    finalidades: 'Introducir a los/as estudiantes en el campo de la Pedagogía como disciplina que reflexiona sobre la educación, sus finalidades sociales y las prácticas de enseñanza.',
+    contenidos: [
+      'La educación como práctica social y política',
+      'Historia de la pedagogía moderna',
+      'Escuela, conocimiento y poder',
+      'Corrientes pedagógicas contemporáneas',
+    ]
+  },
+
+  {
+    id: 'educacion-transformaciones',
+    name: 'Educación y transformaciones sociales contemporáneas',
+    year: 1, campo: 'CFG',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: [],
+    finalidades: 'Abordar los vínculos entre educación y sociedad a la luz de los cambios socioculturales, económicos y políticos del mundo contemporáneo.',
+    contenidos: [
+      'Modernidad, postmodernidad y educación',
+      'Globalización y desigualdad educativa',
+      'Políticas de inclusión y exclusión escolar',
+      'Identidades, diversidad y cultura escolar',
+    ]
+  },
+
+  {
+    id: 'esi',
+    name: 'ESI — Educación Sexual Integral',
+    year: 1, campo: 'CFG',
+    formato: 'Taller', regimen: 'Cuatrimestral', hs: 32,
+    prereqs: [],
+    finalidades: 'Brindar herramientas conceptuales y didácticas para abordar la ESI de forma transversal en la enseñanza de las Ciencias Económicas.',
+    contenidos: [
+      'Marco normativo: Ley 26.150 y Ley provincial 14.744',
+      'Perspectiva de géneros y derechos',
+      'Cuerpo, salud y relaciones interpersonales',
+      'ESI y enseñanza disciplinar',
+    ]
+  },
+
+  {
+    id: 'cultura-digital',
+    name: 'Cultura Digital y educación',
+    year: 1, campo: 'CFG',
+    formato: 'Taller', regimen: 'Cuatrimestral', hs: 32,
+    prereqs: [],
+    finalidades: 'Reflexionar sobre el impacto de las tecnologías digitales en la cultura y la educación, y desarrollar competencias para su uso pedagógico.',
+    contenidos: [
+      'Sociedad de la información y del conocimiento',
+      'Cultura participativa y redes sociales',
+      'Tecnologías digitales en el aula',
+      'Ciudadanía digital y ética en la red',
+    ]
+  },
+
+  {
+    id: 'matematica-cs-economicas',
+    name: 'Matemática aplicada a las Ciencias Económicas',
+    year: 1, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: [],
+    finalidades: 'Proveer los fundamentos matemáticos necesarios para el análisis económico: funciones, cálculo, álgebra lineal y estadística descriptiva.',
+    contenidos: [
+      'Funciones y gráficos económicos',
+      'Cálculo diferencial e integral aplicado',
+      'Sistemas de ecuaciones lineales',
+      'Introducción a la estadística descriptiva',
+    ]
+  },
+
+  {
+    id: 'historia-mundial',
+    name: 'Historia Económica y Social Mundial',
+    year: 1, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: [],
+    finalidades: 'Analizar los procesos históricos de larga duración que configuraron el sistema económico capitalista mundial y sus transformaciones.',
+    contenidos: [
+      'Feudalismo y transición al capitalismo',
+      'Revolución Industrial y expansión europea',
+      'Imperialismo y primera globalización',
+      'Crisis de 1929 y pos-segunda guerra mundial',
+      'Globalización neoliberal y sus críticas',
+    ]
+  },
+
+  {
+    id: 'intro-economia-politica',
+    name: 'Introducción a la Economía Política',
+    year: 1, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 96,
+    prereqs: [],
+    finalidades: 'Introducir los conceptos fundamentales de la Economía Política como ciencia social crítica, distanciándose de enfoques puramente ortodoxos.',
+    contenidos: [
+      'El objeto de la Economía Política',
+      'Valor, trabajo y mercancía',
+      'Oferta, demanda y formación de precios',
+      'Distribución del ingreso y clases sociales',
+      'El rol del Estado en la economía',
+    ]
+  },
+
+  {
+    id: 'teoria-organizaciones',
+    name: 'Teoría de las organizaciones',
+    year: 1, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: [],
+    finalidades: 'Estudiar las organizaciones como fenómeno social complejo, sus estructuras, dinámicas y relación con el entorno económico.',
+    contenidos: [
+      'Concepto y tipología de organizaciones',
+      'Escuelas del pensamiento organizacional',
+      'Cultura y clima organizacional',
+      'Organizaciones y entorno: enfoque sistémico',
+    ]
+  },
+
+  {
+    id: 'sic-i',
+    name: 'Sistemas de Información Contable I',
+    year: 1, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: [],
+    finalidades: 'Introducir los fundamentos de la contabilidad como sistema de información y su rol en la toma de decisiones económicas.',
+    contenidos: [
+      'Partida doble y ecuación patrimonial',
+      'El ciclo contable',
+      'Registración de operaciones básicas',
+      'Estados contables básicos',
+    ]
+  },
+
+  {
+    id: 'practica-i',
+    name: 'Práctica Docente I',
+    year: 1, campo: 'CPD',
+    formato: 'Taller + Terreno', regimen: 'Anual', hs: 128,
+    prereqs: [],
+    finalidades: 'Iniciar el recorrido por instituciones educativas para observar y analizar el trabajo docente y la vida escolar en su contexto.',
+    contenidos: [
+      'El rol docente y la construcción de la identidad profesional',
+      'Observación participante en instituciones escolares',
+      'Análisis del contexto institucional y comunitario',
+      'Primeras intervenciones pedagógicas supervisadas',
+    ]
+  },
+
+  /* ═══════════════ SEGUNDO AÑO ═══════════════ */
+
+  {
+    id: 'didactica-curriculum',
+    name: 'Didáctica y currículum',
+    year: 2, campo: 'CFG',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    // Para cursarla: tener Pedagogía cursada-aprobada
+    prereqs: ['pedagogia'],
+    finalidades: 'Analizar la Didáctica como campo de conocimiento y el currículum como construcción social, articulando teoría y práctica pedagógica.',
+    contenidos: [
+      'La Didáctica: objeto, enfoques y tradiciones',
+      'Diseño curricular: niveles y componentes',
+      'Programación de la enseñanza',
+      'Evaluación: concepciones y prácticas',
+    ]
+  },
+
+  {
+    id: 'psicologia-aprendizaje',
+    name: 'Psicología del aprendizaje',
+    year: 2, campo: 'CFG',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: [],
+    finalidades: 'Comprender los procesos psicológicos involucrados en el aprendizaje y su incidencia en las prácticas de enseñanza en el nivel secundario.',
+    contenidos: [
+      'Teorías del aprendizaje: conductismo, cognitivismo, socioconstructivismo',
+      'Desarrollo cognitivo y aprendizaje escolar',
+      'Motivación, emoción y aprendizaje',
+      'Atención a la diversidad en el aula',
+    ]
+  },
+
+  {
+    id: 'analisis-instituciones',
+    name: 'Análisis de las instituciones educativas',
+    year: 2, campo: 'CFG',
+    formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32,
+    prereqs: [],
+    finalidades: 'Analizar las instituciones educativas desde enfoques organizacionales, sociológicos y psicoanalíticos para comprender su dinámica interna.',
+    contenidos: [
+      'La institución educativa como organización',
+      'Cultura, clima y malestar institucional',
+      'Poder, autoridad y conflicto en la escuela',
+      'El proyecto institucional como herramienta de gestión',
+    ]
+  },
+
+  {
+    id: 'pensamiento-politico',
+    name: 'Pensamiento político pedagógico latinoamericano',
+    year: 2, campo: 'CFG',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: ['pedagogia'],
+    finalidades: 'Recuperar el pensamiento pedagógico latinoamericano como tradición propia para pensar la educación desde una perspectiva descolonizadora.',
+    contenidos: [
+      'Simón Rodríguez y la educación popular',
+      'Paulo Freire: pedagogía del oprimido',
+      'Pedagogías críticas en América Latina',
+      'Educación, Estado e identidad nacional en Argentina',
+    ]
+  },
+
+  {
+    id: 'sic-ii',
+    name: 'Sistemas de Información Contable II',
+    year: 2, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 96,
+    prereqs: ['sic-i'],
+    finalidades: 'Profundizar en los sistemas contables de mayor complejidad, incorporando análisis de estados financieros y normas contables vigentes.',
+    contenidos: [
+      'Ajuste por inflación en contabilidad',
+      'Bienes de cambio, bienes de uso e intangibles',
+      'Estado de resultados y flujo de fondos',
+      'Normas contables profesionales argentinas',
+    ]
+  },
+
+  {
+    id: 'historia-argentina',
+    name: 'Historia Económica y Social Argentina',
+    year: 2, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: ['historia-mundial'],
+    finalidades: 'Analizar el desarrollo histórico de la economía argentina en el contexto latinoamericano y mundial, desde la colonia hasta la actualidad.',
+    contenidos: [
+      'Economía colonial y independencia',
+      'Modelo agroexportador (1880–1930)',
+      'Industrialización por sustitución de importaciones',
+      'Neoliberalismo, crisis de 2001 y pos-convertibilidad',
+    ]
+  },
+
+  {
+    id: 'economia-politica-i',
+    name: 'Economía Política I',
+    year: 2, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: ['intro-economia-politica', 'historia-mundial'],
+    finalidades: 'Profundizar en las categorías centrales de la Economía Política, articulando las perspectivas clásica, marxista y heterodoxa.',
+    contenidos: [
+      'El capital: producción, circulación y acumulación',
+      'Dinero, crédito y capital financiero',
+      'Crisis económicas: enfoques teóricos',
+      'Estado y política económica',
+    ]
+  },
+
+  {
+    id: 'administracion',
+    name: 'Administración',
+    year: 2, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 96,
+    prereqs: ['teoria-organizaciones'],
+    finalidades: 'Estudiar los procesos administrativos y las herramientas de gestión de organizaciones públicas, privadas y del tercer sector.',
+    contenidos: [
+      'Planeamiento estratégico y operativo',
+      'Estructura organizacional y diseño',
+      'Dirección, liderazgo y motivación',
+      'Control de gestión y tablero de comando',
+    ]
+  },
+
+  {
+    id: 'derecho-cs-economicas',
+    name: 'Elementos de Derecho para Ciencias Económicas',
+    year: 2, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: [],
+    finalidades: 'Brindar los fundamentos del derecho privado y público relevantes para las Ciencias Económicas y la vida profesional.',
+    contenidos: [
+      'Introducción al Código Civil y Comercial',
+      'Contratos: tipos y elementos',
+      'Derecho laboral básico',
+      'Derecho tributario y sociedades comerciales',
+    ]
+  },
+
+  {
+    id: 'herramientas-estadisticas',
+    name: 'Herramientas estadísticas para el análisis económico',
+    year: 2, campo: 'CFE',
+    formato: 'Taller', regimen: 'Cuatrimestral', hs: 32,
+    prereqs: ['matematica-cs-economicas'],
+    finalidades: 'Desarrollar competencias en el uso de herramientas estadísticas para el análisis cuantitativo de fenómenos económicos.',
+    contenidos: [
+      'Estadística descriptiva e inferencial',
+      'Correlación y regresión lineal',
+      'Series de tiempo: tendencia y estacionalidad',
+      'Uso de hojas de cálculo para análisis económico',
+    ]
+  },
+
+  {
+    id: 'practica-ii',
+    name: 'Práctica Docente II',
+    year: 2, campo: 'CPD',
+    formato: 'Taller + Terreno', regimen: 'Anual', hs: 128,
+    prereqs: ['practica-i', 'educacion-transformaciones', 'intro-economia-politica'],
+    finalidades: 'Ampliar el conocimiento sobre la institución escolar y comenzar a planificar e intervenir en situaciones de enseñanza de las Ciencias Económicas.',
+    contenidos: [
+      'La planificación como hipótesis de trabajo',
+      'Estrategias de enseñanza en Ciencias Económicas',
+      'Gestión del aula y convivencia escolar',
+      'Análisis reflexivo de las primeras intervenciones',
+    ]
+  },
+
+  /* ═══════════════ TERCER AÑO ═══════════════ */
+
+  {
+    id: 'politica-educativa',
+    name: 'Política educativa argentina',
+    year: 3, campo: 'CFG',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: ['pensamiento-politico'],
+    finalidades: 'Analizar el sistema educativo argentino en sus dimensiones normativas, estructurales y políticas, en relación con el proyecto social y económico del Estado.',
+    contenidos: [
+      'El Estado y la política educativa',
+      'Sistema educativo argentino: estructura y niveles',
+      'Financiamiento educativo y políticas de igualdad',
+      'Reformas educativas en Argentina (décadas 1990–2020)',
+    ]
+  },
+
+  {
+    id: 'problemas-filosoficos',
+    name: 'Problemas filosóficos de la educación',
+    year: 3, campo: 'CFG',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: [],
+    finalidades: 'Reflexionar sobre los fundamentos filosóficos de la educación, articulando epistemología, ética y filosofía política.',
+    contenidos: [
+      'Epistemología y educación',
+      'Ética docente y deontología profesional',
+      'Filosofía política y educación democrática',
+      'El problema de la autoridad pedagógica',
+    ]
+  },
+
+  {
+    id: 'trayectorias-jovenes',
+    name: 'Trayectorias educativas de jóvenes y adultos',
+    year: 3, campo: 'CFG',
+    formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32,
+    prereqs: ['esi', 'cultura-digital'],
+    finalidades: 'Analizar las trayectorias educativas de jóvenes y adultos en los contextos actuales, con énfasis en la retención y el egreso.',
+    contenidos: [
+      'Juventudes: diversidad de trayectorias vitales',
+      'Educación de jóvenes y adultos: marcos normativos',
+      'Dispositivos institucionales de acompañamiento',
+      'TIC y educación de adultos',
+    ]
+  },
+
+  {
+    id: 'economia-politica-ii',
+    name: 'Economía Política II',
+    year: 3, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: ['intro-economia-politica', 'matematica-cs-economicas'],
+    finalidades: 'Avanzar en el estudio de las economías capitalistas contemporáneas: financiarización, hegemonía y transformaciones del mundo del trabajo.',
+    contenidos: [
+      'Financiarización y capital especulativo',
+      'Economía internacional: teorías y debates',
+      'Mundialización del capital y empresas transnacionales',
+      'Crisis del neoliberalismo y alternativas',
+    ]
+  },
+
+  {
+    id: 'sistemas-administrativos',
+    name: 'Sistemas Administrativos',
+    year: 3, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: ['teoria-organizaciones', 'sic-i'],
+    finalidades: 'Estudiar los sistemas administrativos de las organizaciones, sus flujos de información y herramientas de control interno.',
+    contenidos: [
+      'Sistemas y procedimientos administrativos',
+      'Manuales de organización y funciones',
+      'Control interno: concepto y componentes',
+      'Gestión documental y flujos de trabajo',
+    ]
+  },
+
+  {
+    id: 'administracion-financiera',
+    name: 'Administración financiera',
+    year: 3, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: ['matematica-cs-economicas'],
+    finalidades: 'Desarrollar competencias para el análisis financiero de organizaciones y la toma de decisiones de inversión y financiamiento.',
+    contenidos: [
+      'Valor tiempo del dinero y matemática financiera',
+      'Análisis del riesgo y la rentabilidad',
+      'Presupuesto de capital y evaluación de proyectos',
+      'Estructura de capital y política de dividendos',
+    ]
+  },
+
+  {
+    id: 'analisis-estados-contables',
+    name: 'Análisis de Estados Contables',
+    year: 3, campo: 'CFE',
+    formato: 'Taller', regimen: 'Anual', hs: 64,
+    prereqs: ['sic-ii'],
+    finalidades: 'Desarrollar la capacidad de interpretar y analizar estados contables de organizaciones, relacionándolos con el contexto económico.',
+    contenidos: [
+      'Lectura crítica de estados contables',
+      'Ratios e indicadores financieros',
+      'Análisis horizontal y vertical',
+      'Casos reales de empresas argentinas',
+    ]
+  },
+
+  {
+    id: 'didactica-cs-economicas',
+    name: 'Didáctica de las Ciencias Económicas',
+    year: 3, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: ['intro-economia-politica', 'teoria-organizaciones', 'sic-i', 'didactica-curriculum'],
+    finalidades: 'Articular los saberes disciplinares de las Ciencias Económicas con la Didáctica para diseñar propuestas de enseñanza pertinentes y significativas.',
+    contenidos: [
+      'Transposición didáctica en Ciencias Económicas',
+      'Diseño de secuencias didácticas',
+      'Recursos y materiales para la enseñanza',
+      'Evaluación de aprendizajes en Ciencias Económicas',
+    ]
+  },
+
+  {
+    id: 'derechos-esca',
+    name: 'Derechos Económicos, Sociales, Culturales y Ambientales',
+    year: 3, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32,
+    prereqs: [],
+    finalidades: 'Abordar los derechos económicos, sociales, culturales y ambientales como marco para el análisis crítico de las políticas públicas.',
+    contenidos: [
+      'Marco normativo internacional y nacional de los DESCA',
+      'Derecho al trabajo, salud, educación y vivienda',
+      'Ambiente y desarrollo sostenible',
+      'Movimientos sociales y exigibilidad de derechos',
+    ]
+  },
+
+  {
+    id: 'sociologia-organizaciones',
+    name: 'Sociología de las organizaciones',
+    year: 3, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32,
+    prereqs: ['teoria-organizaciones'],
+    finalidades: 'Analizar las organizaciones desde una perspectiva sociológica, atendiendo a las relaciones de poder, conflicto y cambio social.',
+    contenidos: [
+      'Perspectivas clásicas: Weber, Durkheim, Marx y las organizaciones',
+      'Burocracia y racionalidad organizacional',
+      'Poder, control y resistencia en las organizaciones',
+      'Organizaciones y sociedad civil',
+    ]
+  },
+
+  {
+    id: 'practica-iii',
+    name: 'Práctica Docente III',
+    year: 3, campo: 'CPD',
+    formato: 'Taller + Terreno', regimen: 'Anual', hs: 160,
+    prereqs: ['practica-ii', 'didactica-curriculum', 'economia-politica-i'],
+    finalidades: 'Asumir progresivamente la responsabilidad de planificar, implementar y evaluar secuencias de enseñanza completas en el nivel secundario.',
+    contenidos: [
+      'Residencia progresiva en aulas de nivel secundario',
+      'Planificación de unidades y clases',
+      'Relación docente-alumno y gestión del aula',
+      'Análisis reflexivo de la práctica propia',
+    ]
+  },
+
+  /* ═══════════════ CUARTO AÑO ═══════════════ */
+
+  {
+    id: 'reflexion-filosofica',
+    name: 'Reflexión filosófico-política de la práctica docente',
+    year: 4, campo: 'CFG',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: ['politica-educativa'],
+    finalidades: 'Profundizar la reflexión crítica sobre la práctica docente desde coordenadas filosóficas y políticas, orientadas a la emancipación.',
+    contenidos: [
+      'Ética y compromiso político del docente',
+      'Educación, democracia y ciudadanía',
+      'El docente como intelectual transformador',
+      'Perspectivas poscríticas en educación',
+    ]
+  },
+
+  {
+    id: 'derechos-interculturalidad',
+    name: 'Derechos, interculturalidad y ciudadanía',
+    year: 4, campo: 'CFG',
+    formato: 'Seminario', regimen: 'Cuatrimestral', hs: 32,
+    prereqs: [],
+    finalidades: 'Reflexionar sobre la diversidad cultural y el enfoque intercultural como fundamento de una educación inclusiva y democrática.',
+    contenidos: [
+      'Interculturalidad crítica y derechos humanos',
+      'Pueblos originarios y educación intercultural bilingüe',
+      'Migraciones, xenofobia y escuela',
+      'Educación antirracista y perspectiva afrodescendiente',
+    ]
+  },
+
+  {
+    id: 'eoi-cfg',
+    name: 'Espacio de Opción Institucional (CFG)',
+    year: 4, campo: 'CFG',
+    formato: 'Taller', regimen: 'Cuatrimestral', hs: 32,
+    prereqs: [],
+    finalidades: 'Espacio de definición institucional destinado a fortalecer la formación general del/la estudiante según las necesidades y el proyecto del ISFD.',
+    contenidos: ['Definido por el ISFD N°100 según su proyecto institucional']
+  },
+
+  {
+    id: 'problemas-ensenanza',
+    name: 'Problemas de la enseñanza de las Ciencias Económicas',
+    year: 4, campo: 'CFE',
+    formato: 'Ateneo', regimen: 'Anual', hs: 64,
+    prereqs: ['didactica-cs-economicas'],
+    finalidades: 'Analizar colectivamente los principales problemas que presenta la enseñanza de las Ciencias Económicas en el nivel secundario argentino.',
+    contenidos: [
+      'Problemas epistémicos de la Economía como disciplina escolar',
+      'La motivación y el interés en Ciencias Económicas',
+      'TIC y nuevos recursos para la enseñanza económica',
+      'Evaluación alternativa: portfolio, proyectos, rúbricas',
+    ]
+  },
+
+  {
+    id: 'politica-economica',
+    name: 'Política Económica',
+    year: 4, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: ['economia-politica-ii'],
+    finalidades: 'Estudiar los instrumentos y objetivos de la política económica, su aplicación histórica en Argentina y los debates teóricos vigentes.',
+    contenidos: [
+      'Política fiscal, monetaria y cambiaria',
+      'Inflación y estabilización económica',
+      'Política de ingresos y distribución',
+      'Casos de estudio: Argentina 2002–2023',
+    ]
+  },
+
+  {
+    id: 'problemas-desarrollo',
+    name: 'Problemáticas del Desarrollo Latinoamericano',
+    year: 4, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 64,
+    prereqs: ['economia-politica-ii'],
+    finalidades: 'Examinar las problemáticas del desarrollo económico en América Latina desde perspectivas estructuralistas, neodesarrollistas y posdesarrollistas.',
+    contenidos: [
+      'Teoría de la dependencia y estructuralismo cepalino',
+      'Neoextractivismo y economías de enclave',
+      'Integración regional latinoamericana',
+      'Buen vivir y alternativas al desarrollo',
+    ]
+  },
+
+  {
+    id: 'economia-politica-iii',
+    name: 'Economía Política III',
+    year: 4, campo: 'CFE',
+    formato: 'Asignatura', regimen: 'Anual', hs: 96,
+    prereqs: ['economia-politica-ii'],
+    finalidades: 'Profundizar en los grandes debates de la Economía Política contemporánea: financiarización, trabajo, Estado y perspectivas poscapitalistas.',
+    contenidos: [
+      'El debate sobre el fin del trabajo',
+      'Economía popular, social y solidaria',
+      'Renta básica universal y redistribución',
+      'Perspectivas ecosocialistas y feministas',
+    ]
+  },
+
+  {
+    id: 'diseno-proyectos',
+    name: 'Diseño de Proyectos Organizacionales',
+    year: 4, campo: 'CFE',
+    formato: 'Taller', regimen: 'Anual', hs: 96,
+    prereqs: ['administracion'],
+    finalidades: 'Desarrollar competencias para el diseño, formulación y evaluación de proyectos organizacionales en contextos reales.',
+    contenidos: [
+      'Marco lógico para la planificación de proyectos',
+      'Estudio de prefactibilidad técnica y financiera',
+      'Formulación de proyectos de economía social',
+      'Monitoreo, evaluación y sistematización de proyectos',
+    ]
+  },
+
+  {
+    id: 'eoi-cfe',
+    name: 'Espacio de Opción Institucional (CFE)',
+    year: 4, campo: 'CFE',
+    formato: 'A definir', regimen: 'Cuatrimestral', hs: 32,
+    prereqs: [],
+    finalidades: 'Espacio de definición institucional para profundizar en áreas específicas de las Ciencias Económicas según las fortalezas del ISFD.',
+    contenidos: ['Definido por el ISFD N°100 según su proyecto institucional']
+  },
+
+  {
+    id: 'practica-iv',
+    name: 'Práctica Docente IV — Residencia',
+    year: 4, campo: 'CPD',
+    formato: 'Taller + Terreno', regimen: 'Anual', hs: 160,
+    prereqs: ['practica-iii'],
+    finalidades: 'Asumir la conducción del proceso de enseñanza en Ciencias Económicas a nivel secundario de manera integral y autónoma, completando la residencia.',
+    contenidos: [
+      'Residencia docente autónoma en nivel secundario',
+      'Elaboración del portfolio de residencia',
+      'Reflexión crítica sobre la práctica profesional',
+      'Coloquio integrador y presentación final',
+    ]
+  },
+
+];
+
+/* ─────────────────────────────────────────────
+   ESTADO GLOBAL DE LA APLICACIÓN
+───────────────────────────────────────────── */
+const state = {
+  approved: new Set(),   // ids de materias aprobadas
+  activeFilter: 'all',  // filtro activo
+};
+
+/* ─────────────────────────────────────────────
+   COLORES POR CAMPO
+───────────────────────────────────────────── */
+const CAMPO_COLORS = {
+  CFG: { bg: '#1e3a5f', light: '#dbeafe', label: 'CFG' },
+  CFE: { bg: '#7c3d11', light: '#fef3c7', label: 'CFE' },
+  CPD: { bg: '#14532d', light: '#dcfce7', label: 'CPD' },
+};
+
+/* ─────────────────────────────────────────────
+   INICIALIZACIÓN
+───────────────────────────────────────────── */
+function init() {
+  renderGrid();
+  updateAllCards();
+  updateProgress();
+  // Pequeño delay para que el DOM esté pintado antes de dibujar líneas
+  requestAnimationFrame(() => drawLines());
+}
+
+/* ─────────────────────────────────────────────
+   RENDERIZADO DE LA GRILLA
+───────────────────────────────────────────── */
+function renderGrid() {
+  const container = document.getElementById('grid-container');
+  container.innerHTML = '';
+
+  // Agrupar materias por año
+  const byYear = { 1: [], 2: [], 3: [], 4: [] };
+  SUBJECTS.forEach(s => byYear[s.year].push(s));
+
+  const yearLabels = ['1er Año', '2do Año', '3er Año', '4to Año'];
+  const yearColors = ['year-header-1', 'year-header-2', 'year-header-3', 'year-header-4'];
+
+  [1, 2, 3, 4].forEach(yr => {
+    const col = document.createElement('div');
+    col.className = 'year-col flex flex-col gap-3';
+    col.dataset.year = yr;
+
+    // Encabezado del año
+    const hdr = document.createElement('div');
+    hdr.className = `year-header ${yearColors[yr-1]} py-2 px-3 font-black text-sm text-slate-700 mb-1`;
+    hdr.textContent = yearLabels[yr - 1];
+    col.appendChild(hdr);
+
+    // Nodos de materias
+    byYear[yr].forEach(subject => {
+      col.appendChild(createCard(subject));
+    });
+
+    container.appendChild(col);
+  });
+}
+
+/* ─────────────────────────────────────────────
+   CREACIÓN DE UNA TARJETA DE MATERIA
+───────────────────────────────────────────── */
+function createCard(subject) {
+  const card = document.createElement('div');
+  card.className = 'subject-card p-3';
+  card.id = `card-${subject.id}`;
+  card.dataset.id = subject.id;
+  card.dataset.campo = subject.campo;
+
+  const cc = CAMPO_COLORS[subject.campo];
+
+  card.innerHTML = `
+    <!-- badge de campo -->
+    <span class="text-[9px] uppercase tracking-widest font-bold text-white/70">${cc.label}</span>
+    <!-- nombre -->
+    <p class="text-white text-xs font-bold leading-snug mt-0.5 pr-5">${subject.name}</p>
+    <!-- pie: horas + botón info -->
+    <div class="flex items-center justify-between mt-2">
+      <span class="text-white/60 text-[10px]">${subject.regimen} · ${subject.hs}hs</span>
+      <button
+        data-id="${subject.id}"
+        onclick="openModal(event, '${subject.id}')"
+        class="info-btn w-5 h-5 rounded-full bg-white/20 hover:bg-white/40 text-white text-[10px] font-black flex items-center justify-center transition"
+        title="Ver información"
+        aria-label="Información de ${subject.name}"
+      >i</button>
+    </div>
+  `;
+
+  // Clic en la tarjeta → toggle aprobada (si está habilitada o ya aprobada)
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('.info-btn')) return; // el botón "i" tiene su propio handler
+    toggleApproved(subject.id);
+  });
+
+  return card;
+}
+
+/* ─────────────────────────────────────────────
+   LÓGICA DE ESTADO: TOGGLE APROBADA
+───────────────────────────────────────────── */
+function toggleApproved(id) {
+  const subject = SUBJECTS.find(s => s.id === id);
+  if (!subject) return;
+
+  const isEnabled = isSubjectEnabled(id);
+  const isApproved = state.approved.has(id);
+
+  if (isApproved) {
+    // Desmarcar: sólo si ninguna materia dependiente está aprobada
+    const dependents = SUBJECTS.filter(s => s.prereqs.includes(id) && state.approved.has(s.id));
+    if (dependents.length > 0) {
+      const names = dependents.map(d => `"${d.name}"`).join(', ');
+      alert(`No podés desmarcar esta materia porque ${names} ya están marcadas como aprobadas y dependen de ella.`);
+      return;
+    }
+    state.approved.delete(id);
+  } else {
+    if (!isEnabled) return; // bloqueada, no hacer nada
+    state.approved.add(id);
+  }
+
+  updateAllCards();
+  updateProgress();
+  drawLines();
+}
+
+/* ─────────────────────────────────────────────
+   ¿ESTÁ HABILITADA UNA MATERIA?
+   Una materia está habilitada si todos sus prereqs están aprobados.
+───────────────────────────────────────────── */
+function isSubjectEnabled(id) {
+  const subject = SUBJECTS.find(s => s.id === id);
+  if (!subject) return false;
+  return subject.prereqs.every(pid => state.approved.has(pid));
+}
+
+/* ─────────────────────────────────────────────
+   ACTUALIZACIÓN VISUAL DE TODAS LAS TARJETAS
+───────────────────────────────────────────── */
+function updateAllCards() {
+  SUBJECTS.forEach(subject => {
+    const card = document.getElementById(`card-${subject.id}`);
+    if (!card) return;
+
+    // Limpiar clases de estado
+    card.classList.remove('state-locked', 'state-enabled', 'state-approved');
+
+    if (state.approved.has(subject.id)) {
+      card.classList.add('state-approved');
+      card.title = `${subject.name} — ✓ Aprobada (clic para desmarcar)`;
+    } else if (isSubjectEnabled(subject.id)) {
+      card.classList.add('state-enabled');
+      card.title = `${subject.name} — Habilitada (clic para marcar como aprobada)`;
+    } else {
+      card.classList.add('state-locked');
+      const missing = subject.prereqs.filter(pid => !state.approved.has(pid));
+      const missingNames = missing.map(pid => {
+        const s = SUBJECTS.find(x => x.id === pid);
+        return s ? s.name : pid;
+      });
+      card.title = `${subject.name} — Bloqueada. Falta aprobar: ${missingNames.join(', ')}`;
+    }
+  });
+
+  // Re-aplicar filtro activo encima del estado
+  applyFilterStyles();
+}
+
+/* ─────────────────────────────────────────────
+   FILTROS POR CAMPO
+───────────────────────────────────────────── */
+function applyFilter(campo) {
+  state.activeFilter = campo;
+
+  // Actualizar botones de filtro
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.remove('active', 'ring-2', 'ring-offset-1', 'ring-blue-400');
+  });
+  const activeBtn = document.getElementById(`btn-${campo}`);
+  if (activeBtn) activeBtn.classList.add('ring-2', 'ring-offset-1', 'ring-blue-400');
+
+  applyFilterStyles();
+  drawLines();
+}
+
+function applyFilterStyles() {
+  const campo = state.activeFilter;
+  SUBJECTS.forEach(subject => {
+    const card = document.getElementById(`card-${subject.id}`);
+    if (!card) return;
+    card.classList.remove('filter-active', 'filter-dimmed');
+    if (campo === 'all' || subject.campo === campo) {
+      card.classList.add('filter-active');
+    } else {
+      card.classList.add('filter-dimmed');
+    }
+  });
+}
+
+/* ─────────────────────────────────────────────
+   BARRA DE PROGRESO
+───────────────────────────────────────────── */
+function updateProgress() {
+  const total = SUBJECTS.length;
+  const approved = state.approved.size;
+  const pct = total === 0 ? 0 : Math.round((approved / total) * 100);
+
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('pct-label').textContent = pct + '%';
+  document.getElementById('approved-count').textContent = approved;
+  document.getElementById('total-count').textContent = total;
+}
+
+/* ─────────────────────────────────────────────
+   DIBUJO DE LÍNEAS DE CORRELATIVIDAD (SVG)
+   Conecta cada materia con sus correlativas visibles.
+───────────────────────────────────────────── */
+function drawLines() {
+  const svg = document.getElementById('lines-svg');
+  const container = document.getElementById('grid-container');
+  const containerRect = container.getBoundingClientRect();
+
+  // Limpiar líneas anteriores
+  svg.innerHTML = '';
+
+  // Determinar qué nodos están visibles según el filtro activo
+  const visibleIds = new Set(
+    SUBJECTS
+      .filter(s => state.activeFilter === 'all' || s.campo === state.activeFilter)
+      .map(s => s.id)
+  );
+
+  SUBJECTS.forEach(subject => {
+    if (!visibleIds.has(subject.id)) return;
+
+    subject.prereqs.forEach(pid => {
+      if (!visibleIds.has(pid)) return;
+
+      const fromCard = document.getElementById(`card-${pid}`);
+      const toCard   = document.getElementById(`card-${subject.id}`);
+      if (!fromCard || !toCard) return;
+
+      const fromRect = fromCard.getBoundingClientRect();
+      const toRect   = toCard.getBoundingClientRect();
+
+      // Punto de salida: centro derecho del nodo origen
+      const x1 = fromRect.right  - containerRect.left;
+      const y1 = fromRect.top    - containerRect.top  + fromRect.height / 2;
+      // Punto de entrada: centro izquierdo del nodo destino
+      const x2 = toRect.left     - containerRect.left;
+      const y2 = toRect.top      - containerRect.top  + toRect.height / 2;
+
+      // Curva bezier cúbica
+      const cp1x = x1 + (x2 - x1) * 0.5;
+      const cp2x = x1 + (x2 - x1) * 0.5;
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', `M${x1},${y1} C${cp1x},${y1} ${cp2x},${y2} ${x2},${y2}`);
+
+      // Si el prereq está aprobado → línea activa (cian sólida)
+      const isActive = state.approved.has(pid);
+      path.setAttribute('class', `corr-line${isActive ? ' active' : ''}`);
+
+      svg.appendChild(path);
+    });
+  });
+}
+
+/* ─────────────────────────────────────────────
+   MODAL DE INFORMACIÓN
+───────────────────────────────────────────── */
+function openModal(event, id) {
+  event.stopPropagation();
+  const subject = SUBJECTS.find(s => s.id === id);
+  if (!subject) return;
+
+  const cc = CAMPO_COLORS[subject.campo];
+
+  // Cabecera coloreada
+  document.getElementById('modal-header').style.background = cc.bg;
+  document.getElementById('modal-badge').textContent = cc.label + ' — ' + (
+    subject.campo === 'CFG' ? 'Formación General' :
+    subject.campo === 'CFE' ? 'Formación Específica' : 'Práctica Docente'
+  );
+  document.getElementById('modal-title').textContent = subject.name;
+
+  // Metadatos
+  document.getElementById('modal-formato').textContent  = subject.formato;
+  document.getElementById('modal-regimen').textContent  = subject.regimen;
+  document.getElementById('modal-hs').textContent       = subject.hs + ' hs';
+
+  // Finalidades
+  document.getElementById('modal-finalidades').textContent = subject.finalidades;
+
+  // Contenidos
+  const ul = document.getElementById('modal-contenidos');
+  ul.innerHTML = '';
+  subject.contenidos.forEach(c => {
+    const li = document.createElement('li');
+    li.textContent = c;
+    ul.appendChild(li);
+  });
+
+  // Correlatividades
+  if (subject.prereqs.length === 0) {
+    document.getElementById('modal-corr').textContent = 'Sin correlativas previas — libre desde 1er año.';
+  } else {
+    const names = subject.prereqs.map(pid => {
+      const pre = SUBJECTS.find(x => x.id === pid);
+      return pre ? pre.name : pid;
+    });
+    document.getElementById('modal-corr').textContent = names.join(' · ');
+  }
+
+  document.getElementById('modal-backdrop').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(event) {
+  // Si se llamó desde el backdrop, sólo cerrar si el clic fue EN el backdrop
+  if (event && event.target !== document.getElementById('modal-backdrop') && event.type === 'click') return;
+  document.getElementById('modal-backdrop').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+// Cerrar modal con Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeModal();
+});
+
+/* ─────────────────────────────────────────────
+   RESET
+───────────────────────────────────────────── */
+function resetAll() {
+  if (!confirm('¿Reiniciar el progreso? Se desmarcarán todas las materias aprobadas.')) return;
+  state.approved.clear();
+  updateAllCards();
+  updateProgress();
+  drawLines();
+}
+
+/* ─────────────────────────────────────────────
+   REDIBUJAR LÍNEAS AL HACER RESIZE
+───────────────────────────────────────────── */
+window.addEventListener('resize', () => {
+  requestAnimationFrame(drawLines);
+});
+
+/* ─────────────────────────────────────────────
+   ARRANCAR
+───────────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
