@@ -15,10 +15,10 @@
       theme: {
         extend: {
           colors: {
-            cfg: '#334155', /* Slate 700 */
-            cfe: '#0f172a', /* Slate 900 */
-            cpd: '#475569', /* Slate 600 */
-            brand: '#2563eb' /* Azul vibrante financiero */
+            cfg: '#334155', 
+            cfe: '#0f172a', 
+            cpd: '#475569', 
+            brand: '#2563eb' 
           },
           fontFamily: {
             sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -57,9 +57,9 @@
       height: 100%;
     }
 
-    /* ESTADO 1: APROBADA (Oscura, Sólida, Asegurada) */
+    /* ESTADO 1: APROBADA */
     .subject-card[data-state="approved"] {
-      background-color: #0f172a; /* Fondo casi negro */
+      background-color: #0f172a;
       border: 2px solid #0f172a;
       color: #ffffff;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
@@ -67,28 +67,28 @@
     .subject-card[data-state="approved"] h3 { color: #ffffff; }
     .subject-card[data-state="approved"] .subtitle { color: #94a3b8; }
     .subject-card[data-state="approved"] .card-divider { border-color: #334155; }
-    .subject-card[data-state="approved"] .status-label { color: #38bdf8; } /* Azul claro */
+    .subject-card[data-state="approved"] .status-label { color: #38bdf8; }
     .subject-card[data-state="approved"] .info-btn { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155;}
     .subject-card[data-state="approved"]:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
 
-    /* ESTADO 2: HABILITADA (Blanca, Borde Grueso, Brillante) */
+    /* ESTADO 2: HABILITADA */
     .subject-card[data-state="enabled"] {
       background-color: #ffffff;
-      border: 2px solid #2563eb; /* Borde azul fuerte */
+      border: 2px solid #2563eb;
       color: #0f172a;
       box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15);
     }
     .subject-card[data-state="enabled"] h3 { color: #0f172a; }
     .subject-card[data-state="enabled"] .subtitle { color: #64748b; }
     .subject-card[data-state="enabled"] .card-divider { border-color: #e2e8f0; }
-    .subject-card[data-state="enabled"] .status-label { color: #2563eb; } /* Azul fuerte */
+    .subject-card[data-state="enabled"] .status-label { color: #2563eb; }
     .subject-card[data-state="enabled"] .info-btn { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;}
     .subject-card[data-state="enabled"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.2); }
 
-    /* ESTADO 3: BLOQUEADA (Grisácea, Borde Punteado, Inactiva) */
+    /* ESTADO 3: BLOQUEADA */
     .subject-card[data-state="locked"] {
       background-color: #f8fafc;
-      border: 2px dashed #cbd5e1; /* Borde punteado */
+      border: 2px dashed #cbd5e1;
       color: #64748b;
     }
     .subject-card[data-state="locked"] h3 { color: #475569; }
@@ -98,10 +98,6 @@
     .subject-card[data-state="locked"] .info-btn { background-color: #ffffff; color: #94a3b8; border: 1px solid #e2e8f0;}
     .subject-card[data-state="locked"]:hover { background-color: #f1f5f9; border-color: #94a3b8; }
 
-    /* Filtro de Búsqueda / Modo Inscripción */
-    .filter-active  { opacity: 1 !important; display: flex !important; }
-    .filter-dimmed  { opacity: 0.15 !important; filter: grayscale(100%); pointer-events: none; }
-
     /* Animación Desbloqueo */
     @keyframes unlockPop {
       0% { transform: scale(1); }
@@ -110,7 +106,6 @@
     }
     .animate-unlock { animation: unlockPop 0.5s ease-out; }
 
-    /* Modales y Scroll */
     .modal-backdrop { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px); }
     ::-webkit-scrollbar { height: 8px; width: 8px; }
     ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.5); }
@@ -141,9 +136,9 @@
       <h2 class="text-2xl font-black mb-3 text-slate-900 tracking-tight">Portal de Planificación</h2>
       <p class="text-sm text-slate-600 mb-6 leading-relaxed">
         Gestioná tu progreso académico con un diseño optimizado para la claridad visual.<br><br>
-        <span class="inline-block bg-slate-900 text-white px-2 py-0.5 rounded text-xs font-bold mb-1">CAPITALIZADAS</span> — Materias aprobadas.<br>
-        <span class="inline-block bg-white border-2 border-blue-500 text-blue-700 px-2 py-0.5 rounded text-xs font-bold mb-1">DISPONIBLES</span> — Listas para cursar.<br>
-        <span class="inline-block bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-2 py-0.5 rounded text-xs font-bold">RESTRINGIDAS</span> — Faltan correlativas.
+        <span class="inline-block bg-slate-900 text-white px-2 py-0.5 rounded text-xs font-bold mb-1">APROBADA</span> — Materias superadas.<br>
+        <span class="inline-block bg-white border-2 border-blue-500 text-blue-700 px-2 py-0.5 rounded text-xs font-bold mb-1">DISPONIBLE</span> — Listas para cursar.<br>
+        <span class="inline-block bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-2 py-0.5 rounded text-xs font-bold">RESTRINGIDA</span> — Faltan correlativas.
       </p>
       <button onclick="closeOnboarding()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-md">
         Comenzar a planificar
@@ -248,9 +243,9 @@
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
         
-        <!-- Búsqueda -->
-        <div class="flex flex-wrap items-center gap-3 flex-1">
-          <div class="relative w-full sm:max-w-sm flex-1">
+        <!-- Búsqueda sin cortes en móvil -->
+        <div class="flex flex-wrap items-center gap-3 flex-1 min-w-[200px]">
+          <div class="relative w-full flex-1">
             <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
             <input type="text" id="search-input" placeholder="Buscar materia..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-800 transition-all font-medium truncate" onkeyup="applyFilterStyles()">
           </div>
@@ -263,7 +258,7 @@
             <span>📱</span> <span class="hidden sm:inline">Instalar App</span>
           </button>
 
-          <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-4 py-2 rounded-xl border border-blue-200 transition" title="Muestra únicamente las materias que ya podés cursar">
+          <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 sm:px-4 py-2 rounded-xl border border-blue-200 transition" title="Muestra únicamente las materias que ya podés cursar">
             <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
             <div class="w-8 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
             Modo Inscripción
@@ -284,19 +279,19 @@
       </div>
     </div>
 
-    <!-- Barra de Leyenda Estructural (Reemplaza los puntitos de color por la estructura real) -->
+    <!-- Barra de Leyenda con los nombres solicitados: Aprobada, Habilitada, Bloqueada -->
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
-      <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-col md:flex-row gap-4 items-center justify-between">
+      <div class="max-w-screen-xl mx-auto px-4 py-2.5 flex flex-col md:flex-row gap-4 items-center justify-between">
         
         <div class="flex flex-wrap gap-3 text-[10px] sm:text-xs font-bold text-slate-600 uppercase tracking-wide">
-          <div class="flex items-center gap-2 bg-slate-900 text-white px-3 py-1.5 rounded-lg">
-            <span>✓</span> Capitalizado
+          <div class="flex items-center gap-2 bg-slate-900 text-white px-3 py-1 rounded-lg">
+            <span>✓</span> Aprobada
           </div>
-          <div class="flex items-center gap-2 bg-white border-2 border-blue-500 text-slate-800 px-3 py-1 rounded-lg">
-            <span class="text-blue-600">▶</span> Disponible
+          <div class="flex items-center gap-2 bg-white border-2 border-blue-500 text-slate-800 px-3 py-0.5 rounded-lg">
+            <span class="text-blue-600">▶</span> Habilitada
           </div>
-          <div class="flex items-center gap-2 bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-3 py-1 rounded-lg">
-            <span>🔒</span> Restringida
+          <div class="flex items-center gap-2 bg-slate-50 border-2 border-dashed border-slate-300 text-slate-500 px-3 py-0.5 rounded-lg">
+            <span>🔒</span> Bloqueada
           </div>
         </div>
         
@@ -341,24 +336,24 @@
   </div>
 
   <!-- ══════════════════════════════════════════
-       MODAL DE INFORMACIÓN MATERIA
+       MODAL DE INFORMACIÓN MATERIA (Con visibilidad corregida)
   ══════════════════════════════════════════ -->
   <div id="modal-backdrop" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 hidden" onclick="closeModal(event)">
     <div id="modal-box" class="bg-white w-full max-w-lg shadow-2xl rounded-3xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
       
-      <!-- Header del modal -->
-      <div id="modal-header" class="p-5 sm:p-7 text-slate-900 bg-slate-50 border-b border-slate-200 relative overflow-hidden shrink-0">
+      <!-- Header fijo con texto blanco visible -->
+      <div id="modal-header" class="p-5 sm:p-6 text-white bg-slate-900 border-b border-slate-700 relative overflow-hidden shrink-0">
         <div class="relative z-10 flex justify-between items-start gap-3">
           <div>
-            <span id="modal-badge" class="text-[10px] uppercase tracking-widest font-black text-white px-3 py-1 rounded-md shadow-sm inline-block mb-3"></span>
-            <h2 id="modal-title" class="text-2xl sm:text-3xl font-black leading-tight tracking-tight text-slate-900"></h2>
+            <span id="modal-badge" class="text-[9px] sm:text-[10px] uppercase tracking-widest font-black bg-white/20 text-white px-3 py-1 rounded-full shadow-sm backdrop-blur-sm border border-white/20 inline-block mb-3"></span>
+            <h2 id="modal-title" class="text-xl sm:text-2xl font-black leading-tight tracking-tight text-white drop-shadow-md"></h2>
           </div>
-          <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-full w-10 h-10 shrink-0 flex items-center justify-center transition shadow-sm text-lg">✕</button>
+          <button onclick="closeModal()" class="text-white hover:text-slate-200 bg-white/20 hover:bg-white/30 border border-white/20 rounded-full w-9 h-9 shrink-0 flex items-center justify-center transition shadow-sm text-base">✕</button>
         </div>
       </div>
       
       <!-- Contenedor con Scroll -->
-      <div class="p-5 sm:p-7 space-y-6 text-sm text-slate-700 overflow-y-auto">
+      <div class="p-5 sm:p-7 space-y-5 text-sm text-slate-700 bg-slate-50 overflow-y-auto">
         
         <!-- KPIs -->
         <div class="grid grid-cols-3 gap-3 sm:gap-4">
@@ -398,7 +393,7 @@
 
 <script>
 /* ─────────────────────────────────────────────
-   DATOS DEL PLAN DE ESTUDIOS (Completo)
+   DATOS DEL PLAN DE ESTUDIOS
 ───────────────────────────────────────────── */
 const SUBJECTS = [
   // 1ER AÑO
@@ -540,7 +535,6 @@ function renderGrid() {
 ───────────────────────────────────────────── */
 function createCard(subject) {
   const card = document.createElement('div');
-  // Usamos data-state="locked" por defecto, updateAllCards() lo cambiará.
   card.className = 'subject-card group';
   card.dataset.state = 'locked';
   card.id = `card-${subject.id}`;
@@ -624,21 +618,18 @@ function updateAllCards() {
     const labelEl = card.querySelector('.status-label');
 
     if (state.approved.has(subject.id)) {
-      // Estado: APROBADA
       card.dataset.state = 'approved';
       iconEl.innerHTML = '✓';
-      labelEl.innerHTML = 'Capitalizado';
+      labelEl.innerHTML = 'Aprobada';
       labelEl.removeAttribute('title');
     } 
     else if (isSubjectEnabled(subject.id)) {
-      // Estado: HABILITADA
       card.dataset.state = 'enabled';
       iconEl.innerHTML = '▶';
-      labelEl.innerHTML = 'Disponible';
+      labelEl.innerHTML = 'Habilitada';
       labelEl.removeAttribute('title');
     } 
     else {
-      // Estado: BLOQUEADA
       card.dataset.state = 'locked';
       iconEl.innerHTML = '🔒';
       const missingIds = subject.prereqs.filter(pid => !state.approved.has(pid));
@@ -664,21 +655,19 @@ function applyFilterStyles() {
     let visible = true;
     if (q && !subject.name.toLowerCase().includes(q)) visible = false;
     
-    if (showOnlyEnabled && (!isSubjectEnabled(subject.id) || state.approved.has(subject.id))) {
-       visible = false;
+    // CORREGIDO: Modo Inscripción muestra únicamente las habilitadas que aún NO están aprobadas
+    if (showOnlyEnabled) {
+      if (!isSubjectEnabled(subject.id) || state.approved.has(subject.id)) {
+        visible = false;
+      }
     }
 
     if (visible) {
-      card.classList.remove('filter-dimmed', 'hidden');
+      card.style.display = 'flex';
+      card.classList.remove('filter-dimmed');
       card.classList.add('filter-active');
     } else {
-      // Si estamos buscando, mejor ocultar las que no coinciden en vez de atenuarlas
-      if(q || showOnlyEnabled) {
-         card.classList.add('hidden');
-      } else {
-         card.classList.add('filter-dimmed');
-         card.classList.remove('filter-active');
-      }
+      card.style.display = 'none';
     }
   });
 }
