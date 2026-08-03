@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mapa Curricular · Economía · ISFD N°100</title>
   
-  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Fxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -311,7 +311,6 @@
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
         
-        <!-- Búsqueda con ancho completo -->
         <div class="flex w-full lg:w-auto flex-1 gap-3">
           <div class="relative flex-1">
             <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
@@ -319,10 +318,8 @@
           </div>
         </div>
 
-        <!-- Botones de Acción y Modo Inscripción (Barra Horizontal Deslizable) -->
         <div class="flex items-center justify-start lg:justify-end gap-2 w-full lg:w-auto overflow-x-auto hide-scrollbar pb-1 lg:pb-0 pt-1 lg:pt-0">
           
-          <!-- MODO INSCRIPCIÓN INTEGRADO ACÁ -->
           <label class="flex shrink-0 items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl border border-blue-200 transition shadow-sm">
             <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
             <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
@@ -331,7 +328,7 @@
           
           <div class="w-px h-6 bg-slate-300 hidden lg:block shrink-0 mx-1"></div>
 
-          <!-- BOTÓN INSTALAR (Se muestra si el navegador lo permite) -->
+          <!-- BOTÓN INSTALAR (Inicia oculto, se muestra si el navegador lo permite) -->
           <button id="btn-install" onclick="installApp()" class="hidden shrink-0 text-xs bg-slate-900 text-white px-3 py-2 rounded-xl font-bold hover:bg-slate-800 transition shadow-sm flex items-center gap-1.5">
             <span>📱</span> Instalar App
           </button>
@@ -458,22 +455,41 @@
 
 <script>
 /* ─────────────────────────────────────────────
-   INSTALACIÓN PWA AUTOMÁTICA
+   INSTALACIÓN PWA AUTOMÁTICA SEGURA
 ───────────────────────────────────────────── */
 let deferredPrompt;
+const isAppInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  // Mostrar el botón solo cuando el navegador esté listo para instalar
-  document.getElementById('btn-install').classList.remove('hidden');
+  showInstallBtn();
 });
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  hideInstallBtn();
+});
+
+function showInstallBtn() {
+  if (isAppInstalled) return;
+  const btn = document.getElementById('btn-install');
+  if (btn) btn.classList.remove('hidden');
+}
+
+function hideInstallBtn() {
+  const btn = document.getElementById('btn-install');
+  if (btn) btn.classList.add('hidden');
+}
 
 function installApp() {
   if (deferredPrompt) {
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        hideInstallBtn();
+      }
       deferredPrompt = null;
-      document.getElementById('btn-install').classList.add('hidden');
     });
   }
 }
@@ -593,6 +609,10 @@ function init() {
   renderGrid();
   updateAllCards();
   updateProgress();
+  
+  if (deferredPrompt && !isAppInstalled) {
+    showInstallBtn();
+  }
   
   document.getElementById('search-input').addEventListener('input', (e) => {
     state.searchQuery = e.target.value.toLowerCase();
