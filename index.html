@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mapa Curricular · Economía · ISFD N°100</title>
   
-  <!-- Manifest dinámico para PWA -->
-  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Fxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Fxml%22%7D%5D%7D" />
+  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Fxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -26,7 +24,6 @@
     }
   </script>
 
-  <!-- Librerías Externas -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -141,22 +138,6 @@
         <span class="inline-block bg-slate-50 border border-dashed border-slate-300 text-slate-500 px-2 py-0.5 rounded text-[10px] font-bold mb-1">BLOQUEADA</span> — Faltan correlativas.<br>
       </p>
       <button onclick="closeOnboarding()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-md">Comenzar a planificar</button>
-    </div>
-  </div>
-
-  <!-- MODAL INSTRUCCIONES DE INSTALACIÓN (NUEVO) -->
-  <div id="install-modal" class="modal-backdrop fixed inset-0 z-[110] flex items-center justify-center p-4 hidden" onclick="closeInstallModal(event)">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
-      <h2 class="text-xl font-black mb-2 text-slate-900 flex items-center gap-2">📱 Instalar Aplicación</h2>
-      <p class="text-xs text-slate-600 mb-4 leading-relaxed">Llevá tu mapa curricular siempre a mano como una app nativa en tu celular:</p>
-      
-      <div class="space-y-3 text-xs text-slate-700 bg-slate-50 p-4 rounded-2xl border border-slate-200">
-        <p><b>En Android (Chrome):</b><br> Tocá los tres puntos vertical <b>( ⋮ )</b> arriba a la derecha en tu navegador y seleccioná <b>"Instalar aplicación"</b> o <b>"Agregar a la pantalla principal"</b>.</p>
-        <hr class="border-slate-200">
-        <p><b>En iPhone (Safari):</b><br> Tocá el botón de compartir <b>( ⎋ )</b> en la barra inferior y seleccioná <b>"Agregar al inicio"</b>.</p>
-      </div>
-
-      <button onclick="closeInstallModal()" class="w-full mt-5 bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl transition shadow-md text-xs">Entendido</button>
     </div>
   </div>
 
@@ -330,6 +311,7 @@
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
         
+        <!-- Búsqueda con ancho completo -->
         <div class="flex w-full lg:w-auto flex-1 gap-3">
           <div class="relative flex-1">
             <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
@@ -337,14 +319,10 @@
           </div>
         </div>
 
+        <!-- Botones de Acción y Modo Inscripción (Barra Horizontal Deslizable) -->
         <div class="flex items-center justify-start lg:justify-end gap-2 w-full lg:w-auto overflow-x-auto hide-scrollbar pb-1 lg:pb-0 pt-1 lg:pt-0">
           
-          <!-- BOTÓN INSTALAR SIEMPRE VISIBLE -->
-          <button id="btn-install" onclick="installApp()" class="shrink-0 text-xs bg-purple-50 text-purple-700 px-3 py-2 rounded-xl font-bold border border-purple-200 hover:bg-purple-100 transition shadow-sm flex items-center gap-1.5">
-            <span>📱</span> Instalar App
-          </button>
-
-          <!-- MODO INSCRIPCIÓN INTEGRADO -->
+          <!-- MODO INSCRIPCIÓN INTEGRADO ACÁ -->
           <label class="flex shrink-0 items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl border border-blue-200 transition shadow-sm">
             <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
             <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
@@ -352,6 +330,11 @@
           </label>
           
           <div class="w-px h-6 bg-slate-300 hidden lg:block shrink-0 mx-1"></div>
+
+          <!-- BOTÓN INSTALAR (Se muestra si el navegador lo permite) -->
+          <button id="btn-install" onclick="installApp()" class="hidden shrink-0 text-xs bg-slate-900 text-white px-3 py-2 rounded-xl font-bold hover:bg-slate-800 transition shadow-sm flex items-center gap-1.5">
+            <span>📱</span> Instalar App
+          </button>
           
           <button onclick="openSchedule()" class="shrink-0 text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📅</span> Horarios
@@ -475,40 +458,24 @@
 
 <script>
 /* ─────────────────────────────────────────────
-   INSTALACIÓN PWA MEJORADA
+   INSTALACIÓN PWA AUTOMÁTICA
 ───────────────────────────────────────────── */
 let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
+  // Mostrar el botón solo cuando el navegador esté listo para instalar
+  document.getElementById('btn-install').classList.remove('hidden');
 });
 
 function installApp() {
   if (deferredPrompt) {
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('Usuario aceptó instalar la PWA');
-      }
       deferredPrompt = null;
+      document.getElementById('btn-install').classList.add('hidden');
     });
-  } else {
-    // Si el navegador no disparó el prompt nativo, abrimos el modal con las instrucciones manuales
-    const modal = document.getElementById('install-modal');
-    modal.classList.remove('hidden');
-    setTimeout(() => {
-      modal.children[0].classList.remove('scale-95');
-      modal.children[0].classList.add('scale-100');
-    }, 10);
   }
-}
-
-function closeInstallModal(e) {
-  if (e && e.target !== document.getElementById('install-modal') && e.type === 'click') return;
-  const modal = document.getElementById('install-modal');
-  modal.children[0].classList.remove('scale-100');
-  modal.children[0].classList.add('scale-95');
-  setTimeout(() => { modal.classList.add('hidden'); }, 150);
 }
 
 /* ─────────────────────────────────────────────
@@ -581,7 +548,7 @@ const SUBJECTS = [
   { id: 'economia-politica-iii', name: 'Economía Política III', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: ['economia-politica-ii'], finalidades: 'Profundizar en grandes debates: financiarización, trabajo, Estado y poscapitalismo.', contenidos: ['El debate sobre el fin del trabajo','Economía popular, social y solidaria','Renta básica universal y redistribución','Perspectivas ecosocialistas y feministas'] },
   { id: 'diseno-proyectos', name: 'Diseño de Proyectos Organizacionales', year: 4, campo: 'CFE', formato: 'Taller', regimen: 'Anual', hs: 96, prereqs: ['administracion'], finalidades: 'Desarrollar competencias para el diseño y evaluación de proyectos en contextos reales.', contenidos: ['Marco lógico para la planificación de proyectos','Estudio de prefactibilidad técnica y financiera','Formulación de proyectos de economía social','Monitoreo, evaluación y sistematización de proyectos'] },
   { id: 'eoi-cfe', name: 'Espacio de Opción Institucional (CFE)', year: 4, campo: 'CFE', formato: 'A definir', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Espacio de definición institucional para profundizar en Ciencias Económicas.', contenidos: ['Definido por el ISFD N°100 según su proyecto institucional'] },
-  { id: 'practica-iv', name: 'Práctica Docente IV — Residencia', year: 4, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['practica-iii'], finalidades: 'Asumir la conducción del proceso de enseñanza de manera integral completando la residencia.', contenidos: ['Residencia docente autónoma en nivel secundario','Elaboración del portfolio de residencia','Reflexión crítica sobre la práctica profesional','Coloquio integrador y presentación final'] }
+  { id: 'practica-iv', name: 'Práctica Docente IV — Residencia', year: 4, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['practica-iii'], finalidades: 'Asumir la conducción del proceso de enseñanza de manera integral completando la residencia.', contenidos: ['Residencia docente autónoma en nivel secundario','Elaboración del portfolio de residencia','Reflexión crítica sobre la práctica profesional','Coloquio integrador y presentation final'] }
 ];
 
 /* ─────────────────────────────────────────────
@@ -1406,7 +1373,6 @@ document.addEventListener('keydown', e => {
     closeSchedule();
     closeStatusModal();
     closeSyncModal();
-    closeInstallModal();
   } 
 });
 window.addEventListener('DOMContentLoaded', init);
