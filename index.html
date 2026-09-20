@@ -5,7 +5,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mapa Curricular · Economía · ISFD N°100</title>
   
-  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22Mapa%20Curricular%20ISFD%20100%22%2C%22short_name%22%3A%22Econom%C3%ADa%20100%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%230f172a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiBmaWxsPSJub25lIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkwIiBmaWxsPSJ3aGl0ZSI+MTAwPC90ZXh0Pjwvc3ZnPg==%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D" />
+  <meta name="theme-color" content="#0f172a" />
+  <script>
+  /* Manifest generado al vuelo: íconos PNG de 192 y 512 (Chrome/Edge de escritorio los exigen),
+     id, scope y start_url absolutos. Solo tiene sentido si se abre por http(s). */
+  (function setupManifest() {
+    try {
+      if (!/^https?:$/.test(location.protocol)) return;
+      const icon = size => {
+        try {
+          const c = document.createElement('canvas'); c.width = c.height = size;
+          const x = c.getContext('2d');
+          if (x) {
+            x.fillStyle = '#0f172a'; x.fillRect(0, 0, size, size);
+            x.fillStyle = '#ffffff'; x.font = 'bold ' + Math.round(size * 0.42) + 'px sans-serif';
+            x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('100', size / 2, size / 2);
+            return { src: c.toDataURL('image/png'), type: 'image/png' };
+          }
+        } catch (e) {}
+        const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '"><rect width="100%" height="100%" fill="#0f172a"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="' + Math.round(size * 0.42) + '" font-family="sans-serif" font-weight="bold" fill="#fff">100</text></svg>';
+        return { src: 'data:image/svg+xml,' + encodeURIComponent(svg), type: 'image/svg+xml' };
+      };
+      const i192 = icon(192), i512 = icon(512);
+      const startUrl = location.href.split('#')[0].split('?')[0];
+      const manifest = {
+        name: 'Mapa Curricular ISFD 100', short_name: 'Economía 100', lang: 'es-AR',
+        id: startUrl, start_url: startUrl, scope: startUrl.replace(/[^/]*$/, ''),
+        display: 'standalone', background_color: '#f8fafc', theme_color: '#0f172a',
+        icons: [
+          { src: i192.src, sizes: '192x192', type: i192.type, purpose: 'any' },
+          { src: i512.src, sizes: '512x512', type: i512.type, purpose: 'any' },
+          { src: i512.src, sizes: '512x512', type: i512.type, purpose: 'maskable' }
+        ]
+      };
+      const link = document.createElement('link');
+      link.rel = 'manifest';
+      link.href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+      document.head.appendChild(link);
+      const apple = document.createElement('link');
+      apple.rel = 'apple-touch-icon'; apple.href = i192.src;
+      document.head.appendChild(apple);
+    } catch (e) { console.warn('No se pudo generar el manifest', e); }
+  })();
+  </script>
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -73,6 +115,18 @@
     .subject-card[data-state="en_curso"] .info-btn { background-color: #ffffff; color: #a855f7; border: 1px solid #d8b4fe;}
     .subject-card[data-state="en_curso"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(168, 85, 247, 0.2); }
 
+    /* Cursada aprobada · final pendiente */
+    .subject-card[data-state="cursada"] {
+      background-color: #f0fdfa; border: 2px solid #14b8a6; color: #134e4a;
+      box-shadow: 0 10px 25px -5px rgba(20, 184, 166, 0.15);
+    }
+    .subject-card[data-state="cursada"] h3 { color: #134e4a; }
+    .subject-card[data-state="cursada"] .subtitle { color: #0f766e; }
+    .subject-card[data-state="cursada"] .card-divider { border-color: #99f6e4; }
+    .subject-card[data-state="cursada"] .status-label { color: #0d9488; }
+    .subject-card[data-state="cursada"] .info-btn { background-color: #ffffff; color: #0d9488; border: 1px solid #5eead4;}
+    .subject-card[data-state="cursada"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(20, 184, 166, 0.2); }
+
     /* Habilitada */
     .subject-card[data-state="enabled"] {
       background-color: #ffffff; border: 2px solid #2563eb; color: #0f172a;
@@ -134,6 +188,7 @@
         Gestioná tu progreso académico con un diseño optimizado.<br><br>
         <span class="inline-block bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-bold mb-1">APROBADA</span> — Materias superadas.<br>
         <span class="inline-block bg-purple-50 border border-purple-400 text-purple-700 px-2 py-0.5 rounded text-[10px] font-bold mb-1">EN CURSO</span> — Cursando actualmente.<br>
+        <span class="inline-block bg-teal-50 border border-teal-400 text-teal-700 px-2 py-0.5 rounded text-[10px] font-bold mb-1">FINAL PENDIENTE</span> — Cursada aprobada, falta rendir el final.<br>
         <span class="inline-block bg-white border border-blue-500 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold mb-1">HABILITADA</span> — Listas para cursar.<br>
         <span class="inline-block bg-slate-50 border border-dashed border-slate-300 text-slate-500 px-2 py-0.5 rounded text-[10px] font-bold mb-1">BLOQUEADA</span> — Faltan correlativas.<br>
       </p>
@@ -154,13 +209,14 @@
           <select id="status-select" onchange="toggleGradeInput()" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50">
             <option value="enabled">▶ Habilitada (Sin cursar)</option>
             <option value="en_curso">⏳ En Curso (Cursando actualmente)</option>
-            <option value="approved">✅ Aprobada</option>
+            <option value="cursada">📝 Cursada aprobada (final pendiente)</option>
+            <option value="approved">✅ Aprobada (final rendido)</option>
           </select>
         </div>
         
         <div id="grade-container" class="hidden">
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Nota Final:</label>
-          <input type="number" id="status-grade" min="0" max="10" step="0.01" oninput="validateGrade(this)" placeholder="Ej: 8.50" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50">
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Nota Final (mínimo 4):</label>
+          <input type="number" id="status-grade" min="4" max="10" step="0.01" oninput="validateGrade(this)" placeholder="Ej: 8.50" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50">
         </div>
       </div>
       
@@ -289,7 +345,7 @@
         <div class="w-px h-10 sm:h-12 bg-slate-700"></div>
 
         <div class="text-center sm:text-right flex flex-col flex-1 sm:flex-none">
-          <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Avance Global</p>
+          <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1" title="Horas con final aprobado sobre el total de horas del plan">Avance Global</p>
           <div class="flex items-baseline gap-1 justify-center sm:justify-end">
             <span class="text-2xl sm:text-4xl font-black text-white font-mono tracking-tighter" id="pct-label">0</span>
             <span class="text-sm sm:text-lg font-bold text-blue-400">%</span>
@@ -364,16 +420,18 @@
         <div class="flex flex-wrap justify-center sm:justify-start gap-2 text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-wide w-full md:w-auto">
           <div class="flex items-center gap-1 bg-slate-900 text-white px-2 py-1 rounded-lg"><span>✓</span> Aprobada</div>
           <div class="flex items-center gap-1 bg-purple-50 border border-purple-400 text-purple-700 px-2 py-1 rounded-lg"><span class="text-purple-600">⏳</span> En Curso</div>
+          <div class="flex items-center gap-1 bg-teal-50 border border-teal-400 text-teal-700 px-2 py-1 rounded-lg"><span>📝</span> Final pendiente</div>
           <div class="flex items-center gap-1 bg-white border border-blue-500 text-slate-800 px-2 py-1 rounded-lg"><span class="text-blue-600">▶</span> Habilitada</div>
           <div class="flex items-center gap-1 bg-slate-50 border border-dashed border-slate-300 text-slate-500 px-2 py-1 rounded-lg"><span>🔒</span> Bloqueada</div>
         </div>
         
         <div class="flex items-center gap-3 w-full md:w-80">
           <span class="text-[10px] font-black text-slate-400 whitespace-nowrap uppercase tracking-widest shrink-0">
-            <span id="approved-count" class="text-slate-800 text-sm font-mono">0</span> / <span id="total-count" class="font-mono">0</span>
+            <span id="approved-count" class="text-slate-800 text-sm font-mono">0</span> / <span id="total-count" class="font-mono">0</span><span id="pend-label" class="normal-case tracking-normal text-teal-600 ml-1"></span>
           </span>
-          <div class="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden shadow-inner border border-slate-200">
+          <div class="flex flex-1 bg-slate-100 rounded-full h-2 overflow-hidden shadow-inner border border-slate-200" title="Azul: horas con final aprobado · Verde agua: horas con cursada aprobada (final pendiente)">
             <div id="progress-bar" class="h-full bg-blue-600 relative" style="width:0%"></div>
+            <div id="progress-bar-cursada" class="h-full bg-teal-400" style="width:0%"></div>
           </div>
         </div>
 
@@ -491,12 +549,31 @@ function installApp() {
   if (deferredPrompt) {
     deferredPrompt.prompt();
     deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        hideInstallBtn();
-      }
+      if (choiceResult.outcome === 'accepted') hideInstallBtn();
       deferredPrompt = null;
     });
+  } else {
+    showInstallHelp();
   }
+}
+
+/* El navegador no siempre dispara el aviso de instalación (ya la instalaste, lo descartaste antes,
+   abriste el archivo local, usás Firefox...). En ese caso explicamos el camino manual. */
+function showInstallHelp() {
+  const ua = navigator.userAgent;
+  let msg;
+  if (location.protocol === 'file:') {
+    msg = 'Estás abriendo el archivo desde tu disco, y así el navegador no permite instalarla. Publicala en una dirección <b>https://</b> (por ejemplo GitHub Pages o Netlify) y abrila desde ahí.';
+  } else if (/iPhone|iPad|iPod/.test(ua)) {
+    msg = 'En Safari: tocá <b>Compartir</b> y después <b>Agregar a inicio</b>.';
+  } else if (/Firefox\//.test(ua) && !/Android/.test(ua)) {
+    msg = 'Firefox de escritorio no permite instalar apps web. Abrila con <b>Chrome</b> o <b>Edge</b>.';
+  } else if (/Edg\//.test(ua)) {
+    msg = 'En Edge: menú <b>⋯</b> → <b>Aplicaciones</b> → <b>Instalar este sitio como aplicación</b>. Si ya la instalaste, buscala en el menú Inicio.';
+  } else {
+    msg = 'En Chrome: menú <b>⋮</b> → <b>Transmitir, guardar y compartir</b> → <b>Instalar página como aplicación</b> (o el ícono de instalar en la barra de direcciones). Si ya la instalaste, buscala en el menú Inicio.';
+  }
+  showAlert('📱 Instalar la app', msg);
 }
 
 /* ─────────────────────────────────────────────
@@ -506,7 +583,7 @@ function validateGrade(el) {
   if (el.value === '') return;
   const n = parseFloat(el.value);
   if (isNaN(n)) return;
-  if (n < 0) { el.value = 0; return; }
+  if (n < 0) { el.value = ''; return; }
   if (n > 10) { el.value = 10; return; }
   const m = el.value.match(/^(\d+)\.(\d{3,})$/);   // máximo 2 decimales
   if (m) el.value = m[1] + '.' + m[2].substring(0, 2);
@@ -584,6 +661,8 @@ const SUBJECTS = [
 /* ─────────────────────────────────────────────
    ESTADO GLOBAL (V2) & LOCAL STORAGE
 ───────────────────────────────────────────── */
+const NOTA_MINIMA = 4;                             // nota mínima de aprobación
+const FINAL_REQUIERE_CORRELATIVAS_ACREDITADAS = true;   // para rendir un final hay que tener los finales de las correlativas aprobados
 const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 const emptySchedule = () => Object.fromEntries(DAYS.map(d => [d, []]));
 
@@ -607,9 +686,9 @@ function sanitizeUserSubjects(raw) {
   Object.keys(raw).forEach(id => {
     if (!SUBJECTS.some(s => s.id === id)) return;
     const v = raw[id];
-    if (!v || (v.status !== 'approved' && v.status !== 'en_curso')) return;
-    let g = (v.grade === null || v.grade === undefined || v.grade === '') ? null : Number(v.grade);
-    if (g !== null && (isNaN(g) || g < 0 || g > 10)) g = null;
+    if (!v || !['approved', 'cursada', 'en_curso'].includes(v.status)) return;
+    let g = (v.status !== 'approved' || v.grade === null || v.grade === undefined || v.grade === '') ? null : Number(v.grade);
+    if (g !== null && (isNaN(g) || g < NOTA_MINIMA || g > 10)) g = null;
     out[id] = { status: v.status, grade: g };
   });
   return out;
@@ -658,9 +737,7 @@ function init() {
   updateAllCards();
   updateProgress();
 
-  if (deferredPrompt && !isAppInstalled) {
-    showInstallBtn();
-  }
+  showInstallBtn();   // siempre visible salvo que ya estés dentro de la app instalada
 
   document.getElementById('search-input').addEventListener('input', (e) => {
     state.searchQuery = normalizeText(e.target.value.trim());
@@ -709,7 +786,7 @@ function generateShortCode() {
     const idx = SUBJECTS.findIndex(s => s.id === id);
     if (idx === -1) return;
     const sub = state.userSubjects[id];
-    const st = sub.status === 'approved' ? 'a' : 'c';
+    const st = sub.status === 'approved' ? 'a' : sub.status === 'cursada' ? 'f' : 'c';
     const gr = (sub.grade !== null && sub.grade !== undefined) ? sub.grade : '';
     uParts.push(`${idx}${st}${gr}`);
   });
@@ -722,7 +799,7 @@ function generateShortCode() {
     });
   });
 
-  return btoa(`v4|${uParts.join(',')}|${sParts.join(',')}`).replace(/=/g, '');
+  return btoa(`v5|${uParts.join(',')}|${sParts.join(',')}`).replace(/=/g, '');
 }
 
 function decodeShortCode(encoded) {
@@ -733,7 +810,7 @@ function decodeShortCode(encoded) {
   const parts = decoded.split('|');
   const version = parts[0];
 
-  if (version !== 'v3' && version !== 'v4') {
+  if (!['v3', 'v4', 'v5'].includes(version)) {
     const data = JSON.parse(decoded);          // formato viejo (v2)
     if (data && data.v === 2) return { u: sanitizeUserSubjects(data.u), s: sanitizeSchedule(data.s) };
     throw new Error('Invalid');
@@ -742,10 +819,10 @@ function decodeShortCode(encoded) {
   const newU = {};
   if (parts[1]) {
     parts[1].split(',').forEach(p => {
-      const match = p.match(/^(\d+)([ac])(.*)$/);
+      const match = p.match(/^(\d+)([acf])(.*)$/);
       if (match) {
         const idx = parseInt(match[1], 10);
-        const status = match[2] === 'a' ? 'approved' : 'en_curso';
+        const status = match[2] === 'a' ? 'approved' : match[2] === 'f' ? 'cursada' : 'en_curso';
         const grade = match[3] ? parseFloat(match[3]) : null;
         if (SUBJECTS[idx]) newU[SUBJECTS[idx].id] = { status, grade };
       }
@@ -760,7 +837,7 @@ function decodeShortCode(encoded) {
         const dIdx = parseInt(match[1], 10);
         const sIdx = parseInt(match[2], 10);
         let time = match[3];
-        if (version === 'v4') { try { time = decodeURIComponent(time); } catch (e) {} }
+        if (version !== 'v3') { try { time = decodeURIComponent(time); } catch (e) {} }
         if (DAYS[dIdx] && SUBJECTS[sIdx]) newS[DAYS[dIdx]].push({ id: SUBJECTS[sIdx].id, time });
       }
     });
@@ -839,7 +916,18 @@ function createCard(subject) {
 function isSubjectEnabled(id) {
   const subject = SUBJECTS.find(s => s.id === id);
   if (!subject) return false;
-  return subject.prereqs.every(pid => state.userSubjects[pid] && state.userSubjects[pid].status === 'approved');
+  return subject.prereqs.every(prereqCursadaOk);
+}
+
+/* Para CURSAR una materia alcanza con tener la cursada aprobada de las correlativas (o el final). */
+function prereqCursadaOk(pid) {
+  const st = state.userSubjects[pid]?.status;
+  return st === 'cursada' || st === 'approved';
+}
+
+/* Para RENDIR/acreditar el final hay que tener acreditadas (final aprobado) las correlativas. */
+function finalBlockers(subject) {
+  return subject.prereqs.filter(pid => state.userSubjects[pid]?.status !== 'approved');
 }
 
 function handleCardClick(id) {
@@ -889,26 +977,38 @@ function toggleGradeInput() {
 function saveSubjectStatus() {
   const id = document.getElementById('status-subject-id').value;
   const newStatus = document.getElementById('status-select').value;
-  let gradeInput = document.getElementById('status-grade').value;
+  const gradeInput = document.getElementById('status-grade').value;
   let grade = null;
-  
-  if (newStatus === 'approved' && gradeInput) {
+
+  if (newStatus === 'approved' && gradeInput !== '') {
     grade = parseFloat(gradeInput);
-    if (grade < 0 || grade > 10) {
-      showAlert('⚠️ Atención', "La nota debe estar comprendida entre 0 y 10.");
+    if (isNaN(grade) || grade < NOTA_MINIMA || grade > 10) {
+      showAlert('⚠️ Atención', `La nota de aprobación tiene que estar entre ${NOTA_MINIMA} y 10.`);
       return;
     }
   }
-  
-  const subject = SUBJECTS.find(s => s.id === id);
-  const currentStatus = state.userSubjects[id]?.status;
 
-  if (currentStatus === 'approved' && newStatus !== 'approved') {
-    const dependents = SUBJECTS.filter(s => s.prereqs.includes(id) && state.userSubjects[s.id]);
-    if (dependents.length > 0) {
-      showAlert('🛑 Movimiento Bloqueado', `Transacción denegada. Las siguientes materias dependen de <b>${subject.name}</b> para su validez:<br><br><span class="text-xs text-slate-500 font-mono">▪ ${dependents.map(d=>d.name).join('<br>▪ ')}</span>`);
+  const subject = SUBJECTS.find(s => s.id === id);
+
+  // Para acreditar el final, las correlativas tienen que estar acreditadas
+  if (newStatus === 'approved' && FINAL_REQUIERE_CORRELATIVAS_ACREDITADAS) {
+    const faltan = finalBlockers(subject);
+    if (faltan.length > 0) {
+      const names = faltan.map(pid => SUBJECTS.find(x => x.id === pid).name);
+      showAlert('🛑 Final bloqueado', `Para rendir <b>${subject.name}</b> primero necesitás tener aprobado el final de:<br><br><span class="text-xs text-slate-500 font-mono">▪ ${names.join('<br>▪ ')}</span><br><br>Podés dejarla como <b>Cursada aprobada (final pendiente)</b>.`);
       return;
     }
+  }
+
+  // Coherencia hacia adelante: no se puede "bajar" una materia si otras que dependen de ella ya están en marcha
+  const broken = SUBJECTS.filter(d => d.prereqs.includes(id) && state.userSubjects[d.id]).filter(d => {
+    const ds = state.userSubjects[d.id].status;
+    if (ds === 'approved' && FINAL_REQUIERE_CORRELATIVAS_ACREDITADAS) return newStatus !== 'approved';
+    return newStatus !== 'cursada' && newStatus !== 'approved';
+  });
+  if (broken.length > 0) {
+    showAlert('🛑 Movimiento Bloqueado', `Con ese estado se rompen las correlativas de:<br><br><span class="text-xs text-slate-500 font-mono">▪ ${broken.map(d => d.name).join('<br>▪ ')}</span><br><br>Primero cambiá el estado de esas materias.`);
+    return;
   }
 
   const previouslyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
@@ -924,14 +1024,14 @@ function saveSubjectStatus() {
   updateProgress();
   closeStatusModal();
 
-  if (newStatus === 'approved') {
+  if (newStatus === 'approved' || newStatus === 'cursada') {
     const currentlyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
     currentlyEnabled.forEach(newId => {
       if (!previouslyEnabled.has(newId)) {
         const card = document.getElementById(`card-${newId}`);
-        if(card) {
+        if (card) {
           card.classList.remove('animate-unlock');
-          void card.offsetWidth; 
+          void card.offsetWidth;
           card.classList.add('animate-unlock');
         }
       }
@@ -943,12 +1043,12 @@ function updateAllCards() {
   SUBJECTS.forEach(subject => {
     const card = document.getElementById(`card-${subject.id}`);
     if (!card) return;
-    
+
     const iconEl = card.querySelector('.status-icon');
     const labelEl = card.querySelector('.status-label');
     const uData = state.userSubjects[subject.id];
 
-    // Limpia lo que pudo dejar el estado "bloqueada" (antes quedaba el subrayado y el cursor de ayuda)
+    // Limpia lo que pudo dejar el estado anterior (título, cursor de ayuda, subrayado)
     labelEl.removeAttribute('title');
     labelEl.style.cursor = '';
     labelEl.style.textDecoration = '';
@@ -957,28 +1057,38 @@ function updateAllCards() {
       card.dataset.state = 'approved';
       iconEl.innerHTML = '✓';
       labelEl.innerHTML = (uData.grade !== null && uData.grade !== undefined) ? `Aprobada (Nota: ${uData.grade})` : 'Aprobada';
-      labelEl.removeAttribute('title');
-    } 
+    }
+    else if (uData && uData.status === 'cursada') {
+      card.dataset.state = 'cursada';
+      iconEl.innerHTML = '📝';
+      const blockers = FINAL_REQUIERE_CORRELATIVAS_ACREDITADAS ? finalBlockers(subject) : [];
+      if (blockers.length > 0) {
+        labelEl.innerHTML = `Final pendiente · 🔒 ${blockers.length}`;
+        labelEl.title = `Para rendir el final falta aprobar:\n• ${blockers.map(pid => SUBJECTS.find(x => x.id === pid).name).join('\n• ')}`;
+        labelEl.style.cursor = 'help';
+        labelEl.style.textDecoration = 'underline dashed';
+      } else {
+        labelEl.innerHTML = 'Final pendiente';
+      }
+    }
     else if (uData && uData.status === 'en_curso') {
       card.dataset.state = 'en_curso';
       iconEl.innerHTML = '⏳';
       labelEl.innerHTML = 'En Curso';
-      labelEl.removeAttribute('title');
     }
     else if (isSubjectEnabled(subject.id)) {
       card.dataset.state = 'enabled';
       iconEl.innerHTML = '▶';
       labelEl.innerHTML = 'Habilitada';
-      labelEl.removeAttribute('title');
-    } 
+    }
     else {
       card.dataset.state = 'locked';
       iconEl.innerHTML = '🔒';
-      const missingIds = subject.prereqs.filter(pid => !state.userSubjects[pid] || state.userSubjects[pid].status !== 'approved');
-      const missingNames = missingIds.map(pid => SUBJECTS.find(x=>x.id===pid).name);
-      
+      const missingIds = subject.prereqs.filter(pid => !prereqCursadaOk(pid));
+      const missingNames = missingIds.map(pid => SUBJECTS.find(x => x.id === pid).name);
+
       labelEl.innerHTML = `Req: ${missingIds.length} mat.`;
-      labelEl.title = `Falta aprobar:\n• ${missingNames.join('\n• ')}`;
+      labelEl.title = `Falta aprobar la cursada de:\n• ${missingNames.join('\n• ')}`;
       labelEl.style.cursor = 'help';
       labelEl.style.textDecoration = 'underline dashed';
     }
@@ -1021,42 +1131,50 @@ function applyFilterStyles() {
   });
 }
 
-let lastPct = null;
+let wasComplete = null;
 function updateProgress() {
   const total = SUBJECTS.length;
-  const approvedSubjects = Object.keys(state.userSubjects).filter(id =>
-    state.userSubjects[id].status === 'approved' && SUBJECTS.some(s => s.id === id));
-  const approvedCount = approvedSubjects.length;
-  const pct = total === 0 ? 0 : Math.round((approvedCount / total) * 100);
+  const totalHs = state.totalHs || SUBJECTS.reduce((acc, s) => acc + s.hs, 0);
 
-  let approvedHs = 0;
-  let gradesSum = 0;
-  let gradesCount = 0;
+  let approvedCount = 0, cursadaCount = 0;
+  let approvedHs = 0, cursadaHs = 0;
+  let gradesSum = 0, gradesCount = 0;
 
-  approvedSubjects.forEach(id => {
-    approvedHs += SUBJECTS.find(x => x.id === id).hs;
-    const g = state.userSubjects[id].grade;
-    if (g !== null && g !== undefined) {
-      gradesSum += g;
-      gradesCount++;
+  SUBJECTS.forEach(s => {
+    const u = state.userSubjects[s.id];
+    if (!u) return;
+    if (u.status === 'approved') {
+      approvedCount++;
+      approvedHs += s.hs;
+      if (u.grade !== null && u.grade !== undefined) { gradesSum += u.grade; gradesCount++; }
+    } else if (u.status === 'cursada') {
+      cursadaCount++;
+      cursadaHs += s.hs;
     }
   });
 
+  // El avance se mide por carga horaria (finales aprobados). Nunca muestra 100 hasta tenerlo todo.
+  const complete = total > 0 && approvedCount === total;
+  let pct = totalHs === 0 ? 0 : Math.round((approvedHs / totalHs) * 100);
+  if (!complete && pct >= 100) pct = 99;
+
   const promedio = gradesCount > 0 ? (gradesSum / gradesCount).toFixed(2) : '-';
 
-  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-bar').style.width = (totalHs ? (approvedHs / totalHs) * 100 : 0) + '%';
+  document.getElementById('progress-bar-cursada').style.width = (totalHs ? (cursadaHs / totalHs) * 100 : 0) + '%';
   document.getElementById('pct-label').textContent = pct;
   document.getElementById('approved-count').textContent = approvedCount;
   document.getElementById('total-count').textContent = total;
+  document.getElementById('pend-label').textContent = cursadaCount > 0 ? ` · ${cursadaCount} con final pendiente` : '';
   document.getElementById('hs-count').textContent = approvedHs;
-  document.getElementById('hs-total').textContent = `/ ${state.totalHs} HS`;
+  document.getElementById('hs-total').textContent = `/ ${totalHs} HS`;
   document.getElementById('promedio-label').textContent = promedio;
 
-  // Confeti solo cuando efectivamente llegás al 100% (antes se disparaba en cada carga)
-  if (pct === 100 && total > 0 && lastPct !== null && lastPct < 100 && typeof confetti === 'function') {
+  // Confeti solo en el momento en que completás la carrera (no en cada carga)
+  if (complete && wasComplete === false && typeof confetti === 'function') {
     confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999, colors: ['#2563eb', '#1e40af', '#60a5fa'] });
   }
-  lastPct = pct;
+  wasComplete = complete;
 }
 
 /* ─────────────────────────────────────────────
@@ -1162,7 +1280,9 @@ function openModal(event, id) {
   const ul = document.getElementById('modal-contenidos');
   ul.innerHTML = subject.contenidos.map(c => `<li><span class="text-blue-500 mr-2 font-black">»</span> ${c}</li>`).join('');
 
-  const corrText = subject.prereqs.length === 0 ? 'Materia de libre acceso' : subject.prereqs.map(pid => `<span class="text-slate-400 mr-1">▪</span> ${SUBJECTS.find(x=>x.id===pid).name}`).join('<br>');
+  const corrList = subject.prereqs.map(pid => `<span class="text-slate-400 mr-1">▪</span> ${SUBJECTS.find(x=>x.id===pid).name}`).join('<br>');
+  const corrText = subject.prereqs.length === 0 ? 'Materia de libre acceso'
+    : corrList + '<br><span class="block mt-3 text-[11px] font-medium text-slate-500 leading-snug">Para cursar: cursada aprobada de estas materias. Para rendir el final: final aprobado de estas materias.</span>';
   document.getElementById('modal-corr').innerHTML = corrText;
 
   const backdrop = document.getElementById('modal-backdrop');
@@ -1424,36 +1544,45 @@ function runSimulador() {
   let qty = parseInt(document.getElementById('sim-qty').value, 10);
   if (isNaN(qty)) qty = 3;
   qty = Math.min(10, Math.max(1, qty));
+
   const enabled = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.userSubjects[s.id]);
-  
-  enabled.sort((a,b) => {
+  enabled.sort((a, b) => {
     if (b.bottleneckCount !== a.bottleneckCount) return b.bottleneckCount - a.bottleneckCount;
     return a.year - b.year;
   });
-  
   const selected = enabled.slice(0, qty);
 
+  // Materias con cursada aprobada cuyas correlativas ya tienen final: se puede rendir ya
+  const finales = SUBJECTS.filter(s => state.userSubjects[s.id]?.status === 'cursada' && finalBlockers(s).length === 0);
+  finales.sort((a, b) => (b.bottleneckCount - a.bottleneckCount) || (a.year - b.year));
+
   const container = document.getElementById('sim-results');
-  if(selected.length === 0) {
+  if (selected.length === 0 && finales.length === 0) {
     container.innerHTML = '<p class="text-sm text-blue-600 font-bold text-center py-4">¡Excelente balance! No hay materias pendientes en este momento.</p>';
     return;
   }
 
-  let html = `<p class="text-[11px] text-slate-500 font-medium mb-3">Plan sugerido. Estas materias están libres de trabas y priorizan la <b>Ruta Crítica</b> para destrabar correlativas posteriores:</p>`;
-
-  html += selected.map(s => `
+  const simCard = (s, detail) => `
     <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm">
       <div>
         <div class="flex items-center gap-1.5">
           <p class="text-sm font-black text-slate-800 leading-tight">${s.name}</p>
           ${s.bottleneckCount >= 3 ? '<span title="Ruta Crítica">🔥</span>' : ''}
         </div>
-        <p class="text-[11px] text-slate-500 mt-1 font-mono">${s.regimen} · Año ${s.year}</p>
+        <p class="text-[11px] text-slate-500 mt-1 font-mono">${detail}</p>
       </div>
       <button onclick="handleCardClick('${s.id}'); closeSimulador();" class="text-[10px] uppercase font-bold bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition shadow-sm">Gestionar</button>
-    </div>
-  `).join('');
-  
+    </div>`;
+
+  let html = '';
+  if (finales.length) {
+    html += `<p class="text-[11px] text-slate-500 font-medium mb-3">📝 Finales que ya podés rendir (las correlativas ya están aprobadas):</p>`;
+    html += finales.map(s => simCard(s, `Final pendiente · Año ${s.year}`)).join('');
+  }
+  if (selected.length) {
+    html += `<p class="text-[11px] text-slate-500 font-medium ${finales.length ? 'mt-4 ' : ''}mb-3">Plan sugerido. Estas materias están libres de trabas y priorizan la <b>Ruta Crítica</b> para destrabar correlativas posteriores:</p>`;
+    html += selected.map(s => simCard(s, `${s.regimen} · Año ${s.year}`)).join('');
+  }
   container.innerHTML = html;
 }
 
