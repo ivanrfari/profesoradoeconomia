@@ -7,6 +7,15 @@
   
   <meta name="theme-color" content="#0f172a" />
   <script>
+    /* Tema: se aplica antes de pintar para que no parpadee */
+    try {
+      var t = localStorage.getItem('isfd100_theme');
+      if (t === 'dark' || (!t && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    } catch (e) {}
+  </script>
+  <script>
   /* Manifest generado al vuelo: íconos PNG de 192 y 512 (Chrome/Edge de escritorio los exigen),
      id, scope y start_url absolutos. Solo tiene sentido si se abre por http(s). */
   (function setupManifest() {
@@ -161,6 +170,147 @@
     .animate-unlock { animation: unlockPop 0.5s ease-out; }
 
     .modal-backdrop { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px); }
+
+    /* ── Cadena de correlativas ── */
+    .subject-card.chain-dim { opacity: 0.28 !important; filter: grayscale(0.6); }
+    .subject-card.chain-pre  { outline: 3px solid #f59e0b; outline-offset: 2px; }
+    .subject-card.chain-post { outline: 3px solid #6366f1; outline-offset: 2px; }
+    .subject-card.chain-self { outline: 4px solid #0ea5e9; outline-offset: 2px; }
+    .info-btn.pinned { box-shadow: 0 0 0 2px #0ea5e9; }
+
+    /* ── Chips dentro de las tarjetas ── */
+    .card-chip { font-size: 9px; font-weight: 800; letter-spacing: 0.03em; padding: 2px 6px; border-radius: 6px; background: rgba(100, 116, 139, 0.16); white-space: nowrap; }
+    .card-chip.warn   { background: rgba(245, 158, 11, 0.22); color: #b45309; }
+    .card-chip.danger { background: rgba(239, 68, 68, 0.18); color: #b91c1c; }
+    .subject-card[data-state="approved"] .card-chip { background: rgba(148, 163, 184, 0.2); }
+    .subject-card[data-state="approved"] .card-chip.warn   { color: #fbbf24; }
+    .subject-card[data-state="approved"] .card-chip.danger { color: #fca5a5; }
+
+    /* ── Pestañas del planificador ── */
+    .sched-tab { font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 10px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; transition: all 0.15s; }
+    .sched-tab:hover { background: #f1f5f9; }
+    .sched-tab.active { background: #2563eb; border-color: #2563eb; color: #ffffff; }
+
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ══════════ MODO OSCURO ══════════ */
+    html.dark { color-scheme: dark; }
+    html.dark body { background-color: #0b1220; background-image: radial-gradient(#1e293b 1px, transparent 1px); color: #e2e8f0; }
+
+    html.dark .bg-white { background-color: #111827; }
+    html.dark .bg-white\/95 { background-color: rgba(15, 23, 42, 0.95); }
+    html.dark .bg-slate-50 { background-color: #0f172a; }
+    html.dark .bg-slate-100 { background-color: #1e293b; }
+    html.dark .bg-slate-300 { background-color: #475569; }
+    html.dark .hover\:bg-slate-200:hover { background-color: #334155; }
+    html.dark button.bg-slate-900 { background-color: #334155; }
+    html.dark button.bg-slate-900:hover, html.dark button.hover\:bg-slate-800:hover { background-color: #475569; }
+    html.dark .focus\:bg-white:focus { background-color: #111827; }
+
+    html.dark .bg-blue-50    { background-color: rgba(59, 130, 246, 0.14); }
+    html.dark .bg-blue-100   { background-color: rgba(59, 130, 246, 0.22); }
+    html.dark .bg-indigo-50  { background-color: rgba(99, 102, 241, 0.16); }
+    html.dark .bg-cyan-50    { background-color: rgba(6, 182, 212, 0.14); }
+    html.dark .bg-amber-50   { background-color: rgba(245, 158, 11, 0.14); }
+    html.dark .bg-emerald-50 { background-color: rgba(16, 185, 129, 0.14); }
+    html.dark .bg-red-50     { background-color: rgba(239, 68, 68, 0.14); }
+    html.dark .bg-red-100    { background-color: rgba(239, 68, 68, 0.22); }
+    html.dark .bg-purple-50  { background-color: rgba(168, 85, 247, 0.16); }
+    html.dark .bg-teal-50    { background-color: rgba(20, 184, 166, 0.16); }
+    html.dark .hover\:bg-blue-100:hover    { background-color: rgba(59, 130, 246, 0.3); }
+    html.dark .hover\:bg-indigo-100:hover  { background-color: rgba(99, 102, 241, 0.3); }
+    html.dark .hover\:bg-cyan-100:hover    { background-color: rgba(6, 182, 212, 0.3); }
+    html.dark .hover\:bg-amber-100:hover   { background-color: rgba(245, 158, 11, 0.3); }
+    html.dark .hover\:bg-emerald-100:hover { background-color: rgba(16, 185, 129, 0.3); }
+    html.dark .hover\:bg-red-100:hover     { background-color: rgba(239, 68, 68, 0.3); }
+
+    html.dark .text-slate-900 { color: #f1f5f9; }
+    html.dark .text-slate-800 { color: #e2e8f0; }
+    html.dark .text-slate-700 { color: #cbd5e1; }
+    html.dark .text-slate-600 { color: #a8b5c8; }
+    html.dark .text-slate-500 { color: #94a3b8; }
+    html.dark .text-blue-800 { color: #93c5fd; }
+    html.dark .text-blue-700 { color: #93c5fd; }
+    html.dark .text-blue-600 { color: #60a5fa; }
+    html.dark .text-indigo-700 { color: #a5b4fc; }
+    html.dark .text-indigo-600 { color: #818cf8; }
+    html.dark .text-cyan-700 { color: #67e8f9; }
+    html.dark .text-amber-700 { color: #fcd34d; }
+    html.dark .text-emerald-700 { color: #6ee7b7; }
+    html.dark .text-emerald-600 { color: #34d399; }
+    html.dark .text-red-700 { color: #fca5a5; }
+    html.dark .text-red-600 { color: #f87171; }
+    html.dark .text-purple-700 { color: #d8b4fe; }
+    html.dark .text-purple-600 { color: #c084fc; }
+    html.dark .text-teal-700 { color: #5eead4; }
+    html.dark .text-teal-600 { color: #2dd4bf; }
+    html.dark .card-chip.warn { color: #fbbf24; }
+    html.dark .card-chip.danger { color: #fca5a5; }
+
+    html.dark .border-slate-100 { border-color: #1e293b; }
+    html.dark .border-slate-200 { border-color: #334155; }
+    html.dark .border-slate-300 { border-color: #475569; }
+    html.dark .border-blue-100, html.dark .border-blue-200, html.dark .border-indigo-200, html.dark .border-cyan-200,
+    html.dark .border-emerald-200, html.dark .border-amber-200 { border-color: rgba(148, 163, 184, 0.35); }
+    html.dark .border-red-100, html.dark .border-red-200 { border-color: rgba(239, 68, 68, 0.4); }
+
+    html.dark input, html.dark select, html.dark textarea { background-color: #0f172a; color: #e2e8f0; border-color: #475569; }
+    html.dark input::placeholder, html.dark textarea::placeholder { color: #64748b; }
+    html.dark option, html.dark optgroup { background-color: #0f172a; color: #e2e8f0; }
+
+    html.dark .sched-tab { background: #1e293b; border-color: #475569; color: #cbd5e1; }
+    html.dark .sched-tab:hover { background: #334155; }
+    html.dark .sched-tab.active { background: #2563eb; border-color: #2563eb; color: #ffffff; }
+
+    html.dark .subject-card[data-state="approved"] { background-color: #1e293b; border-color: #475569; }
+    html.dark .subject-card[data-state="en_curso"] { background-color: #2e1065; border-color: #a855f7; color: #f3e8ff; box-shadow: none; }
+    html.dark .subject-card[data-state="en_curso"] h3 { color: #f3e8ff; }
+    html.dark .subject-card[data-state="en_curso"] .subtitle { color: #d8b4fe; }
+    html.dark .subject-card[data-state="en_curso"] .card-divider { border-color: #6b21a8; }
+    html.dark .subject-card[data-state="en_curso"] .status-label { color: #d8b4fe; }
+    html.dark .subject-card[data-state="en_curso"] .info-btn { background-color: #3b0764; color: #d8b4fe; border-color: #6b21a8; }
+    html.dark .subject-card[data-state="cursada"] { background-color: #042f2e; border-color: #14b8a6; color: #ccfbf1; box-shadow: none; }
+    html.dark .subject-card[data-state="cursada"] h3 { color: #ccfbf1; }
+    html.dark .subject-card[data-state="cursada"] .subtitle { color: #5eead4; }
+    html.dark .subject-card[data-state="cursada"] .card-divider { border-color: #115e59; }
+    html.dark .subject-card[data-state="cursada"] .status-label { color: #5eead4; }
+    html.dark .subject-card[data-state="cursada"] .info-btn { background-color: #134e4a; color: #5eead4; border-color: #0f766e; }
+    html.dark .subject-card[data-state="enabled"] { background-color: #111827; border-color: #3b82f6; color: #f1f5f9; box-shadow: none; }
+    html.dark .subject-card[data-state="enabled"] h3 { color: #f1f5f9; }
+    html.dark .subject-card[data-state="enabled"] .subtitle { color: #94a3b8; }
+    html.dark .subject-card[data-state="enabled"] .card-divider { border-color: #334155; }
+    html.dark .subject-card[data-state="enabled"] .status-label { color: #60a5fa; }
+    html.dark .subject-card[data-state="enabled"] .info-btn { background-color: rgba(59, 130, 246, 0.18); color: #93c5fd; border-color: #1d4ed8; }
+    html.dark .subject-card[data-state="locked"] { background-color: #0f172a; border-color: #334155; color: #64748b; }
+    html.dark .subject-card[data-state="locked"] h3 { color: #94a3b8; }
+    html.dark .subject-card[data-state="locked"] .subtitle { color: #64748b; }
+    html.dark .subject-card[data-state="locked"] .card-divider { border-color: #1e293b; }
+    html.dark .subject-card[data-state="locked"] .status-label { color: #64748b; }
+    html.dark .subject-card[data-state="locked"] .info-btn { background-color: #111827; color: #64748b; border-color: #1e293b; }
+    html.dark .subject-card[data-state="locked"]:hover { background-color: #1e293b; border-color: #64748b; }
+
+    /* ══════════ IMPRESIÓN / PDF ══════════ */
+    #print-report { display: none; }
+    @media print {
+      @page { size: A4; margin: 12mm; }
+      html, body { background: #ffffff !important; background-image: none !important; }
+      body > *:not(#print-report) { display: none !important; }
+      #print-report { display: block !important; color: #0f172a; font-family: Inter, system-ui, sans-serif; font-size: 10.5px; line-height: 1.35; }
+      #print-report h1 { font-size: 20px; font-weight: 900; margin: 0; }
+      #print-report .sub { color: #475569; margin: 2px 0 12px; }
+      #print-report h2 { font-size: 13px; font-weight: 900; margin: 16px 0 6px; border-bottom: 2px solid #0f172a; padding-bottom: 3px; break-after: avoid; }
+      #print-report h3 { font-size: 11px; font-weight: 800; margin: 10px 0 4px; break-after: avoid; }
+      #print-report table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+      #print-report tr { break-inside: avoid; }
+      #print-report th, #print-report td { border: 1px solid #cbd5e1; padding: 3px 6px; text-align: left; vertical-align: top; }
+      #print-report th { background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      #print-report .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+      #print-report .kpi { border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 8px; }
+      #print-report .kpi b { display: block; font-size: 16px; }
+      #print-report .kpi span { color: #64748b; font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+      #print-report .st-approved { font-weight: 800; }
+      #print-report .muted { color: #64748b; font-weight: 500; }
+    }
   </style>
 </head>
 
@@ -229,8 +379,8 @@
 
   <div id="sync-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden" onclick="closeSyncModal(event)">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
-      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>💾</span> Sincronización Rápida</h2>
-      <p class="text-xs text-slate-500 mb-5 leading-relaxed">Copiá tu código para guardar un respaldo o transferir tu progreso a otro dispositivo.</p>
+      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>💾</span> Sincronización y respaldo</h2>
+      <p class="text-xs text-slate-500 mb-5 leading-relaxed">El código lleva tu progreso, horarios y períodos. El archivo de respaldo lleva <b>todo</b> (también mesas de examen y notas).</p>
       
       <div class="space-y-6 overflow-y-auto">
         <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
@@ -246,6 +396,15 @@
           <div class="flex gap-2">
             <input type="text" id="sync-import-code" placeholder="Pegá tu código acá..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
             <button onclick="importSyncCode()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm">Cargar</button>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+          <h3 class="text-[10px] font-black uppercase tracking-widest text-indigo-600 mb-2">3. Respaldo completo en archivo</h3>
+          <div class="flex gap-2">
+            <button onclick="downloadBackup()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm">⬇ Descargar (.json)</button>
+            <button onclick="document.getElementById('backup-file').click()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm">⬆ Cargar respaldo</button>
+            <input type="file" id="backup-file" accept="application/json,.json" class="hidden" onchange="importBackupFile(this)">
           </div>
         </div>
       </div>
@@ -279,6 +438,16 @@
           <h2 class="text-xl font-black flex items-center gap-2 tracking-tight"><span>📅</span> Planificador de Horarios</h2>
         </div>
         <button onclick="closeSchedule()" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
+      </div>
+      <div id="sched-tabs" class="px-4 pt-3 pb-1 bg-slate-50 flex items-center gap-2 flex-wrap shrink-0">
+        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-1">Ver:</span>
+        <button class="sched-tab active" data-view="all" onclick="setScheduleView('all')">Todo el año</button>
+        <button class="sched-tab" data-view="1" onclick="setScheduleView('1')">1° cuatrimestre</button>
+        <button class="sched-tab" data-view="2" onclick="setScheduleView('2')">2° cuatrimestre</button>
+        <div class="ml-auto flex gap-2">
+          <button onclick="exportScheduleImage()" class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition shadow-sm">🖼️ Imagen</button>
+          <button onclick="openCalModal()" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition shadow-sm">📆 Calendario</button>
+        </div>
       </div>
       <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row gap-3 shrink-0">
         <select id="sched-subject" class="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none truncate"></select>
@@ -318,6 +487,91 @@
       <div id="sim-results" class="mt-4 max-h-[45vh] overflow-y-auto pr-2 space-y-3"></div>
     </div>
   </div>
+
+  <div id="exams-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 hidden" onclick="closeExamsModal(event)">
+    <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation()">
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
+        <h2 class="text-xl font-black flex items-center gap-2 tracking-tight"><span>📝</span> Mesas de examen</h2>
+        <button onclick="closeExamsModal()" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
+      </div>
+      <div class="p-4 bg-slate-50 border-b border-slate-200 shrink-0">
+        <p class="text-[11px] text-slate-500 mb-3 leading-relaxed">Cargá la fecha de la mesa de las materias con <b>cursada aprobada</b>. Cuando falte una semana o menos, aparece un aviso arriba de todo, y podés llevarlas a tu calendario desde Horarios → Calendario.</p>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <select id="exam-subject" class="flex-1 min-w-0 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none"></select>
+          <div class="flex gap-2">
+            <input type="date" id="exam-date" aria-label="Fecha de la mesa" class="min-w-0 flex-1 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            <input type="time" id="exam-time" aria-label="Hora de la mesa" class="min-w-0 w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <button onclick="addExam()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm">Guardar</button>
+        </div>
+      </div>
+      <div id="exam-list" class="p-4 space-y-3 overflow-y-auto bg-slate-100 flex-1"></div>
+    </div>
+  </div>
+
+  <div id="cal-modal" class="modal-backdrop fixed inset-0 z-[70] flex items-center justify-center p-4 hidden" onclick="closeCalModal(event)">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>📆</span> Llevar al calendario</h2>
+      <p class="text-xs text-slate-500 mb-5 leading-relaxed">Genera un archivo <b>.ics</b> que podés abrir con Google Calendar, Outlook o el calendario del celular. Cada materia se repite todas las semanas dentro del rango.</p>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Período</label>
+          <select id="cal-view" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="all">Todo el año</option>
+            <option value="1">1° cuatrimestre</option>
+            <option value="2">2° cuatrimestre</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Primera semana</label>
+            <input type="date" id="cal-start" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Última semana</label>
+            <input type="date" id="cal-end" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+        </div>
+        <label class="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+          <input type="checkbox" id="cal-exams" checked class="w-4 h-4"> Incluir mesas de examen (con aviso el día anterior)
+        </label>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button onclick="closeCalModal()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
+        <button onclick="generateCalendar()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition">Descargar .ics</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="report-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-4 hidden" onclick="closeReportModal(event)">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-4"><span>📄</span> Exportar reporte</h2>
+      <div class="space-y-3">
+        <button onclick="closeReportModal(); exportMap()" class="w-full text-left px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 transition">
+          <span class="block text-sm font-black">🖼️ Imagen del mapa curricular</span>
+          <span class="block text-[11px] font-medium mt-0.5">Un PNG con todas las materias y su estado.</span>
+        </button>
+        <div class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-200">
+          <p class="text-sm font-black text-slate-800">🖨️ Imprimir o guardar como PDF</p>
+          <div class="mt-3 space-y-2 text-sm font-medium text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="rp-materias" checked class="w-4 h-4"> Materias por año (estado y notas)</label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="rp-horarios" checked class="w-4 h-4"> Horarios (del período que estés viendo)</label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="rp-mesas" checked class="w-4 h-4"> Mesas de examen</label>
+          </div>
+          <button onclick="printReport()" class="w-full mt-4 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition">Abrir vista de impresión</button>
+          <p class="text-[11px] text-slate-500 mt-2 leading-snug">En el diálogo de impresión elegí <b>Guardar como PDF</b> como destino.</p>
+        </div>
+      </div>
+      <button onclick="closeReportModal()" class="w-full mt-4 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cerrar</button>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[150] hidden items-center gap-3 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 max-w-[90vw]" role="status" aria-live="polite">
+    <span id="toast-msg" class="truncate"></span>
+    <button id="toast-undo" onclick="undoLast()" class="shrink-0 text-sky-300 hover:text-white underline underline-offset-2">Deshacer</button>
+  </div>
+
+  <div id="print-report"></div>
 
   <!-- ══════════════════════════════════════════
        HEADER PRINCIPAL DASHBOARD
@@ -386,6 +640,12 @@
             <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
             <span>Modo Inscripción</span>
           </label>
+
+          <select id="term-filter" onchange="setTermFilter(this.value)" title="Mostrar solo las materias de un cuatrimestre (las anuales siempre aparecen). Definí en qué cuatrimestre se dicta cada materia desde su ficha ⓘ → Mis notas." class="shrink-0 text-xs font-bold text-slate-700 bg-slate-50 px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="all">Todos los períodos</option>
+            <option value="1">1° cuatrimestre</option>
+            <option value="2">2° cuatrimestre</option>
+          </select>
           
           <div class="w-px h-6 bg-slate-300 hidden lg:block shrink-0 mx-1"></div>
 
@@ -397,15 +657,22 @@
           <button onclick="openSchedule()" class="shrink-0 text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📅</span> Horarios
           </button>
+          <button onclick="openExamsModal()" class="shrink-0 text-xs bg-teal-50 text-teal-700 px-3 py-2 rounded-xl font-bold border border-teal-400 transition flex items-center gap-1.5 shadow-sm">
+            <span>📝</span> Mesas
+          </button>
           <button onclick="openSimulador()" class="shrink-0 text-xs bg-cyan-50 text-cyan-700 px-3 py-2 rounded-xl font-bold border border-cyan-200 hover:bg-cyan-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📈</span> Proyectar
           </button>
           <button onclick="openSyncModal()" class="shrink-0 text-xs bg-amber-50 text-amber-700 px-3 py-2 rounded-xl font-bold border border-amber-200 hover:bg-amber-100 transition flex items-center gap-1.5 shadow-sm">
             <span>💾</span> Sincronizar
           </button>
-          <button onclick="exportMap()" id="btn-export" class="shrink-0 text-xs bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
+          <button onclick="openReportModal()" id="btn-export" class="shrink-0 text-xs bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📄</span> Reporte
           </button>
+          <button id="btn-undo" onclick="undoLast()" disabled class="shrink-0 text-xs bg-slate-50 text-slate-700 px-3 py-2 rounded-xl font-bold border border-slate-300 hover:bg-slate-200 transition flex items-center gap-1.5 shadow-sm" title="Deshacer el último cambio (Ctrl+Z)">
+            <span>↶</span> <span class="hidden xl:inline">Deshacer</span>
+          </button>
+          <button id="btn-theme" onclick="toggleTheme()" class="shrink-0 text-sm bg-slate-50 text-slate-700 w-9 h-9 rounded-xl border border-slate-300 hover:bg-slate-200 transition shadow-sm flex items-center justify-center" title="Cambiar tema">🌙</button>
           <button onclick="confirmReset()" class="shrink-0 text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm" title="Liquidar Datos">
             <span>🔄</span> <span class="lg:hidden">Reset</span>
           </button>
@@ -435,6 +702,19 @@
           </div>
         </div>
 
+      </div>
+    </div>
+
+
+    <div id="chain-banner" class="hidden bg-indigo-50 border-b border-indigo-200">
+      <div class="max-w-screen-xl mx-auto px-4 py-2 flex items-center justify-between gap-3 text-xs font-bold text-indigo-700">
+        <span id="chain-banner-text" class="min-w-0"></span>
+        <button onclick="clearChain()" class="shrink-0 bg-white border border-indigo-200 px-3 py-1 rounded-lg hover:bg-blue-100 transition">Quitar ✕</button>
+      </div>
+    </div>
+    <div id="exam-banner" onclick="openExamsModal()" class="hidden cursor-pointer bg-amber-50 border-b border-amber-200">
+      <div class="max-w-screen-xl mx-auto px-4 py-2 text-xs font-bold text-amber-700">
+        <span id="exam-banner-text"></span>
       </div>
     </div>
 
@@ -512,6 +792,40 @@
           <h3 class="text-[10px] uppercase tracking-widest font-black text-blue-600 mb-3">Núcleos de Contenido</h3>
           <ul id="modal-contenidos" class="list-none space-y-2 text-sm text-slate-600 font-medium bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-sm"></ul>
         </div>
+
+        <div id="modal-notes-section" class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-blue-600 flex items-center gap-2"><span>🗒️</span> Mis notas <span class="text-slate-400 font-bold normal-case tracking-normal">(se guardan solas)</span></h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Docente</label>
+              <input id="note-teacher" type="text" maxlength="80" oninput="onNoteInput()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Aula / comisión</label>
+              <input id="note-room" type="text" maxlength="40" oninput="onNoteInput()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+          </div>
+          <div id="note-term-wrap">
+            <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Se dicta en</label>
+            <select id="note-term" onchange="onNoteInput()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="">Sin definir</option>
+              <option value="1">1° cuatrimestre</option>
+              <option value="2">2° cuatrimestre</option>
+              <option value="B">Ambos cuatrimestres</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Link al aula virtual o campus</label>
+            <div class="flex gap-2">
+              <input id="note-link" type="text" inputmode="url" maxlength="300" placeholder="https://..." oninput="onNoteInput()" class="min-w-0 flex-1 px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+              <a id="note-link-open" target="_blank" rel="noopener noreferrer" class="hidden shrink-0 px-3 py-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold hover:bg-blue-100 transition">Abrir ↗</a>
+            </div>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Notas</label>
+            <textarea id="note-text" rows="4" maxlength="2000" oninput="onNoteInput()" placeholder="Parciales, TP, bibliografía, recordatorios..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none resize-y"></textarea>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -521,6 +835,7 @@
    INSTALACIÓN PWA AUTOMÁTICA SEGURA
 ───────────────────────────────────────────── */
 let deferredPrompt;
+let DEPS = {};   // mapa materia → materias que la tienen como correlativa
 const isAppInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
 
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -670,7 +985,11 @@ const state = {
   userSubjects: {},
   searchQuery: '',
   totalHs: 0,
-  schedule: emptySchedule()
+  schedule: emptySchedule(),
+  exams: {},
+  notes: {},
+  scheduleView: 'all',
+  termFilter: 'all'
 };
 
 const CAMPO_COLORS = {
@@ -724,6 +1043,12 @@ function init() {
   const savedSchedule = loadJSON('isfd100_horarios');
   if (savedSchedule) state.schedule = sanitizeSchedule(savedSchedule);
 
+  const savedExams = loadJSON('isfd100_mesas');
+  if (savedExams) state.exams = sanitizeExams(savedExams);
+
+  const savedNotes = loadJSON('isfd100_notas');
+  if (savedNotes) state.notes = sanitizeNotes(savedNotes);
+
   state.totalHs = SUBJECTS.reduce((acc, s) => acc + s.hs, 0);
 
   calculateDependencies();
@@ -736,6 +1061,8 @@ function init() {
   renderGrid();
   updateAllCards();
   updateProgress();
+  syncThemeButton();
+  updateUndoButton();
 
   showInstallBtn();   // siempre visible salvo que ya estés dentro de la app instalada
 
@@ -748,6 +1075,8 @@ function init() {
 function saveState() {
   safeSet('isfd100_data_v2', JSON.stringify(state.userSubjects));
   safeSet('isfd100_horarios', JSON.stringify(state.schedule));
+  safeSet('isfd100_mesas', JSON.stringify(state.exams));
+  safeSet('isfd100_notas', JSON.stringify(state.notes));
 }
 
 /* ─────────────────────────────────────────────
@@ -762,6 +1091,8 @@ function calculateDependencies() {
       if (dependentsMap[pre]) dependentsMap[pre].push(s.id);
     });
   });
+
+  DEPS = dependentsMap;
 
   function countAllDownstream(id, visited = new Set()) {
     visited.add(id);
@@ -799,7 +1130,13 @@ function generateShortCode() {
     });
   });
 
-  return btoa(`v5|${uParts.join(',')}|${sParts.join(',')}`).replace(/=/g, '');
+  const tParts = [];
+  SUBJECTS.forEach((s, idx) => {
+    const t = state.notes[s.id]?.term;
+    if (t === '1' || t === '2' || t === 'B') tParts.push(`${idx}${t}`);
+  });
+
+  return btoa(`v6|${uParts.join(',')}|${sParts.join(',')}|${tParts.join(',')}`).replace(/=/g, '');
 }
 
 function decodeShortCode(encoded) {
@@ -810,7 +1147,7 @@ function decodeShortCode(encoded) {
   const parts = decoded.split('|');
   const version = parts[0];
 
-  if (!['v3', 'v4', 'v5'].includes(version)) {
+  if (!['v3', 'v4', 'v5', 'v6'].includes(version)) {
     const data = JSON.parse(decoded);          // formato viejo (v2)
     if (data && data.v === 2) return { u: sanitizeUserSubjects(data.u), s: sanitizeSchedule(data.s) };
     throw new Error('Invalid');
@@ -842,7 +1179,14 @@ function decodeShortCode(encoded) {
       }
     });
   }
-  return { u: sanitizeUserSubjects(newU), s: sanitizeSchedule(newS) };
+  const newT = {};
+  if (parts[3]) {
+    parts[3].split(',').forEach(p => {
+      const m = p.match(/^(\d+)([12B])$/);
+      if (m && SUBJECTS[parseInt(m[1], 10)]) newT[SUBJECTS[parseInt(m[1], 10)].id] = m[2];
+    });
+  }
+  return { u: sanitizeUserSubjects(newU), s: sanitizeSchedule(newS), t: newT };
 }
 
 /* ─────────────────────────────────────────────
@@ -891,10 +1235,14 @@ function createCard(subject) {
     </div>
     <h3 class="font-black text-[15px] leading-snug mb-1.5 pr-2 transition-colors">${subject.name}</h3>
     <p class="subtitle text-[11px] font-bold tracking-wide uppercase font-mono transition-colors">${subject.regimen} · ${subject.hs}hs</p>
+    <div class="card-extras flex-wrap gap-1.5 mt-2" style="display:none"></div>
     
     <div class="card-divider mt-auto pt-3.5 border-t flex justify-between items-center transition-colors">
       <span class="status-label text-[10px] font-black uppercase tracking-widest transition-colors"></span>
-      <button onclick="openModal(event, '${subject.id}')" class="info-btn w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center transition shadow-sm" title="Ver Info">i</button>
+      <div class="flex items-center gap-1.5">
+        <button onclick="toggleChain(event, '${subject.id}')" data-id="${subject.id}" class="info-btn chain-btn w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center transition shadow-sm" title="Resaltar cadena de correlativas" aria-label="Resaltar cadena de correlativas de ${subject.name}">🔗</button>
+        <button onclick="openModal(event, '${subject.id}')" class="info-btn w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center transition shadow-sm" title="Ver Info">i</button>
+      </div>
     </div>
   `;
   
@@ -907,6 +1255,9 @@ function createCard(subject) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(subject.id); }
   });
   
+  card.addEventListener('mouseenter', () => onCardEnter(subject.id));
+  card.addEventListener('mouseleave', onCardLeave);
+
   return card;
 }
 
@@ -1011,6 +1362,8 @@ function saveSubjectStatus() {
     return;
   }
 
+  pushUndo(`${subject.name} → ${STATUS_LABEL[newStatus]}`);
+
   const previouslyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
 
   if (newStatus === 'enabled') {
@@ -1093,7 +1446,11 @@ function updateAllCards() {
       labelEl.style.textDecoration = 'underline dashed';
     }
   });
+  SUBJECTS.forEach(renderCardExtras);
   applyFilterStyles();
+  updateExamBanner();
+  applyChain();
+  if (isOpen('exams-modal')) renderExamsModal();
 }
 
 function applyFilterStyles() {
@@ -1109,6 +1466,8 @@ function applyFilterStyles() {
     
     if (q && !normalizeText(subject.name).includes(q)) visible = false;
     
+    if (state.termFilter !== 'all' && !termVisible(subjectTerm(subject), state.termFilter)) visible = false;
+
     if (showOnlyEnabled) {
       if (!isSubjectEnabled(subject.id) || state.userSubjects[subject.id]) {
         visible = false;
@@ -1120,7 +1479,7 @@ function applyFilterStyles() {
       card.classList.add('filter-active');
     } else {
       card.classList.remove('filter-active');
-      if(q || showOnlyEnabled) {
+      if(q || showOnlyEnabled || state.termFilter !== 'all') {
          card.classList.add('hidden');
          card.classList.remove('filter-dimmed');
       } else {
@@ -1247,11 +1606,12 @@ function importSyncCode() {
   const hasData = Object.keys(state.userSubjects).length > 0 || DAYS.some(d => (state.schedule[d] || []).length > 0);
   if (hasData && !confirm('Esto reemplaza tu progreso y tus horarios actuales por los del código. ¿Continuar?')) return;
 
+  pushUndo('Código importado');
   state.userSubjects = data.u;
   state.schedule = data.s;
+  if (data.t) Object.keys(data.t).forEach(id => setNote(id, { term: data.t[id] }));
   saveState();
-  updateAllCards();
-  updateProgress();
+  refreshAll();
   closeSyncModal();
   showAlert('✅ ¡Éxito!', "Perfil sincronizado exitosamente.");
 }
@@ -1284,6 +1644,7 @@ function openModal(event, id) {
   const corrText = subject.prereqs.length === 0 ? 'Materia de libre acceso'
     : corrList + '<br><span class="block mt-3 text-[11px] font-medium text-slate-500 leading-snug">Para cursar: cursada aprobada de estas materias. Para rendir el final: final aprobado de estas materias.</span>';
   document.getElementById('modal-corr').innerHTML = corrText;
+  fillNotesSection(id);
 
   const backdrop = document.getElementById('modal-backdrop');
   backdrop.classList.remove('hidden');
@@ -1298,6 +1659,7 @@ function openModal(event, id) {
 
 function closeModal(event) {
   if (event && event.target !== document.getElementById('modal-backdrop') && event.type === 'click') return;
+  flushNotes();
   const box = document.getElementById('modal-box');
   if(box) {
     box.classList.remove('scale-100');
@@ -1336,12 +1698,13 @@ function closeConfirmModal() {
 
 function executeReset() {
   closeConfirmModal();
+  pushUndo('Reinicio de datos');
   state.userSubjects = {};
   state.schedule = emptySchedule();
+  state.exams = {};
+  state.notes = {};
   saveState();
-  updateAllCards();
-  updateProgress();
-  if(!document.getElementById('schedule-modal').classList.contains('hidden')) renderScheduleGrid();
+  refreshAll();
 }
 
 function showAlert(title, msg) {
@@ -1369,17 +1732,8 @@ function openSchedule() {
   const modal = document.getElementById('schedule-modal');
   modal.classList.remove('hidden');
 
-  const sel = document.getElementById('sched-subject');
-  const byYear = (a, b) => a.year - b.year;
-  const opt = s => `<option value="${s.id}">${s.bottleneckCount >= 3 ? '🔥 ' : ''}${s.name} (Año ${s.year})</option>`;
-
-  const enCurso = SUBJECTS.filter(s => state.userSubjects[s.id]?.status === 'en_curso').sort(byYear);
-  const habilitadas = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.userSubjects[s.id]).sort(byYear);
-
-  sel.innerHTML = '<option value="" disabled selected>Seleccioná una materia...</option>'
-    + (enCurso.length ? `<optgroup label="⏳ En curso">${enCurso.map(opt).join('')}</optgroup>` : '')
-    + (habilitadas.length ? `<optgroup label="▶ Habilitadas">${habilitadas.map(opt).join('')}</optgroup>` : '');
-
+  updateSchedTabs();
+  buildScheduleOptions();
   renderScheduleGrid();
 
   setTimeout(() => {
@@ -1414,111 +1768,6 @@ function parseTimeRange(text) {
   }
   if (found.length < 2 || found[1] <= found[0]) return null;
   return { start: found[0], end: found[1] };
-}
-
-function findConflicts(day, time, skipIndex = -1) {
-  const r = parseTimeRange(time);
-  if (!r) return [];
-  const out = [];
-  (state.schedule[day] || []).forEach((it, i) => {
-    if (i === skipIndex) return;
-    const o = parseTimeRange(it.time);
-    if (o && r.start < o.end && o.start < r.end) out.push(it);
-  });
-  return out;
-}
-
-function addScheduleItem() {
-  const subId = document.getElementById('sched-subject').value;
-  const day = document.getElementById('sched-day').value;
-  const start = document.getElementById('sched-start').value;
-  const end = document.getElementById('sched-end').value;
-
-  if (!subId) { showAlert('⚠️ Atención', "Por favor, seleccioná una materia primero."); return; }
-  if ((start && !end) || (!start && end)) {
-    showAlert('⚠️ Atención', "Completá la hora de inicio y la de fin (o dejá las dos vacías).");
-    return;
-  }
-  if (start && end && end <= start) {
-    showAlert('⚠️ Atención', "La hora de fin tiene que ser posterior a la de inicio.");
-    return;
-  }
-
-  const time = (start && end) ? `${start} a ${end}` : 'Sin horario definido';
-
-  if (!state.schedule[day]) state.schedule[day] = [];
-  if (state.schedule[day].some(it => it.id === subId && it.time === time)) {
-    showAlert('⚠️ Atención', "Esa materia ya está cargada ese día y en ese horario.");
-    return;
-  }
-
-  const conflicts = findConflicts(day, time);
-  state.schedule[day].push({ id: subId, time });
-
-  saveState();
-  renderScheduleGrid();
-  document.getElementById('sched-start').value = '';
-  document.getElementById('sched-end').value = '';
-
-  if (conflicts.length) {
-    const names = conflicts.map(c => `<b>${esc(SUBJECTS.find(s => s.id === c.id)?.name || c.id)}</b> (${esc(c.time)})`).join('<br>');
-    showAlert('⚠️ Superposición', `Ese horario se pisa con:<br><br>${names}`);
-  }
-}
-
-function removeScheduleItem(day, index) {
-  state.schedule[day].splice(index, 1);
-  saveState();
-  renderScheduleGrid();
-}
-
-function renderScheduleGrid() {
-  const grid = document.getElementById('schedule-grid');
-  let html = '';
-
-  DAYS.forEach(day => {
-    const entries = (state.schedule[day] || []).map((item, index) => ({ item, index }));
-    entries.sort((a, b) => {
-      const ra = parseTimeRange(a.item.time), rb = parseTimeRange(b.item.time);
-      if (ra && rb) return ra.start - rb.start;
-      if (ra) return -1;
-      if (rb) return 1;
-      return 0;
-    });
-
-    html += `
-      <div class="bg-white border border-slate-200 rounded-xl flex flex-col min-w-[200px] w-[200px] shadow-sm">
-        <h4 class="font-black text-slate-800 bg-slate-100 p-3 rounded-t-xl border-b border-slate-200">${day}</h4>
-        <div class="p-3 flex flex-col gap-3 min-h-[150px]">
-    `;
-
-    if (entries.length === 0) {
-      html += `<p class="text-xs text-slate-400 text-center mt-4 italic">Día libre</p>`;
-    } else {
-      entries.forEach(({ item, index }) => {
-        const subject = SUBJECTS.find(x => x.id === item.id);
-        if (!subject) return;
-        const conflict = findConflicts(day, item.time, index).length > 0;
-        const approved = state.userSubjects[item.id]?.status === 'approved';
-        const borderCol = conflict ? 'border-red-500'
-          : subject.campo === 'CFG' ? 'border-blue-500'
-          : subject.campo === 'CFE' ? 'border-emerald-500' : 'border-amber-500';
-
-        html += `
-          <div class="${conflict ? 'bg-red-50' : 'bg-slate-50'} ${approved ? 'opacity-60' : ''} p-3 rounded-lg border-l-4 ${borderCol} border-y border-r border-slate-200 shadow-sm relative group">
-            <p class="text-[11px] font-bold text-slate-800 leading-tight pr-7">${subject.name}</p>
-            <p class="text-[10px] text-blue-600 font-mono mt-1 font-bold">${esc(item.time)}</p>
-            ${conflict ? '<p class="text-[10px] text-red-600 font-black mt-1">⚠ Se superpone</p>' : ''}
-            ${approved ? '<p class="text-[10px] text-slate-500 font-bold mt-1">✓ Ya aprobada</p>' : ''}
-            <button onclick="removeScheduleItem('${day}', ${index})" aria-label="Quitar" class="absolute top-1.5 right-1.5 w-6 h-6 bg-red-100 text-red-600 rounded-md opacity-100 sm:opacity-0 group-hover:opacity-100 focus:opacity-100 transition flex items-center justify-center text-xs font-black shadow-sm">✕</button>
-          </div>
-        `;
-      });
-    }
-    html += `</div></div>`;
-  });
-
-  grid.innerHTML = html;
 }
 
 function openSimulador() { 
@@ -1619,7 +1868,7 @@ function exportMap() {
 
   setTimeout(() => {
     html2canvas(area, { 
-      backgroundColor: '#f8fafc',
+      backgroundColor: document.documentElement.classList.contains('dark') ? '#0b1220' : '#f8fafc',
       scale: isMobile ? 1 : 2, 
       scrollX: 0,
       scrollY: 0,
@@ -1653,16 +1902,1024 @@ function exportMap() {
   }, 400);
 }
 
-document.addEventListener('keydown', e => { 
-  if (e.key === 'Escape') { 
-    closeModal(); 
-    closeSimulador(); 
+/* ═════════════════════════════════════════════
+   NUEVAS FUNCIONES
+   cadena de correlativas · deshacer · mesas de examen · notas por materia · períodos
+   exportar horarios (imagen / calendario) · respaldo en archivo · modo oscuro · impresión/PDF
+═════════════════════════════════════════════ */
+const SUBJECT_BY_ID = Object.fromEntries(SUBJECTS.map(s => [s.id, s]));
+const STATUS_LABEL = { enabled: 'Habilitada', en_curso: 'En curso', cursada: 'Cursada aprobada', approved: 'Aprobada' };
+const TERM_LABEL = { A: 'Anual', '1': '1° cuat.', '2': '2° cuat.', B: '1° y 2° cuat.', '': 'Período sin definir' };
+const VIEW_LABEL = { all: 'Todo el año', '1': '1° cuatrimestre', '2': '2° cuatrimestre' };
+const CAMPO_HEX = { CFG: '#1e3a8a', CFE: '#059669', CPD: '#d97706' };
+const BACKUP_APP = 'planificador-isfd100';
+
+/* ── Utilidades ── */
+const pad2 = n => String(n).padStart(2, '0');
+function todayISO() { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
+function isoToUTC(iso) { const [y, m, d] = iso.split('-').map(Number); return Date.UTC(y, m - 1, d); }
+function isValidISO(s) {
+  if (typeof s !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  try { return new Date(isoToUTC(s)).toISOString().slice(0, 10) === s; } catch (e) { return false; }
+}
+function addDaysISO(iso, n) { return new Date(isoToUTC(iso) + n * 86400000).toISOString().slice(0, 10); }
+function daysUntil(iso) { return Math.round((isoToUTC(iso) - isoToUTC(todayISO())) / 86400000); }
+function fmtDateShort(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' }).replace('.', '');
+}
+function fmtDateLong(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+function relDaysLabel(n) {
+  if (n === 0) return 'Hoy';
+  if (n === 1) return 'Mañana';
+  if (n > 1) return `En ${n} días`;
+  if (n === -1) return 'Ayer';
+  return `Hace ${-n} días`;
+}
+function isTypingTarget(el) {
+  return !!el && (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) || el.isContentEditable);
+}
+function isOpen(id) { const m = document.getElementById(id); return !!m && !m.classList.contains('hidden'); }
+function openBox(id) {
+  const m = document.getElementById(id);
+  m.classList.remove('hidden');
+  setTimeout(() => { m.children[0].classList.remove('scale-95'); m.children[0].classList.add('scale-100'); }, 10);
+}
+function closeBox(id, e) {
+  const m = document.getElementById(id);
+  if (!m || m.classList.contains('hidden')) return;
+  if (e && e.target !== m && e.type === 'click') return;
+  m.children[0].classList.remove('scale-100');
+  m.children[0].classList.add('scale-95');
+  setTimeout(() => m.classList.add('hidden'), 150);
+}
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* ── Modo oscuro ── */
+function applyTheme(dark) {
+  document.documentElement.classList.toggle('dark', dark);
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.setAttribute('content', dark ? '#020617' : '#0f172a');
+  syncThemeButton();
+}
+function toggleTheme() {
+  const dark = !document.documentElement.classList.contains('dark');
+  applyTheme(dark);
+  safeSet('isfd100_theme', dark ? 'dark' : 'light');
+}
+function syncThemeButton() {
+  const b = document.getElementById('btn-theme');
+  if (!b) return;
+  const dark = document.documentElement.classList.contains('dark');
+  b.textContent = dark ? '☀️' : '🌙';
+  b.title = dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+}
+try {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!safeGet('isfd100_theme')) applyTheme(e.matches);   // sigue al sistema mientras no elijas a mano
+  });
+} catch (e) { /* navegadores viejos */ }
+
+/* ── Deshacer ── */
+const undoStack = [];
+let toastTimer = null;
+
+function snapshotData() {
+  return JSON.stringify({ u: state.userSubjects, s: state.schedule, e: state.exams, n: state.notes });
+}
+function pushUndo(label) {
+  undoStack.push({ label, data: snapshotData() });
+  if (undoStack.length > 30) undoStack.shift();
+  updateUndoButton();
+  showToast(label, true);
+}
+function undoLast() {
+  const entry = undoStack.pop();
+  if (!entry) { showToast('No hay nada para deshacer', false); return; }
+  const d = JSON.parse(entry.data);
+  state.userSubjects = sanitizeUserSubjects(d.u);
+  state.schedule = sanitizeSchedule(d.s);
+  state.exams = sanitizeExams(d.e);
+  state.notes = sanitizeNotes(d.n);
+  saveState();
+  refreshAll();
+  showToast(`Deshecho: ${entry.label}`, false);
+}
+function updateUndoButton() {
+  const b = document.getElementById('btn-undo');
+  if (b) b.disabled = undoStack.length === 0;
+}
+function showToast(msg, withUndo) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-undo').classList.toggle('hidden', !withUndo);
+  t.classList.remove('hidden');
+  t.classList.add('flex');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.classList.add('hidden'); t.classList.remove('flex'); }, withUndo ? 7000 : 2500);
+}
+function refreshAll() {
+  updateAllCards();
+  updateProgress();
+  if (isOpen('schedule-modal')) { buildScheduleOptions(); renderScheduleGrid(); }
+  if (currentInfoId && isOpen('modal-backdrop')) fillNotesSection(currentInfoId);
+  applyChain();
+  updateUndoButton();
+}
+
+/* ── Cadena de correlativas ── */
+let chainPinned = null, chainHover = null, chainTimer = null;
+
+function chainClosure(id, dir) {
+  const seen = new Set();
+  const stack = [id];
+  while (stack.length) {
+    const cur = stack.pop();
+    const next = dir === 'pre' ? (SUBJECT_BY_ID[cur]?.prereqs || []) : (DEPS[cur] || []);
+    next.forEach(n => { if (!seen.has(n)) { seen.add(n); stack.push(n); } });
+  }
+  return seen;
+}
+function applyChain() {
+  const id = chainPinned || chainHover;
+  const banner = document.getElementById('chain-banner');
+  document.querySelectorAll('.chain-btn').forEach(b => b.classList.toggle('pinned', b.dataset.id === chainPinned));
+  const cards = document.querySelectorAll('.subject-card');
+  cards.forEach(c => c.classList.remove('chain-dim', 'chain-pre', 'chain-post', 'chain-self'));
+  if (!id) { banner.classList.add('hidden'); return; }
+  const pre = chainClosure(id, 'pre'), post = chainClosure(id, 'post');
+  cards.forEach(c => {
+    const cid = c.id.replace('card-', '');
+    if (cid === id) c.classList.add('chain-self');
+    else if (pre.has(cid)) c.classList.add('chain-pre');
+    else if (post.has(cid)) c.classList.add('chain-post');
+    else c.classList.add('chain-dim');
+  });
+  if (chainPinned) {
+    const name = esc(SUBJECT_BY_ID[id].name);
+    document.getElementById('chain-banner-text').innerHTML =
+      `🔗 <b>${name}</b> · <span class="text-amber-700">Necesita: ${pre.size}</span> · <span class="text-indigo-700">Destraba: ${post.size}</span>` +
+      `<span class="hidden sm:inline text-slate-500 font-medium"> — naranja: correlativas previas · violeta: materias que abre</span>`;
+    banner.classList.remove('hidden');
+  } else {
+    banner.classList.add('hidden');
+  }
+}
+function toggleChain(event, id) {
+  if (event) event.stopPropagation();
+  chainPinned = chainPinned === id ? null : id;
+  applyChain();
+}
+function clearChain() { chainPinned = null; chainHover = null; clearTimeout(chainTimer); applyChain(); }
+function canHover() { try { return window.matchMedia('(hover: hover)').matches; } catch (e) { return false; } }
+function onCardEnter(id) {
+  if (!canHover()) return;
+  clearTimeout(chainTimer);
+  chainTimer = setTimeout(() => { chainHover = id; applyChain(); }, 180);
+}
+function onCardLeave() {
+  clearTimeout(chainTimer);
+  if (chainHover) { chainHover = null; applyChain(); }
+}
+
+/* ── Períodos (cuatrimestres) ── */
+function subjectTerm(s) {
+  if (s.regimen === 'Anual') return 'A';
+  return state.notes[s.id]?.term || '';
+}
+function termsOverlap(a, b) {
+  if (!a || !b || a === 'A' || b === 'A' || a === 'B' || b === 'B') return true;
+  return a === b;
+}
+function termVisible(t, view) { return view === 'all' || !t || t === 'A' || t === 'B' || t === view; }
+function setTermFilter(v) { state.termFilter = v; applyFilterStyles(); }
+
+/* ── Notas por materia ── */
+const NOTE_EMPTY = { teacher: '', room: '', link: '', text: '', term: '' };
+let currentInfoId = null, noteTimer = null;
+
+function normalizeLink(s) {
+  s = String(s || '').trim().slice(0, 300);
+  if (!s) return '';
+  if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+  try {
+    const u = new URL(s);
+    return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : '';
+  } catch (e) { return ''; }
+}
+function getNote(id) { return Object.assign({}, NOTE_EMPTY, state.notes[id] || {}); }
+function isNoteEmpty(n) { return !n.teacher && !n.room && !n.link && !n.text && !n.term; }
+function setNote(id, patch) {
+  const n = Object.assign(getNote(id), patch);
+  if (isNoteEmpty(n)) delete state.notes[id]; else state.notes[id] = n;
+}
+function sanitizeNotes(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  Object.keys(raw).forEach(id => {
+    if (!SUBJECT_BY_ID[id]) return;
+    const v = raw[id];
+    if (!v || typeof v !== 'object') return;
+    const n = {
+      teacher: String(v.teacher || '').slice(0, 80).trim(),
+      room: String(v.room || '').slice(0, 40).trim(),
+      link: normalizeLink(v.link),
+      text: String(v.text || '').slice(0, 2000).trimEnd(),
+      term: ['1', '2', 'B'].includes(v.term) ? v.term : ''
+    };
+    if (!isNoteEmpty(n)) out[id] = n;
+  });
+  return out;
+}
+function fillNotesSection(id) {
+  currentInfoId = id;
+  const subject = SUBJECT_BY_ID[id];
+  const n = getNote(id);
+  document.getElementById('note-teacher').value = n.teacher;
+  document.getElementById('note-room').value = n.room;
+  document.getElementById('note-link').value = n.link;
+  document.getElementById('note-text').value = n.text;
+  document.getElementById('note-term').value = n.term;
+  document.getElementById('note-term-wrap').classList.toggle('hidden', subject.regimen === 'Anual');
+  updateNoteLink(n.link);
+}
+function updateNoteLink(href) {
+  const a = document.getElementById('note-link-open');
+  if (href) { a.href = href; a.classList.remove('hidden'); } else { a.removeAttribute('href'); a.classList.add('hidden'); }
+}
+function onNoteInput() {
+  clearTimeout(noteTimer);
+  noteTimer = setTimeout(saveNotesFromForm, 350);
+}
+function saveNotesFromForm() {
+  clearTimeout(noteTimer);
+  noteTimer = null;
+  const id = currentInfoId;
+  if (!id) return;
+  const link = normalizeLink(document.getElementById('note-link').value);
+  setNote(id, {
+    teacher: document.getElementById('note-teacher').value.slice(0, 80).trim(),
+    room: document.getElementById('note-room').value.slice(0, 40).trim(),
+    link,
+    text: document.getElementById('note-text').value.slice(0, 2000),
+    term: SUBJECT_BY_ID[id].regimen === 'Anual' ? '' : document.getElementById('note-term').value
+  });
+  updateNoteLink(link);
+  saveState();
+  renderCardExtras(SUBJECT_BY_ID[id]);
+  applyFilterStyles();
+  if (isOpen('schedule-modal')) { buildScheduleOptions(); renderScheduleGrid(); }
+}
+function flushNotes() {
+  if (noteTimer) saveNotesFromForm();
+  currentInfoId = null;
+}
+
+/* ── Mesas de examen ── */
+function sanitizeExams(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  Object.keys(raw).forEach(id => {
+    if (!SUBJECT_BY_ID[id]) return;
+    const v = raw[id];
+    if (!v || typeof v !== 'object') return;
+    const date = isValidISO(v.date) ? v.date : '';
+    const time = /^([01]\d|2[0-3]):[0-5]\d$/.test(v.time || '') ? v.time : '';
+    let attempts = parseInt(v.attempts, 10);
+    if (isNaN(attempts) || attempts < 0) attempts = 0;
+    out[id] = { date, time: date ? time : '', attempts: Math.min(attempts, 20) };
+  });
+  return out;
+}
+function examChip(n) {
+  const cls = n < 0 ? 'bg-red-100 text-red-700 border-red-200'
+    : n <= 7 ? 'bg-amber-50 text-amber-700 border-amber-200'
+    : 'bg-slate-100 text-slate-600 border-slate-200';
+  return `<span class="shrink-0 text-[10px] font-black uppercase tracking-wide px-2 py-1 rounded-lg border ${cls}">${relDaysLabel(n)}</span>`;
+}
+function openExamsModal() { renderExamsModal(); openBox('exams-modal'); }
+function closeExamsModal(e) { closeBox('exams-modal', e); }
+function renderExamsModal() {
+  const sel = document.getElementById('exam-subject');
+  const prev = sel.value;
+  const cands = SUBJECTS.filter(s => state.userSubjects[s.id]?.status === 'cursada');
+  sel.innerHTML = cands.length
+    ? '<option value="" disabled selected>Materia con final pendiente...</option>' + cands.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('')
+    : '<option value="" disabled selected>Todavía no tenés cursadas aprobadas</option>';
+  if (prev && cands.some(s => s.id === prev)) sel.value = prev;
+
+  const entries = Object.keys(state.exams).map(id => ({ id, s: SUBJECT_BY_ID[id], e: state.exams[id] })).filter(x => x.s);
+  const pending = entries.filter(x => state.userSubjects[x.id]?.status === 'cursada');
+  pending.sort((a, b) => {
+    if (a.e.date && b.e.date) return a.e.date.localeCompare(b.e.date) || a.e.time.localeCompare(b.e.time);
+    if (a.e.date) return -1;
+    if (b.e.date) return 1;
+    return a.s.name.localeCompare(b.s.name);
+  });
+  const history = entries.filter(x => state.userSubjects[x.id]?.status === 'approved');
+
+  let html = '';
+  if (pending.length === 0) {
+    html += '<p class="text-xs text-slate-400 text-center italic py-6">No hay mesas cargadas.</p>';
+  }
+  pending.forEach(({ id, s, e }) => {
+    const n = e.date ? daysUntil(e.date) : null;
+    const when = e.date ? `${esc(fmtDateLong(e.date))}${e.time ? ' · ' + e.time + ' hs' : ''}` : 'Sin fecha todavía';
+    html += `
+      <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
+        <div class="flex justify-between items-start gap-2">
+          <div class="min-w-0">
+            <p class="text-sm font-black text-slate-800 leading-tight">${esc(s.name)}</p>
+            <p class="text-xs text-slate-500 font-mono mt-1 capitalize">${when}</p>
+          </div>
+          ${n === null ? '' : examChip(n)}
+        </div>
+        ${n !== null && n < 0 ? '<p class="text-[11px] text-red-600 font-bold mt-2">La fecha ya pasó: actualizala o sumá un intento.</p>' : ''}
+        <div class="flex items-center justify-between mt-3 gap-2 flex-wrap">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600">
+            <span>Veces que rendí:</span>
+            <button onclick="changeAttempts('${id}', -1)" aria-label="Restar intento" class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 hover:bg-slate-200 transition">−</button>
+            <span class="font-mono w-5 text-center">${e.attempts}</span>
+            <button onclick="changeAttempts('${id}', 1)" aria-label="Sumar intento" class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 hover:bg-slate-200 transition">+</button>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openStatusModal('${id}')" class="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition">✅ Aprobé</button>
+            <button onclick="removeExam('${id}')" class="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition">Quitar</button>
+          </div>
+        </div>
+      </div>`;
+  });
+  if (history.length) {
+    html += '<p class="text-[10px] font-black uppercase tracking-widest text-slate-400 pt-2">Ya aprobadas</p>';
+    history.forEach(({ s, e }) => {
+      html += `<div class="bg-white border border-slate-200 rounded-xl px-3 py-2 opacity-70 flex justify-between gap-2 text-xs">
+        <span class="font-bold text-slate-700">${esc(s.name)}</span>
+        <span class="text-slate-500 font-mono">${e.attempts ? `rendí ${e.attempts} ${e.attempts === 1 ? 'vez' : 'veces'} antes` : 'a la primera'}</span>
+      </div>`;
+    });
+  }
+  document.getElementById('exam-list').innerHTML = html;
+}
+function addExam() {
+  const id = document.getElementById('exam-subject').value;
+  const date = document.getElementById('exam-date').value;
+  const time = document.getElementById('exam-time').value;
+  if (!id) { showAlert('⚠️ Atención', 'Elegí primero una materia con cursada aprobada.'); return; }
+  if (time && !date) { showAlert('⚠️ Atención', 'Si cargás una hora, cargá también la fecha.'); return; }
+  if (date && !isValidISO(date)) { showAlert('⚠️ Atención', 'La fecha no es válida.'); return; }
+  const prev = state.exams[id];
+  pushUndo(`Mesa de ${SUBJECT_BY_ID[id].name}`);
+  state.exams[id] = { date, time: date ? time : '', attempts: prev ? prev.attempts : 0 };
+  saveState();
+  updateAllCards();
+  document.getElementById('exam-date').value = '';
+  document.getElementById('exam-time').value = '';
+}
+function changeAttempts(id, delta) {
+  const e = state.exams[id];
+  if (!e) return;
+  const next = Math.min(20, Math.max(0, e.attempts + delta));
+  if (next === e.attempts) return;
+  pushUndo(`Intentos de ${SUBJECT_BY_ID[id].name}`);
+  e.attempts = next;
+  saveState();
+  updateAllCards();
+}
+function removeExam(id) {
+  if (!state.exams[id]) return;
+  pushUndo(`Mesa quitada: ${SUBJECT_BY_ID[id].name}`);
+  delete state.exams[id];
+  saveState();
+  updateAllCards();
+}
+function upcomingExams(maxDays) {
+  return SUBJECTS
+    .filter(s => state.userSubjects[s.id]?.status === 'cursada' && state.exams[s.id]?.date)
+    .map(s => ({ s, e: state.exams[s.id], days: daysUntil(state.exams[s.id].date) }))
+    .filter(x => x.days >= 0 && x.days <= maxDays)
+    .sort((a, b) => a.days - b.days || a.e.time.localeCompare(b.e.time));
+}
+function updateExamBanner() {
+  const el = document.getElementById('exam-banner');
+  if (!el) return;
+  const up = upcomingExams(7);
+  if (!up.length) { el.classList.add('hidden'); return; }
+  const f = up[0];
+  document.getElementById('exam-banner-text').innerHTML =
+    `📅 <b>${relDaysLabel(f.days)}</b>: mesa de <b>${esc(f.s.name)}</b>${f.e.time ? ' · ' + f.e.time + ' hs' : ''}${up.length > 1 ? ` · y ${up.length - 1} más esta semana` : ''}`;
+  el.classList.remove('hidden');
+}
+
+/* ── Chips en las tarjetas (mesa, notas, período) ── */
+function renderCardExtras(subject) {
+  const card = document.getElementById(`card-${subject.id}`);
+  if (!card) return;
+  const el = card.querySelector('.card-extras');
+  if (!el) return;
+  const chips = [];
+  const u = state.userSubjects[subject.id];
+  const ex = state.exams[subject.id];
+  const note = state.notes[subject.id];
+  if (u?.status === 'cursada' && ex && ex.date) {
+    const n = daysUntil(ex.date);
+    chips.push(`<span class="card-chip ${n < 0 ? 'danger' : n <= 7 ? 'warn' : ''}" title="Mesa de examen: ${esc(relDaysLabel(n))}">📅 ${esc(fmtDateShort(ex.date))}</span>`);
+  }
+  if (u?.status === 'cursada' && ex && ex.attempts > 0) {
+    chips.push(`<span class="card-chip" title="Veces que rendiste el final">↻ ${ex.attempts}</span>`);
+  }
+  if (note && (note.text || note.link || note.teacher || note.room)) {
+    chips.push('<span class="card-chip" title="Tenés notas en esta materia">🗒️ Notas</span>');
+  }
+  const t = subjectTerm(subject);
+  if (t === '1' || t === '2' || t === 'B') chips.push(`<span class="card-chip">${TERM_LABEL[t]}</span>`);
+  el.innerHTML = chips.join('');
+  el.style.display = chips.length ? 'flex' : 'none';
+}
+
+/* ── Horarios: armado, conflictos y vistas por período ── */
+function setScheduleView(v) {
+  state.scheduleView = v;
+  updateSchedTabs();
+  buildScheduleOptions();
+  renderScheduleGrid();
+}
+function updateSchedTabs() {
+  document.querySelectorAll('#sched-tabs .sched-tab').forEach(b => b.classList.toggle('active', b.dataset.view === state.scheduleView));
+}
+function buildScheduleOptions() {
+  const sel = document.getElementById('sched-subject');
+  const prev = sel.value;
+  const view = state.scheduleView;
+  const fits = s => termVisible(subjectTerm(s), view);
+  const byYear = (a, b) => a.year - b.year;
+  const opt = s => `<option value="${s.id}">${s.bottleneckCount >= 3 ? '🔥 ' : ''}${s.name} (Año ${s.year})</option>`;
+  const enCurso = SUBJECTS.filter(s => state.userSubjects[s.id]?.status === 'en_curso' && fits(s)).sort(byYear);
+  const habilitadas = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.userSubjects[s.id] && fits(s)).sort(byYear);
+  sel.innerHTML = '<option value="" disabled selected>Seleccioná una materia...</option>'
+    + (enCurso.length ? `<optgroup label="⏳ En curso">${enCurso.map(opt).join('')}</optgroup>` : '')
+    + (habilitadas.length ? `<optgroup label="▶ Habilitadas">${habilitadas.map(opt).join('')}</optgroup>` : '');
+  if (prev && sel.querySelector(`option[value="${prev}"]`)) sel.value = prev;
+}
+function findConflicts(day, time, term, skipIndex = -1) {
+  const r = parseTimeRange(time);
+  if (!r) return [];
+  const out = [];
+  (state.schedule[day] || []).forEach((it, i) => {
+    if (i === skipIndex) return;
+    const sub = SUBJECT_BY_ID[it.id];
+    if (!sub || !termsOverlap(term, subjectTerm(sub))) return;
+    const o = parseTimeRange(it.time);
+    if (o && r.start < o.end && o.start < r.end) out.push(it);
+  });
+  return out;
+}
+function collectScheduleItems(view) {
+  const out = [];
+  DAYS.forEach(day => (state.schedule[day] || []).forEach((item, index) => {
+    const subject = SUBJECT_BY_ID[item.id];
+    if (!subject) return;
+    const term = subjectTerm(subject);
+    if (!termVisible(term, view)) return;
+    const note = state.notes[item.id] || {};
+    out.push({
+      day, index, item, subject, term, time: item.time, range: parseTimeRange(item.time),
+      room: note.room || '', teacher: note.teacher || '',
+      conflict: findConflicts(day, item.time, term, index).length > 0
+    });
+  }));
+  return out;
+}
+function sortScheduleItems(a, b) {
+  const d = DAYS.indexOf(a.day) - DAYS.indexOf(b.day);
+  if (d) return d;
+  if (a.range && b.range) return a.range.start - b.range.start;
+  if (a.range) return -1;
+  if (b.range) return 1;
+  return 0;
+}
+function addScheduleItem() {
+  const subId = document.getElementById('sched-subject').value;
+  const day = document.getElementById('sched-day').value;
+  const start = document.getElementById('sched-start').value;
+  const end = document.getElementById('sched-end').value;
+
+  if (!subId) { showAlert('⚠️ Atención', "Por favor, seleccioná una materia primero."); return; }
+  if ((start && !end) || (!start && end)) {
+    showAlert('⚠️ Atención', "Completá la hora de inicio y la de fin (o dejá las dos vacías).");
+    return;
+  }
+  if (start && end && end <= start) {
+    showAlert('⚠️ Atención', "La hora de fin tiene que ser posterior a la de inicio.");
+    return;
+  }
+
+  const subject = SUBJECT_BY_ID[subId];
+  const time = (start && end) ? `${start} a ${end}` : 'Sin horario definido';
+
+  if (!state.schedule[day]) state.schedule[day] = [];
+  if (state.schedule[day].some(it => it.id === subId && it.time === time)) {
+    showAlert('⚠️ Atención', "Esa materia ya está cargada ese día y en ese horario.");
+    return;
+  }
+
+  // Si estás mirando un cuatrimestre y la materia no tenía período, queda asignada a ese
+  const view = state.scheduleView;
+  const assign = (subject.regimen !== 'Anual' && !subjectTerm(subject) && (view === '1' || view === '2')) ? view : null;
+
+  pushUndo(`Horario: ${subject.name} (${day})`);
+  if (assign) setNote(subId, { term: assign });
+  const term = subjectTerm(subject);
+  const conflicts = findConflicts(day, time, term);
+  state.schedule[day].push({ id: subId, time });
+
+  saveState();
+  renderScheduleGrid();
+  renderCardExtras(subject);
+  document.getElementById('sched-start').value = '';
+  document.getElementById('sched-end').value = '';
+
+  if (conflicts.length) {
+    const names = conflicts.map(c => `<b>${esc(SUBJECT_BY_ID[c.id]?.name || c.id)}</b> (${esc(c.time)})`).join('<br>');
+    showAlert('⚠️ Superposición', `Ese horario se pisa con:<br><br>${names}`);
+  }
+}
+function removeScheduleItem(day, index) {
+  const it = state.schedule[day]?.[index];
+  if (!it) return;
+  pushUndo(`Horario quitado: ${SUBJECT_BY_ID[it.id]?.name || it.id}`);
+  state.schedule[day].splice(index, 1);
+  saveState();
+  renderScheduleGrid();
+}
+function renderScheduleGrid() {
+  const grid = document.getElementById('schedule-grid');
+  const view = state.scheduleView;
+  const items = collectScheduleItems(view).sort(sortScheduleItems);
+  let html = '';
+
+  DAYS.forEach(day => {
+    const entries = items.filter(i => i.day === day);
+    html += `
+      <div class="bg-white border border-slate-200 rounded-xl flex flex-col min-w-[200px] w-[200px] shadow-sm">
+        <h4 class="font-black text-slate-800 bg-slate-100 p-3 rounded-t-xl border-b border-slate-200">${day}</h4>
+        <div class="p-3 flex flex-col gap-3 min-h-[150px]">
+    `;
+    if (entries.length === 0) {
+      html += `<p class="text-xs text-slate-400 text-center mt-4 italic">Día libre</p>`;
+    } else {
+      entries.forEach(it => {
+        const subject = it.subject;
+        const approved = state.userSubjects[subject.id]?.status === 'approved';
+        const borderCol = it.conflict ? 'border-red-500'
+          : subject.campo === 'CFG' ? 'border-blue-500'
+          : subject.campo === 'CFE' ? 'border-emerald-500' : 'border-amber-500';
+        const termChip = (view === 'all' && (it.term === '1' || it.term === '2' || it.term === 'B'))
+          ? `<span class="inline-block mt-1 text-[9px] font-black uppercase tracking-wide bg-slate-100 text-slate-600 border border-slate-200 px-1.5 py-0.5 rounded">${TERM_LABEL[it.term]}</span>` : '';
+        html += `
+          <div class="${it.conflict ? 'bg-red-50' : 'bg-slate-50'} ${approved ? 'opacity-60' : ''} p-3 rounded-lg border-l-4 ${borderCol} border-y border-r border-slate-200 shadow-sm relative group">
+            <p class="text-[11px] font-bold text-slate-800 leading-tight pr-7">${subject.name}</p>
+            <p class="text-[10px] text-blue-600 font-mono mt-1 font-bold">${esc(it.time)}</p>
+            ${it.room ? `<p class="text-[10px] text-slate-500 font-medium mt-1">📍 ${esc(it.room)}</p>` : ''}
+            ${it.teacher ? `<p class="text-[10px] text-slate-500 font-medium">👤 ${esc(it.teacher)}</p>` : ''}
+            ${termChip}
+            ${it.conflict ? '<p class="text-[10px] text-red-600 font-black mt-1">⚠ Se superpone</p>' : ''}
+            ${approved ? '<p class="text-[10px] text-slate-500 font-bold mt-1">✓ Ya aprobada</p>' : ''}
+            <button onclick="removeScheduleItem('${day}', ${it.index})" aria-label="Quitar" class="absolute top-1.5 right-1.5 w-6 h-6 bg-red-100 text-red-600 rounded-md opacity-100 sm:opacity-0 group-hover:opacity-100 focus:opacity-100 transition flex items-center justify-center text-xs font-black shadow-sm">✕</button>
+          </div>
+        `;
+      });
+    }
+    html += `</div></div>`;
+  });
+  grid.innerHTML = html;
+}
+
+/* ── Exportar horarios como imagen ── */
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function fitText(ctx, text, maxW) {
+  text = String(text);
+  if (ctx.measureText(text).width <= maxW) return text;
+  while (text.length > 1 && ctx.measureText(text + '…').width > maxW) text = text.slice(0, -1);
+  return text + '…';
+}
+function wrapText(ctx, text, maxW, maxLines) {
+  const words = String(text).split(/\s+/);
+  const lines = [];
+  let cur = '';
+  words.forEach(w => {
+    const t = cur ? cur + ' ' + w : w;
+    if (!cur || ctx.measureText(t).width <= maxW) cur = t;
+    else { lines.push(cur); cur = w; }
+  });
+  if (cur) lines.push(cur);
+  if (maxLines && lines.length > maxLines) {
+    lines.length = maxLines;
+    lines[maxLines - 1] = fitText(ctx, lines[maxLines - 1] + '…', maxW);
+  }
+  return lines;
+}
+function drawScheduleCanvas(view) {
+  const items = collectScheduleItems(view).sort(sortScheduleItems);
+  if (!items.length) return null;
+  const measure = document.createElement('canvas').getContext('2d');
+  if (!measure) return null;
+
+  const FONT = 'system-ui, "Segoe UI", Roboto, Arial, sans-serif';
+  const colW = 250, gap = 14, pad = 28, headH = 100, dayH = 38, cardGap = 10, px = 14, py = 12;
+  const days = DAYS.filter(d => d !== 'Sábado' || items.some(i => i.day === 'Sábado'));
+
+  const layout = days.map(d => {
+    const cards = items.filter(i => i.day === d).map(it => {
+      measure.font = `bold 13px ${FONT}`;
+      const nameLines = wrapText(measure, it.subject.name, colW - px * 2 - 8, 3);
+      measure.font = `12px ${FONT}`;
+      const extra = [];
+      if (it.room) extra.push(fitText(measure, /^(aula|sala|lab)/i.test(it.room) ? it.room : `Aula: ${it.room}`, colW - px * 2 - 8));
+      if (it.teacher) extra.push(fitText(measure, `Docente: ${it.teacher}`, colW - px * 2 - 8));
+      const termText = (view === 'all' && (it.term === '1' || it.term === '2' || it.term === 'B')) ? TERM_LABEL[it.term] : '';
+      const h = py * 2 + nameLines.length * 17 + 20 + extra.length * 16 + (termText ? 16 : 0) + (it.conflict ? 16 : 0);
+      return { it, nameLines, extra, termText, h };
+    });
+    return { day: d, cards };
+  });
+
+  const colHeights = layout.map(c => c.cards.reduce((a, k) => a + k.h + cardGap, 0));
+  const maxCol = Math.max(60, ...colHeights);
+  const W = pad * 2 + days.length * colW + (days.length - 1) * gap;
+  const H = headH + dayH + 14 + maxCol + pad;
+  const S = 2;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W * S;
+  canvas.height = H * S;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(S, S);
+
+  ctx.fillStyle = '#f1f5f9';
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(0, 0, W, headH);
+  ctx.fillStyle = '#3b82f6';
+  ctx.fillRect(0, 0, 8, headH);
+
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `900 26px ${FONT}`;
+  ctx.fillText('Horarios de cursada', pad, 44);
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = `600 13px ${FONT}`;
+  const fecha = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
+  ctx.fillText(`${VIEW_LABEL[view]} · Profesorado en Economía · ISFD N°100`, pad, 68);
+  ctx.fillText(`Emitido el ${fecha}`, pad, 88);
+
+  layout.forEach((col, ci) => {
+    const x = pad + ci * (colW + gap);
+    let y = headH + 14;
+    ctx.fillStyle = '#e2e8f0';
+    roundRect(ctx, x, y, colW, dayH, 10);
+    ctx.fill();
+    ctx.fillStyle = '#0f172a';
+    ctx.font = `900 14px ${FONT}`;
+    ctx.fillText(col.day, x + 14, y + 24);
+    y += dayH + 10;
+
+    if (!col.cards.length) {
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = `italic 12px ${FONT}`;
+      ctx.fillText('Día libre', x + colW / 2 - 24, y + 24);
+      return;
+    }
+    col.cards.forEach(k => {
+      ctx.fillStyle = 'rgba(15,23,42,0.06)';
+      roundRect(ctx, x, y + 2, colW, k.h, 10);
+      ctx.fill();
+      ctx.fillStyle = k.it.conflict ? '#fef2f2' : '#ffffff';
+      roundRect(ctx, x, y, colW, k.h, 10);
+      ctx.fill();
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = k.it.conflict ? '#ef4444' : (CAMPO_HEX[k.it.subject.campo] || '#475569');
+      roundRect(ctx, x, y, 7, k.h, 3);
+      ctx.fill();
+
+      let ty = y + py + 12;
+      ctx.fillStyle = '#0f172a';
+      ctx.font = `bold 13px ${FONT}`;
+      k.nameLines.forEach(l => { ctx.fillText(l, x + px + 6, ty); ty += 17; });
+      ctx.fillStyle = '#2563eb';
+      ctx.font = `bold 13px ui-monospace, Menlo, Consolas, monospace`;
+      ctx.fillText(k.it.time, x + px + 6, ty + 3);
+      ty += 20;
+      ctx.fillStyle = '#64748b';
+      ctx.font = `12px ${FONT}`;
+      k.extra.forEach(l => { ctx.fillText(l, x + px + 6, ty); ty += 16; });
+      if (k.termText) { ctx.fillStyle = '#475569'; ctx.fillText(k.termText, x + px + 6, ty); ty += 16; }
+      if (k.it.conflict) { ctx.fillStyle = '#dc2626'; ctx.font = `bold 12px ${FONT}`; ctx.fillText('¡Se superpone con otra materia!', x + px + 6, ty); }
+      y += k.h + cardGap;
+    });
+  });
+  return canvas;
+}
+function exportScheduleImage() {
+  const canvas = drawScheduleCanvas(state.scheduleView);
+  if (!canvas) { showAlert('⚠️ Atención', 'No hay horarios cargados en este período para exportar.'); return; }
+  const name = `Horarios-ISFD100-${state.scheduleView === 'all' ? 'anual' : state.scheduleView + 'C'}.png`;
+  if (canvas.toBlob) canvas.toBlob(b => { if (b) downloadBlob(b, name); }, 'image/png');
+  else { const a = document.createElement('a'); a.download = name; a.href = canvas.toDataURL('image/png'); a.click(); }
+}
+
+/* ── Exportar al calendario (.ics) ── */
+function icsEscape(s) { return String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
+function utf8Len(s) { return encodeURIComponent(s).replace(/%[0-9A-F]{2}/gi, 'x').length; }
+function icsFold(line) {
+  if (utf8Len(line) <= 75) return line;
+  let out = '', cur = '', bytes = 0;
+  for (const ch of line) {
+    const b = utf8Len(ch);
+    if (bytes + b > 74) { out += cur + '\r\n '; cur = ''; bytes = 1; }
+    cur += ch;
+    bytes += b;
+  }
+  return out + cur;
+}
+function icsStamp(ms) { return new Date(ms).toISOString().slice(0, 19).replace(/[-:]/g, ''); }   // hora "flotante": los campos UTC se usan como reloj local
+function buildICS(opts) {
+  const { view, startISO, endISO, includeExams } = opts;
+  const TZ = 'America/Argentina/Buenos_Aires';
+  const lines = [];
+  const add = l => lines.push(icsFold(l));
+  const now = new Date().toISOString().slice(0, 19).replace(/[-:]/g, '') + 'Z';
+  let uid = 0;
+  const nextUid = () => `${Date.now().toString(36)}-${++uid}@planificador-isfd100`;
+  let skippedNoTime = 0, skippedRange = 0, events = 0;
+
+  add('BEGIN:VCALENDAR');
+  add('VERSION:2.0');
+  add('PRODID:-//Planificador ISFD 100//ES');
+  add('CALSCALE:GREGORIAN');
+  add('METHOD:PUBLISH');
+  add('X-WR-CALNAME:Horarios ISFD 100');
+  add(`X-WR-TIMEZONE:${TZ}`);
+  add('BEGIN:VTIMEZONE');
+  add(`TZID:${TZ}`);
+  add('BEGIN:STANDARD');
+  add('DTSTART:19700101T000000');
+  add('TZOFFSETFROM:-0300');
+  add('TZOFFSETTO:-0300');
+  add('TZNAME:-03');
+  add('END:STANDARD');
+  add('END:VTIMEZONE');
+
+  const [ey, em, ed] = endISO.split('-').map(Number);
+  const until = new Date(Date.UTC(ey, em - 1, ed, 26, 59, 59)).toISOString().slice(0, 19).replace(/[-:]/g, '') + 'Z';   // 23:59:59 hora local (UTC-3)
+
+  collectScheduleItems(view).forEach(it => {
+    if (!it.range) { skippedNoTime++; return; }
+    const target = DAYS.indexOf(it.day) + 1;                       // Lunes = 1 … Sábado = 6
+    const dow = new Date(isoToUTC(startISO)).getUTCDay();
+    const first = addDaysISO(startISO, (target - dow + 7) % 7);
+    if (first > endISO) { skippedRange++; return; }
+    const hm = m => `${pad2(Math.floor(m / 60))}${pad2(m % 60)}00`;
+    const d0 = first.replace(/-/g, '');
+    const desc = [];
+    if (it.teacher) desc.push(`Docente: ${it.teacher}`);
+    const link = state.notes[it.subject.id]?.link;
+    if (link) desc.push(`Aula virtual: ${link}`);
+    add('BEGIN:VEVENT');
+    add(`UID:${nextUid()}`);
+    add(`DTSTAMP:${now}`);
+    add(`DTSTART;TZID=${TZ}:${d0}T${hm(it.range.start)}`);
+    add(`DTEND;TZID=${TZ}:${d0}T${hm(it.range.end)}`);
+    add(`RRULE:FREQ=WEEKLY;UNTIL=${until}`);
+    add(`SUMMARY:${icsEscape(it.subject.name)}`);
+    if (it.room) add(`LOCATION:${icsEscape(it.room)}`);
+    if (desc.length) add(`DESCRIPTION:${icsEscape(desc.join('\n'))}`);
+    add('END:VEVENT');
+    events++;
+  });
+
+  let examCount = 0;
+  if (includeExams) {
+    SUBJECTS.forEach(s => {
+      const e = state.exams[s.id];
+      if (!e || !e.date || state.userSubjects[s.id]?.status !== 'cursada' || daysUntil(e.date) < 0) return;
+      add('BEGIN:VEVENT');
+      add(`UID:${nextUid()}`);
+      add(`DTSTAMP:${now}`);
+      if (e.time) {
+        const [y, m, d] = e.date.split('-').map(Number);
+        const [hh, mm] = e.time.split(':').map(Number);
+        const t0 = Date.UTC(y, m - 1, d, hh, mm);
+        add(`DTSTART;TZID=${TZ}:${icsStamp(t0)}`);
+        add(`DTEND;TZID=${TZ}:${icsStamp(t0 + 2 * 3600000)}`);
+      } else {
+        add(`DTSTART;VALUE=DATE:${e.date.replace(/-/g, '')}`);
+        add(`DTEND;VALUE=DATE:${addDaysISO(e.date, 1).replace(/-/g, '')}`);
+      }
+      add(`SUMMARY:${icsEscape('Mesa de examen: ' + s.name)}`);
+      add('BEGIN:VALARM');
+      add('ACTION:DISPLAY');
+      add(`DESCRIPTION:${icsEscape('Mesa de examen: ' + s.name)}`);
+      add('TRIGGER:-P1D');
+      add('END:VALARM');
+      add('END:VEVENT');
+      examCount++;
+    });
+  }
+  add('END:VCALENDAR');
+  return { text: lines.join('\r\n') + '\r\n', events, examCount, skippedNoTime, skippedRange };
+}
+function openCalModal() {
+  document.getElementById('cal-view').value = state.scheduleView;
+  const start = todayISO();
+  document.getElementById('cal-start').value = start;
+  document.getElementById('cal-end').value = addDaysISO(start, state.scheduleView === 'all' ? 210 : 119);
+  document.getElementById('cal-exams').checked = true;
+  openBox('cal-modal');
+}
+function closeCalModal(e) { closeBox('cal-modal', e); }
+function generateCalendar() {
+  const view = document.getElementById('cal-view').value;
+  const startISO = document.getElementById('cal-start').value;
+  const endISO = document.getElementById('cal-end').value;
+  const includeExams = document.getElementById('cal-exams').checked;
+  if (!isValidISO(startISO) || !isValidISO(endISO)) { showAlert('⚠️ Atención', 'Completá las fechas de inicio y de fin del período.'); return; }
+  if (endISO < startISO) { showAlert('⚠️ Atención', 'La fecha final tiene que ser posterior a la inicial.'); return; }
+  const r = buildICS({ view, startISO, endISO, includeExams });
+  if (r.events + r.examCount === 0) {
+    showAlert('⚠️ Atención', 'No hay nada para exportar: cargá horarios con hora de inicio y fin' + (includeExams ? ' o mesas con fecha' : '') + '.');
+    return;
+  }
+  downloadBlob(new Blob([r.text], { type: 'text/calendar;charset=utf-8' }), `Horarios-ISFD100-${view === 'all' ? 'anual' : view + 'C'}.ics`);
+  closeCalModal();
+  const notes = [];
+  if (r.skippedNoTime) notes.push(`${r.skippedNoTime} horario(s) sin hora definida no se incluyeron.`);
+  if (r.skippedRange) notes.push(`${r.skippedRange} horario(s) quedaron fuera del rango de fechas.`);
+  showAlert('📆 Calendario listo', `Se generaron ${r.events} clase(s) semanal(es) y ${r.examCount} mesa(s). Abrí el archivo <b>.ics</b> con tu app de calendario para importarlo.${notes.length ? '<br><br><span class="text-xs text-slate-500">' + notes.join('<br>') + '</span>' : ''}`);
+}
+
+/* ── Respaldo en archivo ── */
+function downloadBackup() {
+  const payload = {
+    app: BACKUP_APP, version: 1, exportedAt: new Date().toISOString(),
+    data: { userSubjects: state.userSubjects, schedule: state.schedule, exams: state.exams, notes: state.notes }
+  };
+  downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }), `Respaldo-ISFD100-${todayISO()}.json`);
+}
+function importBackupFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { showAlert('❌ Error', 'El archivo es demasiado grande para ser un respaldo.'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    try { applyBackup(JSON.parse(String(reader.result))); }
+    catch (e) { showAlert('❌ Error', 'El archivo no es un respaldo válido de este planificador.'); }
+  };
+  reader.onerror = () => showAlert('❌ Error', 'No se pudo leer el archivo.');
+  reader.readAsText(file);
+  input.value = '';
+}
+function applyBackup(obj) {
+  if (!obj || obj.app !== BACKUP_APP || !obj.data || typeof obj.data !== 'object') throw new Error('Respaldo inválido');
+  const d = obj.data;
+  const next = { u: sanitizeUserSubjects(d.userSubjects), s: sanitizeSchedule(d.schedule), e: sanitizeExams(d.exams), n: sanitizeNotes(d.notes) };
+  const hasData = Object.keys(state.userSubjects).length > 0 || Object.keys(state.exams).length > 0 || Object.keys(state.notes).length > 0
+    || DAYS.some(day => (state.schedule[day] || []).length > 0);
+  if (hasData && !confirm('Esto reemplaza todo lo que tenés cargado (progreso, horarios, mesas y notas) por el contenido del respaldo. ¿Continuar?')) return;
+  pushUndo('Respaldo cargado');
+  state.userSubjects = next.u; state.schedule = next.s; state.exams = next.e; state.notes = next.n;
+  saveState();
+  refreshAll();
+  closeSyncModal();
+  const when = obj.exportedAt ? new Date(obj.exportedAt).toLocaleDateString('es-AR') : '';
+  showAlert('✅ ¡Listo!', `Respaldo cargado${when ? ' (guardado el ' + when + ')' : ''}.`);
+}
+
+/* ── Reporte: imagen o impresión / PDF ── */
+function openReportModal() { openBox('report-modal'); }
+function closeReportModal(e) { closeBox('report-modal', e); }
+function buildPrintReport(opts) {
+  const total = SUBJECTS.length;
+  let approved = 0, cursada = 0, hsA = 0, gSum = 0, gN = 0;
+  SUBJECTS.forEach(s => {
+    const u = state.userSubjects[s.id];
+    if (!u) return;
+    if (u.status === 'approved') { approved++; hsA += s.hs; if (u.grade != null) { gSum += u.grade; gN++; } }
+    else if (u.status === 'cursada') cursada++;
+  });
+  const pct = state.totalHs ? Math.min(approved === total ? 100 : 99, Math.round(hsA / state.totalHs * 100)) : 0;
+  const hoy = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  let h = `<h1>Reporte de avance académico</h1>
+    <p class="sub">Profesorado en Economía — ISFD N°100 — DGCyE · Emitido el ${esc(hoy)}</p>
+    <div class="kpis">
+      <div class="kpi"><b>${pct}%</b><span>Avance (por horas)</span></div>
+      <div class="kpi"><b>${approved} / ${total}</b><span>Materias aprobadas</span></div>
+      <div class="kpi"><b>${cursada}</b><span>Finales pendientes</span></div>
+      <div class="kpi"><b>${gN ? (gSum / gN).toFixed(2) : '-'}</b><span>Promedio</span></div>
+      <div class="kpi"><b>${hsA} / ${state.totalHs}</b><span>Horas aprobadas</span></div>
+    </div>`;
+
+  if (opts.materias) {
+    h += '<h2>Materias por año</h2>';
+    [1, 2, 3, 4].forEach(yr => {
+      h += `<h3>${yr}° Año</h3><table><tr><th>Materia</th><th>Campo</th><th>Régimen</th><th>Hs</th><th>Estado</th><th>Nota</th><th>Mesa de examen</th></tr>`;
+      SUBJECTS.filter(s => s.year === yr).forEach(s => {
+        const u = state.userSubjects[s.id];
+        let est = 'Bloqueada';
+        if (u) est = STATUS_LABEL[u.status];
+        else if (isSubjectEnabled(s.id)) est = 'Habilitada';
+        const e = state.exams[s.id];
+        const mesa = (u?.status === 'cursada' && e && (e.date || e.attempts))
+          ? [e.date ? fmtDateShort(e.date) + (e.time ? ' ' + e.time : '') : '', e.attempts ? `rendí ${e.attempts}×` : ''].filter(Boolean).join(' · ') : '';
+        h += `<tr><td class="${u?.status === 'approved' ? 'st-approved' : ''}">${esc(s.name)}</td><td>${esc(s.campo)}</td><td>${esc(s.regimen)}</td><td>${s.hs}</td><td>${esc(est)}</td><td>${u?.status === 'approved' && u.grade != null ? u.grade : ''}</td><td>${esc(mesa)}</td></tr>`;
+      });
+      h += '</table>';
+    });
+  }
+
+  if (opts.horarios) {
+    const view = state.scheduleView;
+    const items = collectScheduleItems(view).sort(sortScheduleItems);
+    h += `<h2>Horarios de cursada <span class="muted">(${esc(VIEW_LABEL[view])})</span></h2>`;
+    if (!items.length) h += '<p class="muted">No hay horarios cargados en este período.</p>';
+    else {
+      h += '<table><tr><th>Día</th><th>Horario</th><th>Materia</th><th>Período</th><th>Aula</th><th>Docente</th></tr>';
+      items.forEach(it => {
+        h += `<tr><td>${esc(it.day)}</td><td>${esc(it.time)}${it.conflict ? ' ⚠' : ''}</td><td>${esc(it.subject.name)}</td><td>${esc(TERM_LABEL[it.term])}</td><td>${esc(it.room)}</td><td>${esc(it.teacher)}</td></tr>`;
+      });
+      h += '</table>';
+    }
+  }
+
+  if (opts.mesas) {
+    const list = SUBJECTS.filter(s => state.userSubjects[s.id]?.status === 'cursada' && state.exams[s.id] && state.exams[s.id].date)
+      .map(s => ({ s, e: state.exams[s.id] })).sort((a, b) => a.e.date.localeCompare(b.e.date));
+    h += '<h2>Mesas de examen</h2>';
+    if (!list.length) h += '<p class="muted">No hay mesas cargadas.</p>';
+    else {
+      h += '<table><tr><th>Fecha</th><th>Hora</th><th>Materia</th><th>Veces que rendí</th></tr>';
+      list.forEach(({ s, e }) => { h += `<tr><td>${esc(fmtDateLong(e.date))}</td><td>${esc(e.time)}</td><td>${esc(s.name)}</td><td>${e.attempts}</td></tr>`; });
+      h += '</table>';
+    }
+  }
+  return h;
+}
+function printReport() {
+  const opts = {
+    materias: document.getElementById('rp-materias').checked,
+    horarios: document.getElementById('rp-horarios').checked,
+    mesas: document.getElementById('rp-mesas').checked
+  };
+  document.getElementById('print-report').innerHTML = buildPrintReport(opts);
+  closeReportModal();
+  const prevTitle = document.title;
+  document.title = 'Reporte-ISFD100';
+  window.addEventListener('afterprint', () => { document.title = prevTitle; }, { once: true });
+  setTimeout(() => window.print(), 250);
+}
+
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeSimulador();
     closeConfirmModal();
     closeAlertModal();
     closeSchedule();
     closeStatusModal();
     closeSyncModal();
-  } 
+    closeExamsModal();
+    closeCalModal();
+    closeReportModal();
+    if (chainPinned) clearChain();
+  }
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key && e.key.toLowerCase() === 'z' && !isTypingTarget(e.target)) {
+    e.preventDefault();
+    undoLast();
+  }
 });
 window.addEventListener('DOMContentLoaded', init);
 </script>
