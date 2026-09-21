@@ -188,7 +188,7 @@
     .modal-backdrop { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px); }
 
     /* ── Cadena de correlativas ── */
-    .subject-card.chain-dim { opacity: 0.28 !important; filter: grayscale(0.6); }
+    .subject-card.chain-dim { opacity: 0.55 !important; }
     .subject-card.chain-pre  { outline: 3px solid #f59e0b; outline-offset: 2px; }
     .subject-card.chain-post { outline: 3px solid #6366f1; outline-offset: 2px; }
     .subject-card.chain-self { outline: 4px solid #0ea5e9; outline-offset: 2px; }
@@ -260,6 +260,8 @@
     html.dark .text-purple-600 { color: #c084fc; }
     html.dark .text-teal-700 { color: #5eead4; }
     html.dark .text-teal-600 { color: #2dd4bf; }
+    html.dark #chain-banner { background-color: #1e1b4b; border-color: #4338ca; }
+    html.dark #exam-banner { background-color: #3b2a07; border-color: #b45309; }
     html.dark .card-chip.warn { color: #fbbf24; }
     html.dark .card-chip.danger { color: #fca5a5; }
 
@@ -734,13 +736,13 @@
 
     <div id="chain-banner" class="hidden bg-indigo-50 border-b border-indigo-200">
       <div class="max-w-screen-2xl mx-auto px-4 py-2 flex items-center justify-between gap-3 text-xs font-bold text-indigo-700">
-        <span id="chain-banner-text" class="min-w-0"></span>
+        <span id="chain-banner-text" class="min-w-0 flex-1 flex items-center gap-1.5"></span>
         <button onclick="clearChain()" class="shrink-0 bg-white border border-indigo-200 px-3 py-1 rounded-lg hover:bg-blue-100 transition">Quitar ✕</button>
       </div>
     </div>
     <div id="exam-banner" onclick="openExamsModal()" class="hidden cursor-pointer bg-amber-50 border-b border-amber-200">
       <div class="max-w-screen-2xl mx-auto px-4 py-2 text-xs font-bold text-amber-700">
-        <span id="exam-banner-text"></span>
+        <span id="exam-banner-text" class="block truncate"></span>
       </div>
     </div>
 
@@ -1413,9 +1415,4 @@ function saveSubjectStatus() {
 
   if (newStatus === 'approved' || newStatus === 'cursada') {
     const currentlyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
-    currentlyEnabled.forEach(newId => {
-      if (!previouslyEnabled.has(newId)) {
-        const card = document.getElementById(`card-${newId}`);
-        if (card) {
-          card.classList.remove('animate-unlock');
-          v
+    currentlyEnabled.forEach(newI
