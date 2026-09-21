@@ -91,6 +91,22 @@
 
     .year-col { min-width: 280px; max-width: 300px; }
 
+    /* ── Grilla de años: se adapta al ancho, sin scroll lateral en PC ── */
+    #grid-container { display: flex; gap: 2rem; min-width: max-content; }          /* celular: un año por pantalla, se desliza */
+    @media (min-width: 640px) {                                                     /* tablet / ventana chica: 2 × 2 */
+      #main-grid { overflow: visible; }
+      #grid-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; min-width: 0; }
+      .year-col { min-width: 0; max-width: none; }
+    }
+    @media (min-width: 1100px) {                                                    /* PC: los 4 años lado a lado */
+      #grid-container { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1100px) and (max-width: 1279px) {                            /* ventanas justas: tarjetas un poco más compactas */
+      .subject-card { padding: 1rem; }
+    }
+    #grid-container.export-4col { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; min-width: 0; }
+    #grid-container.export-4col .year-col { min-width: 0; max-width: none; }
+
     /* ── Tarjetas Estructura ── */
     .subject-card {
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -566,6 +582,19 @@
     </div>
   </div>
 
+  <div id="name-modal" class="modal-backdrop fixed inset-0 z-[80] flex items-center justify-center p-4 hidden" onclick="closeNameModal(event)">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>👤</span> Alumno de este perfil</h2>
+      <p class="text-xs text-slate-500 mb-4 leading-relaxed">El nombre aparece arriba de todo y en los reportes, horarios, calendario y respaldos, para saber de quién es el perfil cargado. Queda guardado solo en este navegador.</p>
+      <label for="student-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Nombre y apellido</label>
+      <input id="student-input" type="text" maxlength="60" autocomplete="name" placeholder="Ej: Iván Pérez" onkeydown="if(event.key==='Enter'){event.preventDefault();saveStudentName();}" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+      <div class="flex gap-3 mt-5">
+        <button onclick="closeNameModal()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
+        <button onclick="saveStudentName()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition">Guardar</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[150] hidden items-center gap-3 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 max-w-[90vw]" role="status" aria-live="polite">
     <span id="toast-msg" class="truncate"></span>
     <button id="toast-undo" onclick="undoLast()" class="shrink-0 text-sky-300 hover:text-white underline underline-offset-2">Deshacer</button>
@@ -577,7 +606,7 @@
        HEADER PRINCIPAL DASHBOARD
   ══════════════════════════════════════════ -->
   <header class="bg-slate-900 text-white py-6 px-4 sm:px-6 shadow-xl relative z-30">
-    <div class="max-w-screen-xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
+    <div class="max-w-screen-2xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
       
       <div class="flex items-center justify-center lg:justify-start gap-4 w-full lg:w-auto">
         <div class="flex-1 text-center lg:text-left">
@@ -585,6 +614,11 @@
           <h1 class="text-2xl sm:text-3xl font-black mt-0.5 tracking-tight text-white">
             Planificador Curricular
           </h1>
+          <button id="btn-student" onclick="openNameModal()" class="mt-3 inline-flex max-w-full items-center gap-2 text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3.5 py-1.5 rounded-full transition" title="Cambiar el nombre del alumno de este perfil">
+            <span>👤</span>
+            <span id="student-label" class="truncate">Agregar nombre del alumno</span>
+            <span class="text-slate-400 shrink-0">✎</span>
+          </button>
         </div>
       </div>
       
@@ -624,7 +658,7 @@
   ══════════════════════════════════════════ -->
   <div class="sticky top-0 z-20 flex flex-col shadow-sm">
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
-      <div class="max-w-screen-xl mx-auto px-4 py-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
+      <div class="max-w-screen-2xl mx-auto px-4 py-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
         
         <div class="flex w-full lg:w-auto flex-1 gap-3">
           <div class="relative flex-1">
@@ -682,7 +716,7 @@
     </div>
 
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
-      <div class="max-w-screen-xl mx-auto px-4 py-2.5 flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div class="max-w-screen-2xl mx-auto px-4 py-2.5 flex flex-col md:flex-row gap-3 items-center justify-between">
         
         <div class="flex flex-wrap justify-center sm:justify-start gap-2 text-[9px] sm:text-[10px] font-bold text-slate-600 uppercase tracking-wide w-full md:w-auto">
           <div class="flex items-center gap-1 bg-slate-900 text-white px-2 py-1 rounded-lg"><span>✓</span> Aprobada</div>
@@ -707,13 +741,13 @@
 
 
     <div id="chain-banner" class="hidden bg-indigo-50 border-b border-indigo-200">
-      <div class="max-w-screen-xl mx-auto px-4 py-2 flex items-center justify-between gap-3 text-xs font-bold text-indigo-700">
+      <div class="max-w-screen-2xl mx-auto px-4 py-2 flex items-center justify-between gap-3 text-xs font-bold text-indigo-700">
         <span id="chain-banner-text" class="min-w-0"></span>
         <button onclick="clearChain()" class="shrink-0 bg-white border border-indigo-200 px-3 py-1 rounded-lg hover:bg-blue-100 transition">Quitar ✕</button>
       </div>
     </div>
     <div id="exam-banner" onclick="openExamsModal()" class="hidden cursor-pointer bg-amber-50 border-b border-amber-200">
-      <div class="max-w-screen-xl mx-auto px-4 py-2 text-xs font-bold text-amber-700">
+      <div class="max-w-screen-2xl mx-auto px-4 py-2 text-xs font-bold text-amber-700">
         <span id="exam-banner-text"></span>
       </div>
     </div>
@@ -725,11 +759,12 @@
   ══════════════════════════════════════════ -->
   <div id="export-area" class="pb-8 flex-1">
     
-    <div id="export-watermark" class="hidden mx-auto max-w-screen-xl px-4 pt-8 pb-4">
+    <div id="export-watermark" class="hidden mx-auto max-w-screen-2xl px-4 pt-8 pb-4">
       <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-xl flex justify-between items-center border-l-8 border-blue-500">
         <div>
           <h2 class="text-3xl font-black mb-2 tracking-tight">Reporte de Avance Académico</h2>
           <p class="text-base text-slate-300">Profesorado en Economía — ISFD N°100 — DGCyE</p>
+          <p id="export-student" class="text-lg font-bold text-white mt-3 hidden"></p>
         </div>
         <div class="text-right">
           <p class="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Fecha de Emisión</p>
@@ -738,8 +773,8 @@
       </div>
     </div>
 
-    <main class="max-w-screen-xl mx-auto px-4 pb-16 pt-8 overflow-x-auto min-h-[50vh]">
-      <div class="flex gap-8 min-w-max" id="grid-container">
+    <main id="main-grid" class="max-w-screen-2xl mx-auto px-4 sm:px-6 pb-16 pt-8 overflow-x-auto min-h-[50vh]">
+      <div id="grid-container">
         <!-- Generado por JS -->
       </div>
     </main>
@@ -986,6 +1021,7 @@ const state = {
   searchQuery: '',
   totalHs: 0,
   schedule: emptySchedule(),
+  student: '',
   exams: {},
   notes: {},
   scheduleView: 'all',
@@ -1049,6 +1085,8 @@ function init() {
   const savedNotes = loadJSON('isfd100_notas');
   if (savedNotes) state.notes = sanitizeNotes(savedNotes);
 
+  state.student = sanitizeStudent(safeGet('isfd100_alumno'));
+
   state.totalHs = SUBJECTS.reduce((acc, s) => acc + s.hs, 0);
 
   calculateDependencies();
@@ -1063,6 +1101,7 @@ function init() {
   updateProgress();
   syncThemeButton();
   updateUndoButton();
+  updateStudentUI();
 
   showInstallBtn();   // siempre visible salvo que ya estés dentro de la app instalada
 
@@ -1077,6 +1116,7 @@ function saveState() {
   safeSet('isfd100_horarios', JSON.stringify(state.schedule));
   safeSet('isfd100_mesas', JSON.stringify(state.exams));
   safeSet('isfd100_notas', JSON.stringify(state.notes));
+  safeSet('isfd100_alumno', state.student || '');
 }
 
 /* ─────────────────────────────────────────────
@@ -1136,7 +1176,7 @@ function generateShortCode() {
     if (t === '1' || t === '2' || t === 'B') tParts.push(`${idx}${t}`);
   });
 
-  return btoa(`v6|${uParts.join(',')}|${sParts.join(',')}|${tParts.join(',')}`).replace(/=/g, '');
+  return btoa(`v7|${uParts.join(',')}|${sParts.join(',')}|${tParts.join(',')}|${encodeURIComponent(state.student || '')}`).replace(/=/g, '');
 }
 
 function decodeShortCode(encoded) {
@@ -1147,7 +1187,7 @@ function decodeShortCode(encoded) {
   const parts = decoded.split('|');
   const version = parts[0];
 
-  if (!['v3', 'v4', 'v5', 'v6'].includes(version)) {
+  if (!['v3', 'v4', 'v5', 'v6', 'v7'].includes(version)) {
     const data = JSON.parse(decoded);          // formato viejo (v2)
     if (data && data.v === 2) return { u: sanitizeUserSubjects(data.u), s: sanitizeSchedule(data.s) };
     throw new Error('Invalid');
@@ -1186,7 +1226,9 @@ function decodeShortCode(encoded) {
       if (m && SUBJECTS[parseInt(m[1], 10)]) newT[SUBJECTS[parseInt(m[1], 10)].id] = m[2];
     });
   }
-  return { u: sanitizeUserSubjects(newU), s: sanitizeSchedule(newS), t: newT };
+  let name = '';
+  if (parts[4]) { try { name = sanitizeStudent(decodeURIComponent(parts[4])); } catch (e) { name = ''; } }
+  return { u: sanitizeUserSubjects(newU), s: sanitizeSchedule(newS), t: newT, a: name };
 }
 
 /* ─────────────────────────────────────────────
@@ -1610,10 +1652,12 @@ function importSyncCode() {
   state.userSubjects = data.u;
   state.schedule = data.s;
   if (data.t) Object.keys(data.t).forEach(id => setNote(id, { term: data.t[id] }));
+  if (data.a) state.student = data.a;   // los códigos viejos no traen nombre: en ese caso queda el actual
   saveState();
   refreshAll();
+  updateStudentUI();
   closeSyncModal();
-  showAlert('✅ ¡Éxito!', "Perfil sincronizado exitosamente.");
+  showAlert('✅ ¡Éxito!', data.a ? `Perfil de <b>${esc(data.a)}</b> sincronizado exitosamente.` : "Perfil sincronizado exitosamente.");
 }
 
 /* ─────────────────────────────────────────────
@@ -1849,13 +1893,15 @@ function exportMap() {
   const area = document.getElementById('export-area');
   const main = area.querySelector('main');
   const watermark = document.getElementById('export-watermark');
+  const grid = document.getElementById('grid-container');
   
   const origAreaWidth = area.style.width;
   const origMainOverflow = main.style.overflow;
   const origMainMaxWidth = main.style.maxWidth;
   const origMainWidth = main.style.width;
   
-  const fullWidth = main.scrollWidth;
+  grid.classList.add('export-4col');
+  const fullWidth = Math.max(main.scrollWidth, 1400);
   area.style.width = fullWidth + 'px';
   main.style.overflow = 'visible';
   main.style.maxWidth = 'none';
@@ -1878,6 +1924,7 @@ function exportMap() {
       main.style.overflow = origMainOverflow;
       main.style.maxWidth = origMainMaxWidth;
       main.style.width = origMainWidth;
+      grid.classList.remove('export-4col');
       watermark.classList.add('hidden');
       window.scrollTo(scrollX, scrollY);
       
@@ -1894,6 +1941,7 @@ function exportMap() {
       main.style.overflow = origMainOverflow;
       main.style.maxWidth = origMainMaxWidth;
       main.style.width = origMainWidth;
+      grid.classList.remove('export-4col');
       watermark.classList.add('hidden');
       window.scrollTo(scrollX, scrollY);
       btn.innerHTML = originalHTML;
@@ -1967,6 +2015,42 @@ function downloadBlob(blob, filename) {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
+/* ── Nombre del alumno ── */
+const BASE_TITLE = document.title;
+function sanitizeStudent(v) {
+  return String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+}
+function fileSlug(s) {
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30);
+}
+function updateStudentUI() {
+  const has = !!state.student;
+  const label = document.getElementById('student-label');
+  if (label) {
+    label.textContent = has ? state.student : 'Agregar nombre del alumno';
+    label.parentElement.title = has ? `Perfil de ${state.student} (tocá para cambiarlo)` : 'Agregar el nombre del alumno de este perfil';
+  }
+  const wm = document.getElementById('export-student');
+  if (wm) { wm.textContent = has ? `Alumno/a: ${state.student}` : ''; wm.classList.toggle('hidden', !has); }
+  document.title = has ? `${BASE_TITLE} — ${state.student}` : BASE_TITLE;
+}
+function openNameModal() {
+  document.getElementById('student-input').value = state.student;
+  openBox('name-modal');
+  setTimeout(() => { const i = document.getElementById('student-input'); i.focus(); i.select(); }, 60);
+}
+function closeNameModal(e) { closeBox('name-modal', e); }
+function saveStudentName() {
+  const v = sanitizeStudent(document.getElementById('student-input').value);
+  if (v !== state.student) {
+    pushUndo(v ? `Alumno: ${v}` : 'Nombre del alumno quitado');
+    state.student = v;
+    saveState();
+    updateStudentUI();
+  }
+  closeNameModal();
+}
+
 /* ── Modo oscuro ── */
 function applyTheme(dark) {
   document.documentElement.classList.toggle('dark', dark);
@@ -1992,7 +2076,7 @@ const undoStack = [];
 let toastTimer = null;
 
 function snapshotData() {
-  return JSON.stringify({ u: state.userSubjects, s: state.schedule, e: state.exams, n: state.notes });
+  return JSON.stringify({ u: state.userSubjects, s: state.schedule, e: state.exams, n: state.notes, a: state.student });
 }
 function pushUndo(label) {
   undoStack.push({ label, data: snapshotData() });
@@ -2008,8 +2092,10 @@ function undoLast() {
   state.schedule = sanitizeSchedule(d.s);
   state.exams = sanitizeExams(d.e);
   state.notes = sanitizeNotes(d.n);
+  state.student = sanitizeStudent(d.a);
   saveState();
   refreshAll();
+  updateStudentUI();
   showToast(`Deshecho: ${entry.label}`, false);
 }
 function updateUndoButton() {
@@ -2586,7 +2672,7 @@ function drawScheduleCanvas(view) {
   ctx.font = `600 13px ${FONT}`;
   const fecha = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
   ctx.fillText(`${VIEW_LABEL[view]} · Profesorado en Economía · ISFD N°100`, pad, 68);
-  ctx.fillText(`Emitido el ${fecha}`, pad, 88);
+  ctx.fillText((state.student ? `Alumno/a: ${fitText(ctx, state.student, 420)} · ` : '') + `Emitido el ${fecha}`, pad, 88);
 
   layout.forEach((col, ci) => {
     const x = pad + ci * (colW + gap);
@@ -2675,7 +2761,7 @@ function buildICS(opts) {
   add('PRODID:-//Planificador ISFD 100//ES');
   add('CALSCALE:GREGORIAN');
   add('METHOD:PUBLISH');
-  add('X-WR-CALNAME:Horarios ISFD 100');
+  add(`X-WR-CALNAME:${icsEscape('Horarios ISFD 100' + (state.student ? ' — ' + state.student : ''))}`);
   add(`X-WR-TIMEZONE:${TZ}`);
   add('BEGIN:VTIMEZONE');
   add(`TZID:${TZ}`);
@@ -2779,9 +2865,10 @@ function generateCalendar() {
 function downloadBackup() {
   const payload = {
     app: BACKUP_APP, version: 1, exportedAt: new Date().toISOString(),
-    data: { userSubjects: state.userSubjects, schedule: state.schedule, exams: state.exams, notes: state.notes }
+    data: { student: state.student, userSubjects: state.userSubjects, schedule: state.schedule, exams: state.exams, notes: state.notes }
   };
-  downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }), `Respaldo-ISFD100-${todayISO()}.json`);
+  const slug = fileSlug(state.student);
+  downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }), `Respaldo-ISFD100-${slug ? slug + '-' : ''}${todayISO()}.json`);
 }
 function importBackupFile(input) {
   const file = input.files && input.files[0];
@@ -2800,16 +2887,19 @@ function applyBackup(obj) {
   if (!obj || obj.app !== BACKUP_APP || !obj.data || typeof obj.data !== 'object') throw new Error('Respaldo inválido');
   const d = obj.data;
   const next = { u: sanitizeUserSubjects(d.userSubjects), s: sanitizeSchedule(d.schedule), e: sanitizeExams(d.exams), n: sanitizeNotes(d.notes) };
+  const nextStudent = ('student' in d) ? sanitizeStudent(d.student) : state.student;   // respaldos viejos no traen nombre
   const hasData = Object.keys(state.userSubjects).length > 0 || Object.keys(state.exams).length > 0 || Object.keys(state.notes).length > 0
     || DAYS.some(day => (state.schedule[day] || []).length > 0);
   if (hasData && !confirm('Esto reemplaza todo lo que tenés cargado (progreso, horarios, mesas y notas) por el contenido del respaldo. ¿Continuar?')) return;
   pushUndo('Respaldo cargado');
   state.userSubjects = next.u; state.schedule = next.s; state.exams = next.e; state.notes = next.n;
+  state.student = nextStudent;
   saveState();
   refreshAll();
+  updateStudentUI();
   closeSyncModal();
   const when = obj.exportedAt ? new Date(obj.exportedAt).toLocaleDateString('es-AR') : '';
-  showAlert('✅ ¡Listo!', `Respaldo cargado${when ? ' (guardado el ' + when + ')' : ''}.`);
+  showAlert('✅ ¡Listo!', `Respaldo${state.student ? ' de <b>' + esc(state.student) + '</b>' : ''} cargado${when ? ' (guardado el ' + when + ')' : ''}.`);
 }
 
 /* ── Reporte: imagen o impresión / PDF ── */
@@ -2829,6 +2919,7 @@ function buildPrintReport(opts) {
 
   let h = `<h1>Reporte de avance académico</h1>
     <p class="sub">Profesorado en Economía — ISFD N°100 — DGCyE · Emitido el ${esc(hoy)}</p>
+    ${state.student ? `<p class="sub" style="margin-top:-8px"><b>Alumno/a:</b> ${esc(state.student)}</p>` : ''}
     <div class="kpis">
       <div class="kpi"><b>${pct}%</b><span>Avance (por horas)</span></div>
       <div class="kpi"><b>${approved} / ${total}</b><span>Materias aprobadas</span></div>
@@ -2909,6 +3000,7 @@ document.addEventListener('keydown', e => {
     closeExamsModal();
     closeCalModal();
     closeReportModal();
+    closeNameModal();
     if (chainPinned) clearChain();
   }
   if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key && e.key.toLowerCase() === 'z' && !isTypingTarget(e.target)) {
