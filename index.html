@@ -7,10 +7,10 @@
   
   <meta name="theme-color" content="#0f172a" />
   <script>
-    /* Tema: se aplica antes de pintar para que no parpadee */
+    /* Tema: claro por defecto; solo se usa el oscuro si lo elegiste con el botón. Se aplica antes de pintar para que no parpadee. */
     try {
       var t = localStorage.getItem('isfd100_theme');
-      if (t === 'dark' || (!t && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches)) {
+      if (t === 'dark') {
         document.documentElement.classList.add('dark');
       }
     } catch (e) {}
@@ -1986,11 +1986,6 @@ function syncThemeButton() {
   b.textContent = dark ? '☀️' : '🌙';
   b.title = dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
 }
-try {
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    if (!safeGet('isfd100_theme')) applyTheme(e.matches);   // sigue al sistema mientras no elijas a mano
-  });
-} catch (e) { /* navegadores viejos */ }
 
 /* ── Deshacer ── */
 const undoStack = [];
