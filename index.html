@@ -188,10 +188,22 @@
     .modal-backdrop { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px); }
 
     /* ── Cadena de correlativas ── */
-    .subject-card.chain-dim { opacity: 0.55 !important; }
-    .subject-card.chain-pre  { outline: 3px solid #f59e0b; outline-offset: 2px; }
-    .subject-card.chain-post { outline: 3px solid #6366f1; outline-offset: 2px; }
-    .subject-card.chain-self { outline: 4px solid #0ea5e9; outline-offset: 2px; }
+    .subject-card.chain-dim { opacity: 0.55 !important; }   /* solo se usa en la vista previa al pasar el mouse */
+    .subject-card.chain-pre, .subject-card.chain-post, .subject-card.chain-self {
+      outline-offset: 3px; margin-top: 14px;   /* deja lugar a la etiqueta de arriba */
+    }
+    .subject-card.chain-pre  { outline: 3px solid #f59e0b; box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.15); }
+    .subject-card.chain-post { outline: 3px solid #6366f1; box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.15); }
+    .subject-card.chain-self { outline: 4px solid #0ea5e9; box-shadow: 0 0 0 5px rgba(14, 165, 233, 0.18); }
+    .subject-card.chain-pre::before, .subject-card.chain-post::before, .subject-card.chain-self::before {
+      position: absolute; top: -13px; left: 14px; z-index: 5;
+      font-size: 9.5px; font-weight: 900; letter-spacing: 0.03em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 999px; color: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+      white-space: nowrap;
+    }
+    .subject-card.chain-pre::before  { content: '🔸 Necesita'; background: #d97706; }
+    .subject-card.chain-post::before { content: '🔹 Destraba'; background: #4f46e5; }
+    .subject-card.chain-self::before { content: '🔗 Elegida'; background: #0284c7; }
     .info-btn.pinned { box-shadow: 0 0 0 2px #0ea5e9; }
 
     /* ── Chips dentro de las tarjetas ── */
@@ -1486,6 +1498,9 @@ function applyFilterStyles() {
   const q = state.searchQuery;
   const toggleEnabledEl = document.getElementById('toggle-enabled-only');
   const showOnlyEnabled = toggleEnabledEl ? toggleEnabledEl.checked : false;
+  // Con la cadena FIJADA (tocada, no solo pasada con el mouse), se oculta lo que no es parte de ella — igual que Modo Inscripción
+  const chainPre = chainPinned ? chainClosure(chainPinned, 'pre') : null;
+  const chainPost = chainPinned ? chainClosure(chainPinned, 'post') : null;
 
   SUBJECTS.forEach(subject => {
     const card = document.getElementById(`card-${subject.id}`);
@@ -1503,12 +1518,16 @@ function applyFilterStyles() {
       }
     }
 
+    if (chainPinned && !(subject.id === chainPinned || chainPre.has(subject.id) || chainPost.has(subject.id))) {
+      visible = false;
+    }
+
     if (visible) {
       card.classList.remove('hidden', 'filter-dimmed');
       card.classList.add('filter-active');
     } else {
       card.classList.remove('filter-active');
-      if(q || showOnlyEnabled || state.termFilter !== 'all') {
+      if(q || showOnlyEnabled || state.termFilter !== 'all' || chainPinned) {
          card.classList.add('hidden');
          card.classList.remove('filter-dimmed');
       } else {
@@ -2127,21 +2146,23 @@ function applyChain() {
   document.querySelectorAll('.chain-btn').forEach(b => b.classList.toggle('pinned', b.dataset.id === chainPinned));
   const cards = document.querySelectorAll('.subject-card');
   cards.forEach(c => c.classList.remove('chain-dim', 'chain-pre', 'chain-post', 'chain-self'));
-  if (!id) { banner.classList.add('hidden'); return; }
+  if (!id) { banner.classList.add('hidden'); applyFilterStyles(); return; }
   const pre = chainClosure(id, 'pre'), post = chainClosure(id, 'post');
   cards.forEach(c => {
     const cid = c.id.replace('card-', '');
     if (cid === id) c.classList.add('chain-self');
     else if (pre.has(cid)) c.classList.add('chain-pre');
     else if (post.has(cid)) c.classList.add('chain-post');
-    else c.classList.add('chain-dim');
+    else if (!chainPinned) c.classList.add('chain-dim');   // al pasar el mouse (sin tocar), solo se atenúa
   });
+  // Al FIJAR la cadena (tocar el botón) se oculta el resto, como en Modo Inscripción
+  applyFilterStyles();
   if (chainPinned) {
     const name = esc(SUBJECT_BY_ID[id].name);
     document.getElementById('chain-banner-text').innerHTML =
       `<span class="truncate font-black">🔗 ${name}</span>` +
-      `<span class="shrink-0 whitespace-nowrap"><span class="text-amber-700">Necesita ${pre.size}</span> · <span class="text-indigo-700">Destraba ${post.size}</span></span>` +
-      `<span class="hidden md:inline shrink-0 text-slate-500 font-medium">(naranja: correlativas previas · violeta: materias que abre)</span>`;
+      `<span class="shrink-0 whitespace-nowrap"><span class="text-amber-700">🔸 Necesita ${pre.size}</span> · <span class="text-indigo-700">🔹 Destraba ${post.size}</span></span>` +
+      `<span class="hidden md:inline shrink-0 text-slate-500 font-medium">(el resto queda oculto)</span>`;
     banner.classList.remove('hidden');
   } else {
     banner.classList.add('hidden');
