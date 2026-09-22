@@ -589,7 +589,7 @@
       <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>👤</span> Alumno de este perfil</h2>
       <p class="text-xs text-slate-500 mb-4 leading-relaxed">El nombre aparece arriba de todo y en los reportes, horarios, calendario y respaldos, para saber de quién es el perfil cargado. Queda guardado solo en este navegador.</p>
       <label for="student-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Nombre y apellido</label>
-      <input id="student-input" type="text" maxlength="60" autocomplete="name" placeholder="Ej: Juan Pérez" onkeydown="if(event.key==='Enter'){event.preventDefault();saveStudentName();}" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+      <input id="student-input" type="text" maxlength="60" autocomplete="name" placeholder="Ej: Iván Pérez" onkeydown="if(event.key==='Enter'){event.preventDefault();saveStudentName();}" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
       <div class="flex gap-3 mt-5">
         <button onclick="closeNameModal()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
         <button onclick="saveStudentName()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition">Guardar</button>
@@ -830,8 +830,8 @@
               <input id="note-teacher" type="text" maxlength="80" oninput="onNoteInput()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
             <div>
-              <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Aula / comisión</label>
-              <input id="note-room" type="text" maxlength="40" oninput="onNoteInput()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+              <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Código de Classroom</label>
+              <input id="note-room" type="text" maxlength="40" oninput="onNoteInput()" placeholder="Ej: a1b2c3d" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
           </div>
           <div id="note-term-wrap">
@@ -842,13 +842,6 @@
               <option value="2">2° cuatrimestre</option>
               <option value="B">Ambos cuatrimestres</option>
             </select>
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Link al aula virtual o campus</label>
-            <div class="flex gap-2">
-              <input id="note-link" type="text" inputmode="url" maxlength="300" placeholder="https://..." oninput="onNoteInput()" class="min-w-0 flex-1 px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
-              <a id="note-link-open" target="_blank" rel="noopener noreferrer" class="hidden shrink-0 px-3 py-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold hover:bg-blue-100 transition">Abrir ↗</a>
-            </div>
           </div>
           <div>
             <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Notas</label>
@@ -2184,18 +2177,9 @@ function termVisible(t, view) { return view === 'all' || !t || t === 'A' || t ==
 function setTermFilter(v) { state.termFilter = v; applyFilterStyles(); }
 
 /* ── Notas por materia ── */
-const NOTE_EMPTY = { teacher: '', room: '', link: '', text: '', term: '' };
+const NOTE_EMPTY = { teacher: '', room: '', text: '', term: '' };
 let currentInfoId = null, noteTimer = null;
 
-function normalizeLink(s) {
-  s = String(s || '').trim().slice(0, 300);
-  if (!s) return '';
-  if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
-  try {
-    const u = new URL(s);
-    return (u.protocol === 'http:' || u.protocol === 'https:') ? u.href : '';
-  } catch (e) { return ''; }
-}
 function getNote(id) { return Object.assign({}, NOTE_EMPTY, state.notes[id] || {}); }
 function isNoteEmpty(n) { return !n.teacher && !n.room && !n.link && !n.text && !n.term; }
 function setNote(id, patch) {
@@ -2212,7 +2196,6 @@ function sanitizeNotes(raw) {
     const n = {
       teacher: String(v.teacher || '').slice(0, 80).trim(),
       room: String(v.room || '').slice(0, 40).trim(),
-      link: normalizeLink(v.link),
       text: String(v.text || '').slice(0, 2000).trimEnd(),
       term: ['1', '2', 'B'].includes(v.term) ? v.term : ''
     };
@@ -2226,15 +2209,9 @@ function fillNotesSection(id) {
   const n = getNote(id);
   document.getElementById('note-teacher').value = n.teacher;
   document.getElementById('note-room').value = n.room;
-  document.getElementById('note-link').value = n.link;
   document.getElementById('note-text').value = n.text;
   document.getElementById('note-term').value = n.term;
   document.getElementById('note-term-wrap').classList.toggle('hidden', subject.regimen === 'Anual');
-  updateNoteLink(n.link);
-}
-function updateNoteLink(href) {
-  const a = document.getElementById('note-link-open');
-  if (href) { a.href = href; a.classList.remove('hidden'); } else { a.removeAttribute('href'); a.classList.add('hidden'); }
 }
 function onNoteInput() {
   clearTimeout(noteTimer);
@@ -2245,15 +2222,12 @@ function saveNotesFromForm() {
   noteTimer = null;
   const id = currentInfoId;
   if (!id) return;
-  const link = normalizeLink(document.getElementById('note-link').value);
   setNote(id, {
     teacher: document.getElementById('note-teacher').value.slice(0, 80).trim(),
     room: document.getElementById('note-room').value.slice(0, 40).trim(),
-    link,
     text: document.getElementById('note-text').value.slice(0, 2000),
     term: SUBJECT_BY_ID[id].regimen === 'Anual' ? '' : document.getElementById('note-term').value
   });
-  updateNoteLink(link);
   saveState();
   renderCardExtras(SUBJECT_BY_ID[id]);
   applyFilterStyles();
@@ -2416,7 +2390,7 @@ function renderCardExtras(subject) {
   if (u?.status === 'cursada' && ex && ex.attempts > 0) {
     chips.push(`<span class="card-chip" title="Veces que rendiste el final">↻ ${ex.attempts}</span>`);
   }
-  if (note && (note.text || note.link || note.teacher || note.room)) {
+  if (note && (note.text || note.teacher || note.room)) {
     chips.push('<span class="card-chip" title="Tenés notas en esta materia">🗒️ Notas</span>');
   }
   const t = subjectTerm(subject);
@@ -2568,7 +2542,7 @@ function renderScheduleGrid() {
           <div class="${it.conflict ? 'bg-red-50' : 'bg-slate-50'} ${approved ? 'opacity-60' : ''} p-3 rounded-lg border-l-4 ${borderCol} border-y border-r border-slate-200 shadow-sm relative group">
             <p class="text-[11px] font-bold text-slate-800 leading-tight pr-7">${subject.name}</p>
             <p class="text-[10px] text-blue-600 font-mono mt-1 font-bold">${esc(it.time)}</p>
-            ${it.room ? `<p class="text-[10px] text-slate-500 font-medium mt-1">📍 ${esc(it.room)}</p>` : ''}
+            ${it.room ? `<p class="text-[10px] text-slate-500 font-medium mt-1">🏫 Classroom: ${esc(it.room)}</p>` : ''}
             ${it.teacher ? `<p class="text-[10px] text-slate-500 font-medium">👤 ${esc(it.teacher)}</p>` : ''}
             ${termChip}
             ${it.conflict ? '<p class="text-[10px] text-red-600 font-black mt-1">⚠ Se superpone</p>' : ''}
@@ -2631,7 +2605,7 @@ function drawScheduleCanvas(view) {
       const nameLines = wrapText(measure, it.subject.name, colW - px * 2 - 8, 3);
       measure.font = `12px ${FONT}`;
       const extra = [];
-      if (it.room) extra.push(fitText(measure, /^(aula|sala|lab)/i.test(it.room) ? it.room : `Aula: ${it.room}`, colW - px * 2 - 8));
+      if (it.room) extra.push(fitText(measure, `Classroom: ${it.room}`, colW - px * 2 - 8));
       if (it.teacher) extra.push(fitText(measure, `Docente: ${it.teacher}`, colW - px * 2 - 8));
       const termText = (view === 'all' && (it.term === '1' || it.term === '2' || it.term === 'B')) ? TERM_LABEL[it.term] : '';
       const h = py * 2 + nameLines.length * 17 + 20 + extra.length * 16 + (termText ? 16 : 0) + (it.conflict ? 16 : 0);
@@ -2781,9 +2755,7 @@ function buildICS(opts) {
     const d0 = first.replace(/-/g, '');
     const desc = [];
     if (it.teacher) desc.push(`Docente: ${it.teacher}`);
-    const link = state.notes[it.subject.id]?.link;
-    if (link) desc.push(`Aula virtual: ${link}`);
-    add('BEGIN:VEVENT');
+        add('BEGIN:VEVENT');
     add(`UID:${nextUid()}`);
     add(`DTSTAMP:${now}`);
     add(`DTSTART;TZID=${TZ}:${d0}T${hm(it.range.start)}`);
@@ -2947,7 +2919,7 @@ function buildPrintReport(opts) {
     h += `<h2>Horarios de cursada <span class="muted">(${esc(VIEW_LABEL[view])})</span></h2>`;
     if (!items.length) h += '<p class="muted">No hay horarios cargados en este período.</p>';
     else {
-      h += '<table><tr><th>Día</th><th>Horario</th><th>Materia</th><th>Período</th><th>Aula</th><th>Docente</th></tr>';
+      h += '<table><tr><th>Día</th><th>Horario</th><th>Materia</th><th>Período</th><th>Classroom</th><th>Docente</th></tr>';
       items.forEach(it => {
         h += `<tr><td>${esc(it.day)}</td><td>${esc(it.time)}${it.conflict ? ' ⚠' : ''}</td><td>${esc(it.subject.name)}</td><td>${esc(TERM_LABEL[it.term])}</td><td>${esc(it.room)}</td><td>${esc(it.teacher)}</td></tr>`;
       });
