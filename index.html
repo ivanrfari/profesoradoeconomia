@@ -41,6 +41,22 @@
 
 
   <style>
+    * {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    input, textarea, [contenteditable="true"] {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+    html, body {
+      touch-action: manipulation;
+    }
     body {
       background-color: #f8fafc;
       background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
@@ -3106,5 +3122,17 @@ document.addEventListener('keydown', e => {
 });
 window.addEventListener('DOMContentLoaded', init);
 </script>
+  <script>
+    document.addEventListener('selectstart', function (e) {
+      var t = e.target;
+      if (t.matches && t.matches('input, textarea, [contenteditable="true"], [contenteditable="true"] *')) return;
+      e.preventDefault();
+    });
+    document.addEventListener('contextmenu', function (e) {
+      var t = e.target;
+      if (t.matches && t.matches('input, textarea, [contenteditable="true"], [contenteditable="true"] *')) return;
+      e.preventDefault();
+    });
+  </script>
 </body>
 </html>
