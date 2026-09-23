@@ -39,8 +39,6 @@
     }
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
     body {
@@ -283,6 +281,28 @@
     html.dark .subject-card[data-state="locked"] .info-btn { background-color: #111827; color: #64748b; border-color: #1e293b; }
     html.dark .subject-card[data-state="locked"]:hover { background-color: #1e293b; border-color: #64748b; }
 
+    /* ══════════ MODO OSCURO "AMOLED": negro puro + más contraste ══════════ */
+    html.dark body { background-color: #000000; background-image: radial-gradient(#141414 1px, transparent 1px); }
+    html.dark .bg-white, html.dark .bg-white\/95 { background-color: #000000; }
+    html.dark .bg-slate-50 { background-color: #050505; }
+    html.dark .bg-slate-100 { background-color: #0d0d0d; }
+    html.dark .bg-slate-900 { background-color: #000000; }
+    html.dark button.bg-slate-800, html.dark .bg-slate-800 { background-color: #141414; }
+    html.dark button.bg-slate-800:hover, html.dark .hover\:bg-slate-800:hover { background-color: #262626; }
+    html.dark .border-slate-100 { border-color: #141414; }
+    html.dark .border-slate-200 { border-color: #262626; }
+    html.dark .border-slate-300 { border-color: #3a3a3a; }
+    html.dark .text-slate-500 { color: #b4bcc9; }
+    html.dark .text-slate-400 { color: #d5dae2; }
+    html.dark .subject-card[data-state="approved"] { background-color: #050505; border-color: #52525b; }
+    html.dark .subject-card[data-state="en_curso"] { background-color: #12061f; }
+    html.dark .subject-card[data-state="cursada"] { background-color: #001210; }
+    html.dark .subject-card[data-state="enabled"] { background-color: #000000; border-color: #3b82f6; }
+    html.dark .subject-card[data-state="locked"] { background-color: #000000; border-color: #3f3f46; }
+    html.dark .subject-card[data-state="locked"]:hover { background-color: #0d0d0d; border-color: #71717a; }
+    html.dark #chain-banner { background-color: #0d0a1f; }
+    html.dark #exam-banner { background-color: #1f1204; }
+
     /* ══════════ ALTO CONTRASTE (se combina con claro u oscuro) ══════════ */
     html.contrast body { background-image: none; }
     html.contrast .subject-card { border-width: 3px !important; }
@@ -429,7 +449,10 @@
   <div id="confirm-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
       <h2 class="text-xl font-black mb-2 text-slate-900 flex items-center gap-2">⚠️ Liquidar Datos</h2>
-      <p class="text-sm text-slate-600 mb-6 leading-relaxed">¿Estás seguro de reiniciar tu balance? Se borrará todo tu historial, notas y horarios.</p>
+      <p class="text-sm text-slate-600 mb-4 leading-relaxed">¿Estás seguro de reiniciar tu balance? Se borrará todo tu historial, notas y horarios.</p>
+      <label class="flex items-center gap-2 text-xs font-bold text-slate-600 mb-5 cursor-pointer">
+        <input type="checkbox" id="reset-backup-first" checked class="w-4 h-4"> Descargar un respaldo antes de borrar
+      </label>
       <div class="flex gap-3 justify-end">
         <button onclick="closeConfirmModal()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
         <button onclick="executeReset()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition">Sí, reiniciar</button>
@@ -499,6 +522,14 @@
         <button onclick="runSimulador()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow-md transition">Calcular Plan</button>
       </div>
       <div id="sim-results" class="mt-4 max-h-[45vh] overflow-y-auto pr-2 space-y-3"></div>
+      <div class="mt-5 pt-4 border-t border-slate-200">
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">🎓 Proyección de egreso</h3>
+        <div class="flex items-center gap-2 mb-2">
+          <input type="number" id="grad-pace" min="1" max="20" value="3" onchange="runGraduationProjection()" class="w-16 px-2 py-2 border-2 border-slate-200 rounded-xl text-center font-bold text-slate-700 font-mono focus:border-blue-500 outline-none">
+          <span class="text-xs text-slate-500 font-medium">materias por cuatrimestre</span>
+        </div>
+        <div id="grad-result" class="text-xs text-slate-700 leading-relaxed"></div>
+      </div>
     </div>
   </div>
 
@@ -854,6 +885,20 @@
    INSTALACIÓN PWA AUTOMÁTICA SEGURA
 ───────────────────────────────────────────── */
 let deferredPrompt;
+/* Confetti (~6 KB) y html2canvas (~200 KB) solo se descargan cuando realmente hacen falta
+   (festejo del 100% / exportar imagen), no en cada carga de la página. */
+const __libCache = {};
+function loadLib(url) {
+  if (__libCache[url]) return __libCache[url];
+  __libCache[url] = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = url; s.onload = resolve; s.onerror = () => { delete __libCache[url]; reject(new Error('No se pudo cargar ' + url)); };
+    document.head.appendChild(s);
+  });
+  return __libCache[url];
+}
+const loadConfetti = () => loadLib('https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js');
+const loadHtml2Canvas = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
 let DEPS = {};   // mapa materia → materias que la tienen como correlativa
 const isAppInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
 
@@ -1563,9 +1608,9 @@ function updateProgress() {
   document.getElementById('hs-total').textContent = `/ ${totalHs} HS`;
   document.getElementById('promedio-label').textContent = promedio;
 
-  // Confeti solo en el momento en que completás la carrera (no en cada carga)
-  if (complete && wasComplete === false && typeof confetti === 'function') {
-    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999, colors: ['#2563eb', '#1e40af', '#60a5fa'] });
+  // Confeti solo en el momento en que completás la carrera (no en cada carga); recién ahí se descarga la librería
+  if (complete && wasComplete === false) {
+    loadConfetti().then(() => confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999, colors: ['#2563eb', '#1e40af', '#60a5fa'] })).catch(() => {});
   }
   wasComplete = complete;
 }
@@ -1744,6 +1789,7 @@ function closeConfirmModal() {
 }
 
 function executeReset() {
+  if (document.getElementById('reset-backup-first').checked) downloadBackup();
   closeConfirmModal();
   pushUndo('Reinicio de datos');
   state.userSubjects = {};
@@ -1820,10 +1866,52 @@ function parseTimeRange(text) {
 function openSimulador() { 
   const modal = document.getElementById('simulador-modal');
   modal.classList.remove('hidden'); 
+  const savedPace = safeGet('isfd100_ritmo');
+  if (savedPace) document.getElementById('grad-pace').value = savedPace;
+  runGraduationProjection();
   setTimeout(() => {
     modal.children[0].classList.remove('scale-95');
     modal.children[0].classList.add('scale-100');
   }, 10);
+}
+
+/* Cuatrimestre "de calendario" actual, para ubicar la proyección en una fecha real (aproximado) */
+function currentAcademicPeriod() {
+  const d = new Date();
+  return { year: d.getFullYear(), period: (d.getMonth() + 1) <= 7 ? 1 : 2 };
+}
+function addPeriods(year, period, n) {
+  let y = year, p = period;
+  while (n-- > 0) { p++; if (p > 2) { p = 1; y++; } }
+  return `${p}° cuatrimestre de ${y}`;
+}
+/* Cadena más larga de correlativas todavía sin el final aprobado: el piso real de cuatrimestres, sea cual sea el ritmo */
+function minGraduationWaves() {
+  const remainingIds = new Set(SUBJECTS.filter(s => state.userSubjects[s.id]?.status !== 'approved').map(s => s.id));
+  const cache = {};
+  function waveOf(id) {
+    if (cache[id] !== undefined) return cache[id];
+    const pend = SUBJECT_BY_ID[id].prereqs.filter(p => remainingIds.has(p));
+    return cache[id] = pend.length ? 1 + Math.max(...pend.map(waveOf)) : 1;
+  }
+  let max = 0;
+  remainingIds.forEach(id => { max = Math.max(max, waveOf(id)); });
+  return { remainingCount: remainingIds.size, minWaves: max };
+}
+function runGraduationProjection() {
+  const out = document.getElementById('grad-result');
+  let pace = parseInt(document.getElementById('grad-pace').value, 10);
+  if (isNaN(pace) || pace < 1) pace = 1;
+  pace = Math.min(20, pace);
+  safeSet('isfd100_ritmo', String(pace));
+
+  const { remainingCount, minWaves } = minGraduationWaves();
+  if (remainingCount === 0) { out.innerHTML = '🎉 ¡Ya tenés el final de todas las materias aprobado!'; return; }
+
+  const periods = Math.max(minWaves, Math.ceil(remainingCount / pace));
+  const { year, period } = currentAcademicPeriod();
+  out.innerHTML = `Con ${pace} materia${pace === 1 ? '' : 's'} por cuatrimestre, terminarías el final de todo alrededor del <b>${addPeriods(year, period, periods)}</b> (unos ${periods} cuatrimestres más).` +
+    `<span class="block mt-2 text-[11px] text-slate-500 leading-snug">Te faltan ${remainingCount} finales. Por cómo se encadenan las correlativas, necesitás al menos ${minWaves} cuatrimestre${minWaves === 1 ? '' : 's'} sí o sí, sea cual sea tu ritmo. Es una estimación orientativa: no distingue anuales de cuatrimestrales ni tiene en cuenta cupos o superposición de horarios.</span>`;
 }
 
 function closeSimulador(e) {
@@ -1916,7 +2004,7 @@ function exportMap() {
   const isMobile = window.innerWidth < 768;
 
   setTimeout(() => {
-    html2canvas(area, { 
+    loadHtml2Canvas().then(() => html2canvas(area, { 
       backgroundColor: document.documentElement.classList.contains('dark') ? '#0b1220' : '#f8fafc',
       scale: isMobile ? 1 : 2, 
       scrollX: 0,
@@ -1949,6 +2037,17 @@ function exportMap() {
       window.scrollTo(scrollX, scrollY);
       btn.innerHTML = originalHTML;
       btn.disabled = false;
+    })).catch(() => {
+      area.style.width = origAreaWidth;
+      main.style.overflow = origMainOverflow;
+      main.style.maxWidth = origMainMaxWidth;
+      main.style.width = origMainWidth;
+      grid.classList.remove('export-4col');
+      watermark.classList.add('hidden');
+      window.scrollTo(scrollX, scrollY);
+      btn.innerHTML = originalHTML;
+      btn.disabled = false;
+      showAlert('⚠️ Sin conexión', 'No se pudo descargar lo necesario para generar la imagen. Probá de nuevo con internet.');
     });
   }, 400);
 }
