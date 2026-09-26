@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Mapa Curricular · Economía · ISFD N°100</title>
   
   <meta name="theme-color" content="#0f172a" />
@@ -397,6 +397,7 @@
           <div class="flex gap-2">
             <input type="text" id="sync-export-code" readonly class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono bg-white text-slate-400 outline-none truncate">
             <button onclick="copySyncCode()" id="btn-copy-sync" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm">Copiar</button>
+            <button onclick="openQrShow()" title="Ver como QR" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm">📱</button>
           </div>
           <button onclick="shareSyncWhatsApp()" class="mt-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5">
             <span>📲</span> Compartir por WhatsApp
@@ -407,7 +408,8 @@
           <h3 class="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2">2. Importar (Pegar Código)</h3>
           <div class="flex gap-2">
             <input type="text" id="sync-import-code" placeholder="Pegá tu código acá..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
-            <button onclick="importSyncCode()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm">Cargar</button>
+            <button onclick="openQrScan()" class="mb-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5"><span>📷</span> Escanear un QR</button>
+          <button onclick="importSyncCode()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm">Cargar</button>
           </div>
         </div>
 
@@ -602,6 +604,24 @@
         <button onclick="closeNameModal()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
         <button onclick="saveStudentName()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition">Guardar</button>
       </div>
+    </div>
+  </div>
+
+  <div id="qr-show-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden" onclick="closeQrShow(event)">
+    <div class="bg-white rounded-3xl max-w-xs w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200 text-center" onclick="event.stopPropagation()">
+      <h2 class="text-lg font-black text-slate-900 mb-1">📱 Escaneá este código</h2>
+      <p class="text-[11px] text-slate-500 mb-4">Abrí "Escanear un QR" en el otro dispositivo y apuntá la cámara acá.</p>
+      <div id="qr-canvas-holder" class="flex items-center justify-center min-h-[220px]"></div>
+      <button onclick="closeQrShow()" class="w-full mt-4 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cerrar</button>
+    </div>
+  </div>
+
+  <div id="qr-scan-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden" onclick="closeQrScan(event)">
+    <div class="bg-white rounded-3xl max-w-xs w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200 text-center" onclick="event.stopPropagation()">
+      <h2 class="text-lg font-black text-slate-900 mb-3">📷 Escanear código</h2>
+      <video id="qr-video" class="w-full rounded-xl bg-slate-900 aspect-square object-cover"></video>
+      <p id="qr-scan-status" class="text-[11px] text-slate-500 mt-3"></p>
+      <button onclick="closeQrScan()" class="w-full mt-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
     </div>
   </div>
 
@@ -865,6 +885,19 @@
    INSTALACIÓN PWA AUTOMÁTICA SEGURA
 ───────────────────────────────────────────── */
 let deferredPrompt;
+/* Al abrir un modal se fija la página con position:fixed (en vez de solo overflow:hidden), que es
+   lo que evita que el navegador la mande de golpe al principio al cerrarlo. */
+let __scrollLockY = 0;
+function lockScroll() {
+  __scrollLockY = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${__scrollLockY}px`;
+  document.body.style.left = '0'; document.body.style.right = '0';
+}
+function unlockScroll() {
+  document.body.style.position = ''; document.body.style.top = ''; document.body.style.left = ''; document.body.style.right = '';
+  window.scrollTo(0, __scrollLockY);
+}
 /* Confetti (~6 KB) y html2canvas (~200 KB) solo se descargan cuando realmente hacen falta
    (festejo del 100% / exportar imagen), no en cada carga de la página. */
 const __libCache = {};
@@ -879,6 +912,69 @@ function loadLib(url) {
 }
 const loadConfetti = () => loadLib('https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js');
 const loadHtml2Canvas = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+const loadQRCode = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js');
+const loadJsQR = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js');
+
+function openQrShow() {
+  const code = document.getElementById('sync-export-code').value;
+  if (!code || /^Error/.test(code)) { showAlert('⚠️ Atención', 'No se pudo generar el código.'); return; }
+  const holder = document.getElementById('qr-canvas-holder');
+  holder.innerHTML = '<p class="text-xs text-slate-400 py-16">Generando…</p>';
+  openBox('qr-show-modal');
+  loadQRCode().then(() => {
+    holder.innerHTML = '';
+    new QRCode(holder, { text: code, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.L });
+  }).catch(() => { holder.innerHTML = '<p class="text-xs text-red-500 py-16">No se pudo generar el QR (¿sin internet?).</p>'; });
+}
+function closeQrShow(e) { closeBox('qr-show-modal', e); }
+
+let __qrStream = null, __qrRAF = null;
+function openQrScan() {
+  const status = document.getElementById('qr-scan-status');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    status.textContent = 'Este navegador no puede usar la cámara acá (probá con https:// y un navegador más nuevo).';
+    openBox('qr-scan-modal');
+    return;
+  }
+  status.textContent = 'Cargando lector...';
+  openBox('qr-scan-modal');
+  Promise.all([loadJsQR(), navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })])
+    .then(([, stream]) => {
+      __qrStream = stream;
+      const video = document.getElementById('qr-video');
+      video.srcObject = stream;
+      video.setAttribute('playsinline', 'true');
+      video.play();
+      status.textContent = 'Apuntá al código QR...';
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const tick = () => {
+        if (!__qrStream) return;
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+          canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const found = jsQR(img.data, img.width, img.height);
+          if (found && found.data) {
+            closeQrScan();
+            document.getElementById('sync-import-code').value = found.data;
+            importSyncCode();
+            return;
+          }
+        }
+        __qrRAF = requestAnimationFrame(tick);
+      };
+      __qrRAF = requestAnimationFrame(tick);
+    })
+    .catch(() => { status.textContent = 'No se pudo activar la cámara (revisá los permisos o probá con internet).'; });
+}
+function closeQrScan(e) {
+  closeBox('qr-scan-modal', e);
+  if (__qrRAF) cancelAnimationFrame(__qrRAF);
+  __qrRAF = null;
+  if (__qrStream) { __qrStream.getTracks().forEach(t => t.stop()); __qrStream = null; }
+}
+
 let DEPS = {};   // mapa materia → materias que la tienen como correlativa
 const isAppInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
 
@@ -1391,6 +1487,12 @@ function saveSubjectStatus() {
   }
 
   const subject = SUBJECTS.find(s => s.id === id);
+  const prevStatus = state.userSubjects[id]?.status;
+
+  if (prevStatus === 'cursada' && newStatus !== 'cursada' && newStatus !== 'approved' && state.exams[id] && (state.exams[id].date || state.exams[id].attempts)) {
+    const when = state.exams[id].date ? ` (${fmtDateShort(state.exams[id].date)})` : '';
+    if (!confirm(`Tenés una mesa cargada para ${subject.name}${when}. Si cambiás el estado, va a dejar de verse en "Mesas". ¿Continuar?`)) return;
+  }
 
   // Para acreditar el final, las correlativas tienen que estar acreditadas
   if (newStatus === 'approved' && FINAL_REQUIERE_CORRELATIVAS_ACREDITADAS) {
@@ -1725,7 +1827,7 @@ function openModal(event, id) {
     document.getElementById('modal-box').classList.add('scale-100');
   }, 10);
   
-  document.body.style.overflow = 'hidden';
+  lockScroll();
 }
 
 function closeModal(event) {
@@ -1739,7 +1841,7 @@ function closeModal(event) {
   
   setTimeout(() => {
     document.getElementById('modal-backdrop').classList.add('hidden');
-    document.body.style.overflow = '';
+    unlockScroll();
   }, 150);
 }
 
@@ -1812,7 +1914,7 @@ function openSchedule() {
     modal.children[0].classList.remove('scale-95');
     modal.children[0].classList.add('scale-100');
   }, 10);
-  document.body.style.overflow = 'hidden';
+  lockScroll();
 }
 
 function closeSchedule(e) {
@@ -1822,7 +1924,7 @@ function closeSchedule(e) {
   modal.children[0].classList.add('scale-95');
   setTimeout(() => {
     modal.classList.add('hidden');
-    document.body.style.overflow = '';
+    unlockScroll();
   }, 150);
 }
 
@@ -2350,6 +2452,20 @@ function sanitizeExams(raw) {
   });
   return out;
 }
+function googleCalUrl(name, dateISO, time) {
+  const title = encodeURIComponent('Mesa de examen: ' + name);
+  let dates;
+  if (time) {
+    const [y, m, d] = dateISO.split('-').map(Number);
+    const [hh, mm] = time.split(':').map(Number);
+    const start = Date.UTC(y, m - 1, d, hh + 3, mm);   // ART = UTC-3
+    const fmt = ms => new Date(ms).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    dates = `${fmt(start)}/${fmt(start + 2 * 3600000)}`;
+  } else {
+    dates = `${dateISO.replace(/-/g, '')}/${addDaysISO(dateISO, 1).replace(/-/g, '')}`;
+  }
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${title}`;
+}
 function examChip(n) {
   const cls = n < 0 ? 'bg-red-100 text-red-700 border-red-200'
     : n <= 7 ? 'bg-amber-50 text-amber-700 border-amber-200'
@@ -2393,6 +2509,7 @@ function renderExamsModal() {
           </div>
           ${n === null ? '' : examChip(n)}
         </div>
+        ${e.date ? `<a href="${googleCalUrl(s.name, e.date, e.time)}" target="_blank" rel="noopener" class="inline-block mt-2 text-[11px] font-bold text-blue-600 hover:underline">📅 Agregar a Google Calendar</a>` : ''}
         ${n !== null && n < 0 ? '<p class="text-[11px] text-red-600 font-bold mt-2">La fecha ya pasó: actualizala o sumá un intento.</p>' : ''}
         <div class="flex items-center justify-between mt-3 gap-2 flex-wrap">
           <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600">
@@ -3064,6 +3181,8 @@ document.addEventListener('keydown', e => {
     closeCalModal();
     closeReportModal();
     closeNameModal();
+    closeQrShow();
+    closeQrScan();
     if (chainPinned) clearChain();
   }
   if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key && e.key.toLowerCase() === 'z' && !isTypingTarget(e.target)) {
