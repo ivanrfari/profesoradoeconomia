@@ -943,14 +943,26 @@ function openQrScan() {
   const getCam = () => navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } })
     .catch(() => navigator.mediaDevices.getUserMedia({ video: true }))
     .then(stream => navigator.mediaDevices.enumerateDevices().then(devs => {
-      // En celulares con varias cámaras traseras, Chrome a veces abre la gran angular por defecto;
-      // si hay otra que no diga "wide/ultra" en el nombre, se prueba con esa (la principal).
-      const back = devs.filter(d => d.kind === 'videoinput' && /back|rear|trasera/i.test(d.label));
-      const main = back.find(d => !/wide|ultra|angular/i.test(d.label));
-      if (!main || stream.getVideoTracks()[0]?.label === main.label) return stream;
-      return navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: main.deviceId } } })
-        .then(better => { stream.getTracks().forEach(t => t.stop()); return better; })
-        .catch(() => stream);
+      // Algunos celulares (ej. Samsung) no distinguen "gran angular" en el nombre de la cámara,
+      // así que se prueba cada cámara trasera y se elige la del sensor más grande (la principal).
+      const cams = devs.filter(d => d.kind === 'videoinput' && !/front|frontal/i.test(d.label));
+      if (cams.length < 2) return stream;
+      return Promise.all(cams.map(d => (d.deviceId === stream.getVideoTracks()[0].getSettings().deviceId
+        ? Promise.resolve(stream)
+        : navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: d.deviceId } } }).catch(() => null)
+      ).then(s => {
+        if (!s) return null;
+        const t = s.getVideoTracks()[0];
+        const caps = t.getCapabilities ? t.getCapabilities() : {};
+        return { s, w: (caps.width && caps.width.max) || 0 };
+      }))).then(results => {
+        const ok = results.filter(Boolean);
+        if (!ok.length) return stream;
+        ok.sort((a, b) => b.w - a.w);
+        const best = ok[0].s;
+        ok.forEach(o => { if (o.s !== best) o.s.getTracks().forEach(t => t.stop()); });
+        return best;
+      });
     }).catch(() => stream));
   Promise.all([loadJsQR(), getCam()])
     .then(([, stream]) => {
