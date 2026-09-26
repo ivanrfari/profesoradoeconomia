@@ -941,7 +941,17 @@ function openQrScan() {
   status.textContent = 'Cargando lector...';
   openBox('qr-scan-modal');
   const getCam = () => navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } })
-    .catch(() => navigator.mediaDevices.getUserMedia({ video: true }));
+    .catch(() => navigator.mediaDevices.getUserMedia({ video: true }))
+    .then(stream => navigator.mediaDevices.enumerateDevices().then(devs => {
+      // En celulares con varias cámaras traseras, Chrome a veces abre la gran angular por defecto;
+      // si hay otra que no diga "wide/ultra" en el nombre, se prueba con esa (la principal).
+      const back = devs.filter(d => d.kind === 'videoinput' && /back|rear|trasera/i.test(d.label));
+      const main = back.find(d => !/wide|ultra|angular/i.test(d.label));
+      if (!main || stream.getVideoTracks()[0]?.label === main.label) return stream;
+      return navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: main.deviceId } } })
+        .then(better => { stream.getTracks().forEach(t => t.stop()); return better; })
+        .catch(() => stream);
+    }).catch(() => stream));
   Promise.all([loadJsQR(), getCam()])
     .then(([, stream]) => {
       __qrStream = stream;
