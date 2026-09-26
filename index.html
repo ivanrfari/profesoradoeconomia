@@ -1,0 +1,3200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Mapa Curricular · Economía · ISFD N°100</title>
+  
+  <meta name="theme-color" content="#0f172a" />
+  <script>
+    /* Tema: claro por defecto; solo se usa el oscuro si lo elegiste con el botón. Se aplica antes de pintar para que no parpadee. */
+    try {
+      var t = localStorage.getItem('isfd100_theme');
+      if (t === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    } catch (e) {}
+  </script>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" href="icon-192.png">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cfg: '#334155', cfe: '#0f172a', cpd: '#475569', brand: '#2563eb' 
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+
+  <style>
+    body {
+      background-color: #f8fafc;
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 24px 24px;
+      scroll-behavior: smooth;
+    }
+    
+    .hide-scrollbar::-webkit-scrollbar { display: none; }
+    .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .year-col { min-width: 280px; max-width: 300px; }
+
+    /* ── Grilla de años: se adapta al ancho, sin scroll lateral en PC ── */
+    #grid-container { display: flex; gap: 2rem; min-width: max-content; }          /* celular: un año por pantalla, se desliza */
+    @media (min-width: 640px) {                                                     /* tablet / ventana chica: 2 × 2 */
+      #main-grid { overflow: visible; }
+      #grid-container { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; min-width: 0; }
+      .year-col { min-width: 0; max-width: none; }
+    }
+    @media (min-width: 1100px) {                                                    /* PC: los 4 años lado a lado */
+      #grid-container { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    @media (min-width: 1100px) and (max-width: 1279px) {                            /* ventanas justas: tarjetas un poco más compactas */
+      .subject-card { padding: 1rem; }
+    }
+    #grid-container.export-4col { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.5rem; min-width: 0; }
+    #grid-container.export-4col .year-col { min-width: 0; max-width: none; }
+
+    /* ── Tarjetas Estructura ── */
+    .subject-card {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer; border-radius: 1rem; padding: 1.25rem;
+      display: flex; flex-direction: column; height: 100%; position: relative;
+    }
+    
+    .subject-card.hidden { display: none !important; }
+
+    /* Aprobada */
+    .subject-card[data-state="approved"] {
+      background-color: #0f172a; border: 2px solid #0f172a; color: #ffffff;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+    .subject-card[data-state="approved"] h3 { color: #ffffff; }
+    .subject-card[data-state="approved"] .subtitle { color: #94a3b8; }
+    .subject-card[data-state="approved"] .card-divider { border-color: #334155; }
+    .subject-card[data-state="approved"] .status-label { color: #38bdf8; }
+    .subject-card[data-state="approved"] .info-btn { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155;}
+    .subject-card[data-state="approved"]:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
+
+    /* En Curso */
+    .subject-card[data-state="en_curso"] {
+      background-color: #fdf4ff; border: 2px solid #a855f7; color: #3b0764;
+      box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.15);
+    }
+    .subject-card[data-state="en_curso"] h3 { color: #3b0764; }
+    .subject-card[data-state="en_curso"] .subtitle { color: #7e22ce; }
+    .subject-card[data-state="en_curso"] .card-divider { border-color: #e9d5ff; }
+    .subject-card[data-state="en_curso"] .status-label { color: #9333ea; }
+    .subject-card[data-state="en_curso"] .info-btn { background-color: #ffffff; color: #a855f7; border: 1px solid #d8b4fe;}
+    .subject-card[data-state="en_curso"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(168, 85, 247, 0.2); }
+
+    /* Cursada aprobada · final pendiente */
+    .subject-card[data-state="cursada"] {
+      background-color: #f0fdfa; border: 2px solid #14b8a6; color: #134e4a;
+      box-shadow: 0 10px 25px -5px rgba(20, 184, 166, 0.15);
+    }
+    .subject-card[data-state="cursada"] h3 { color: #134e4a; }
+    .subject-card[data-state="cursada"] .subtitle { color: #0f766e; }
+    .subject-card[data-state="cursada"] .card-divider { border-color: #99f6e4; }
+    .subject-card[data-state="cursada"] .status-label { color: #0d9488; }
+    .subject-card[data-state="cursada"] .info-btn { background-color: #ffffff; color: #0d9488; border: 1px solid #5eead4;}
+    .subject-card[data-state="cursada"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(20, 184, 166, 0.2); }
+
+    /* Habilitada */
+    .subject-card[data-state="enabled"] {
+      background-color: #ffffff; border: 2px solid #2563eb; color: #0f172a;
+      box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.15);
+    }
+    .subject-card[data-state="enabled"] h3 { color: #0f172a; }
+    .subject-card[data-state="enabled"] .subtitle { color: #64748b; }
+    .subject-card[data-state="enabled"] .card-divider { border-color: #e2e8f0; }
+    .subject-card[data-state="enabled"] .status-label { color: #2563eb; }
+    .subject-card[data-state="enabled"] .info-btn { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;}
+    .subject-card[data-state="enabled"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.2); }
+
+    /* Bloqueada */
+    .subject-card[data-state="locked"] {
+      background-color: #f8fafc; border: 2px dashed #cbd5e1; color: #64748b;
+    }
+    .subject-card[data-state="locked"] h3 { color: #475569; }
+    .subject-card[data-state="locked"] .subtitle { color: #94a3b8; }
+    .subject-card[data-state="locked"] .card-divider { border-color: #e2e8f0; border-style: dashed; }
+    .subject-card[data-state="locked"] .status-label { color: #94a3b8; }
+    .subject-card[data-state="locked"] .info-btn { background-color: #ffffff; color: #94a3b8; border: 1px solid #e2e8f0;}
+    .subject-card[data-state="locked"]:hover { background-color: #f1f5f9; border-color: #94a3b8; }
+
+    .filter-active  { opacity: 1 !important; display: flex !important; }
+    .filter-dimmed  { opacity: 0.15 !important; filter: grayscale(100%); pointer-events: none; }
+
+    @keyframes unlockPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(37, 99, 235, 0.4); border-color: #2563eb; }
+      100% { transform: scale(1); }
+    }
+    .animate-unlock { animation: unlockPop 0.5s ease-out; }
+
+    .modal-backdrop { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px); }
+    body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+    input, textarea, select, [contenteditable] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+
+    /* ── Cadena de correlativas ── */
+    .subject-card.chain-dim { opacity: 0.55 !important; }   /* solo se usa en la vista previa al pasar el mouse */
+    .subject-card.chain-pre, .subject-card.chain-post, .subject-card.chain-self {
+      outline-offset: 3px; margin-top: 14px;   /* deja lugar a la etiqueta de arriba */
+    }
+    .subject-card.chain-pre  { outline: 3px solid #f59e0b; box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.15); }
+    .subject-card.chain-post { outline: 3px solid #6366f1; box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.15); }
+    .subject-card.chain-self { outline: 4px solid #0ea5e9; box-shadow: 0 0 0 5px rgba(14, 165, 233, 0.18); }
+    .subject-card.chain-pre::before, .subject-card.chain-post::before, .subject-card.chain-self::before {
+      position: absolute; top: -13px; left: 14px; z-index: 5;
+      font-size: 9.5px; font-weight: 900; letter-spacing: 0.03em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 999px; color: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+      white-space: nowrap;
+    }
+    .subject-card.chain-pre::before  { content: '🔸 Necesita'; background: #d97706; }
+    .subject-card.chain-post::before { content: '🔹 Destraba'; background: #4f46e5; }
+    .subject-card.chain-self::before { content: '🔗 Elegida'; background: #0284c7; }
+    .info-btn.pinned { box-shadow: 0 0 0 2px #0ea5e9; }
+
+    /* ── Chips dentro de las tarjetas ── */
+    .card-chip { font-size: 9px; font-weight: 800; letter-spacing: 0.03em; padding: 2px 6px; border-radius: 6px; background: rgba(100, 116, 139, 0.16); white-space: nowrap; }
+    .card-chip.warn   { background: rgba(245, 158, 11, 0.22); color: #b45309; }
+    .card-chip.danger { background: rgba(239, 68, 68, 0.18); color: #b91c1c; }
+    .subject-card[data-state="approved"] .card-chip { background: rgba(148, 163, 184, 0.2); }
+    .subject-card[data-state="approved"] .card-chip.warn   { color: #fbbf24; }
+    .subject-card[data-state="approved"] .card-chip.danger { color: #fca5a5; }
+
+    /* ── Pestañas del planificador ── */
+    .sched-tab { font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 10px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; transition: all 0.15s; }
+    .sched-tab:hover { background: #f1f5f9; }
+    .sched-tab.active { background: #2563eb; border-color: #2563eb; color: #ffffff; }
+
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ══════════ MODO OSCURO ══════════ */
+    html.dark { color-scheme: dark; }
+    html.dark body { background-color: #0b1220; background-image: radial-gradient(#1e293b 1px, transparent 1px); color: #e2e8f0; }
+
+    html.dark .bg-white { background-color: #111827; }
+    html.dark .bg-white\/95 { background-color: rgba(15, 23, 42, 0.95); }
+    html.dark .bg-slate-50 { background-color: #0f172a; }
+    html.dark .bg-slate-100 { background-color: #1e293b; }
+    html.dark .bg-slate-300 { background-color: #475569; }
+    html.dark .hover\:bg-slate-200:hover { background-color: #334155; }
+    html.dark button.bg-slate-900 { background-color: #334155; }
+    html.dark button.bg-slate-900:hover, html.dark button.hover\:bg-slate-800:hover { background-color: #475569; }
+    html.dark .focus\:bg-white:focus { background-color: #111827; }
+
+    html.dark .bg-blue-50    { background-color: rgba(59, 130, 246, 0.14); }
+    html.dark .bg-blue-100   { background-color: rgba(59, 130, 246, 0.22); }
+    html.dark .bg-indigo-50  { background-color: rgba(99, 102, 241, 0.16); }
+    html.dark .bg-cyan-50    { background-color: rgba(6, 182, 212, 0.14); }
+    html.dark .bg-amber-50   { background-color: rgba(245, 158, 11, 0.14); }
+    html.dark .bg-emerald-50 { background-color: rgba(16, 185, 129, 0.14); }
+    html.dark .bg-red-50     { background-color: rgba(239, 68, 68, 0.14); }
+    html.dark .bg-red-100    { background-color: rgba(239, 68, 68, 0.22); }
+    html.dark .bg-purple-50  { background-color: rgba(168, 85, 247, 0.16); }
+    html.dark .bg-teal-50    { background-color: rgba(20, 184, 166, 0.16); }
+    html.dark .hover\:bg-blue-100:hover    { background-color: rgba(59, 130, 246, 0.3); }
+    html.dark .hover\:bg-indigo-100:hover  { background-color: rgba(99, 102, 241, 0.3); }
+    html.dark .hover\:bg-cyan-100:hover    { background-color: rgba(6, 182, 212, 0.3); }
+    html.dark .hover\:bg-amber-100:hover   { background-color: rgba(245, 158, 11, 0.3); }
+    html.dark .hover\:bg-emerald-100:hover { background-color: rgba(16, 185, 129, 0.3); }
+    html.dark .hover\:bg-red-100:hover     { background-color: rgba(239, 68, 68, 0.3); }
+
+    html.dark .text-slate-900 { color: #f1f5f9; }
+    html.dark .text-slate-800 { color: #e2e8f0; }
+    html.dark .text-slate-700 { color: #cbd5e1; }
+    html.dark .text-slate-600 { color: #a8b5c8; }
+    html.dark .text-slate-500 { color: #94a3b8; }
+    html.dark .text-blue-800 { color: #93c5fd; }
+    html.dark .text-blue-700 { color: #93c5fd; }
+    html.dark .text-blue-600 { color: #60a5fa; }
+    html.dark .text-indigo-700 { color: #a5b4fc; }
+    html.dark .text-indigo-600 { color: #818cf8; }
+    html.dark .text-cyan-700 { color: #67e8f9; }
+    html.dark .text-amber-700 { color: #fcd34d; }
+    html.dark .text-emerald-700 { color: #6ee7b7; }
+    html.dark .text-emerald-600 { color: #34d399; }
+    html.dark .text-red-700 { color: #fca5a5; }
+    html.dark .text-red-600 { color: #f87171; }
+    html.dark .text-purple-700 { color: #d8b4fe; }
+    html.dark .text-purple-600 { color: #c084fc; }
+    html.dark .text-teal-700 { color: #5eead4; }
+    html.dark .text-teal-600 { color: #2dd4bf; }
+    html.dark #chain-banner { background-color: #1e1b4b; border-color: #4338ca; }
+    html.dark #exam-banner { background-color: #3b2a07; border-color: #b45309; }
+    html.dark .card-chip.warn { color: #fbbf24; }
+    html.dark .card-chip.danger { color: #fca5a5; }
+
+    html.dark .border-slate-100 { border-color: #1e293b; }
+    html.dark .border-slate-200 { border-color: #334155; }
+    html.dark .border-slate-300 { border-color: #475569; }
+    html.dark .border-blue-100, html.dark .border-blue-200, html.dark .border-indigo-200, html.dark .border-cyan-200,
+    html.dark .border-emerald-200, html.dark .border-amber-200 { border-color: rgba(148, 163, 184, 0.35); }
+    html.dark .border-red-100, html.dark .border-red-200 { border-color: rgba(239, 68, 68, 0.4); }
+
+    html.dark input, html.dark select, html.dark textarea { background-color: #0f172a; color: #e2e8f0; border-color: #475569; }
+    html.dark input::placeholder, html.dark textarea::placeholder { color: #64748b; }
+    html.dark option, html.dark optgroup { background-color: #0f172a; color: #e2e8f0; }
+
+    html.dark .sched-tab { background: #1e293b; border-color: #475569; color: #cbd5e1; }
+    html.dark .sched-tab:hover { background: #334155; }
+    html.dark .sched-tab.active { background: #2563eb; border-color: #2563eb; color: #ffffff; }
+
+    html.dark .subject-card[data-state="approved"] { background-color: #1e293b; border-color: #475569; }
+    html.dark .subject-card[data-state="en_curso"] { background-color: #2e1065; border-color: #a855f7; color: #f3e8ff; box-shadow: none; }
+    html.dark .subject-card[data-state="en_curso"] h3 { color: #f3e8ff; }
+    html.dark .subject-card[data-state="en_curso"] .subtitle { color: #d8b4fe; }
+    html.dark .subject-card[data-state="en_curso"] .card-divider { border-color: #6b21a8; }
+    html.dark .subject-card[data-state="en_curso"] .status-label { color: #d8b4fe; }
+    html.dark .subject-card[data-state="en_curso"] .info-btn { background-color: #3b0764; color: #d8b4fe; border-color: #6b21a8; }
+    html.dark .subject-card[data-state="cursada"] { background-color: #042f2e; border-color: #14b8a6; color: #ccfbf1; box-shadow: none; }
+    html.dark .subject-card[data-state="cursada"] h3 { color: #ccfbf1; }
+    html.dark .subject-card[data-state="cursada"] .subtitle { color: #5eead4; }
+    html.dark .subject-card[data-state="cursada"] .card-divider { border-color: #115e59; }
+    html.dark .subject-card[data-state="cursada"] .status-label { color: #5eead4; }
+    html.dark .subject-card[data-state="cursada"] .info-btn { background-color: #134e4a; color: #5eead4; border-color: #0f766e; }
+    html.dark .subject-card[data-state="enabled"] { background-color: #111827; border-color: #3b82f6; color: #f1f5f9; box-shadow: none; }
+    html.dark .subject-card[data-state="enabled"] h3 { color: #f1f5f9; }
+    html.dark .subject-card[data-state="enabled"] .subtitle { color: #94a3b8; }
+    html.dark .subject-card[data-state="enabled"] .card-divider { border-color: #334155; }
+    html.dark .subject-card[data-state="enabled"] .status-label { color: #60a5fa; }
+    html.dark .subject-card[data-state="enabled"] .info-btn { background-color: rgba(59, 130, 246, 0.18); color: #93c5fd; border-color: #1d4ed8; }
+    html.dark .subject-card[data-state="locked"] { background-color: #0f172a; border-color: #334155; color: #64748b; }
+    html.dark .subject-card[data-state="locked"] h3 { color: #94a3b8; }
+    html.dark .subject-card[data-state="locked"] .subtitle { color: #64748b; }
+    html.dark .subject-card[data-state="locked"] .card-divider { border-color: #1e293b; }
+    html.dark .subject-card[data-state="locked"] .status-label { color: #64748b; }
+    html.dark .subject-card[data-state="locked"] .info-btn { background-color: #111827; color: #64748b; border-color: #1e293b; }
+    html.dark .subject-card[data-state="locked"]:hover { background-color: #1e293b; border-color: #64748b; }
+
+    /* ══════════ MODO OSCURO "AMOLED": negro puro + más contraste ══════════ */
+    html.dark body { background-color: #000000; background-image: radial-gradient(#141414 1px, transparent 1px); }
+    html.dark .bg-white, html.dark .bg-white\/95 { background-color: #000000; }
+    html.dark .bg-slate-50 { background-color: #050505; }
+    html.dark .bg-slate-100 { background-color: #0d0d0d; }
+    html.dark .bg-slate-900 { background-color: #000000; }
+    html.dark button.bg-slate-800, html.dark .bg-slate-800 { background-color: #141414; }
+    html.dark button.bg-slate-800:hover, html.dark .hover\:bg-slate-800:hover { background-color: #262626; }
+    html.dark .border-slate-100 { border-color: #141414; }
+    html.dark .border-slate-200 { border-color: #262626; }
+    html.dark .border-slate-300 { border-color: #3a3a3a; }
+    html.dark .text-slate-500 { color: #b4bcc9; }
+    html.dark .text-slate-400 { color: #d5dae2; }
+    html.dark .subject-card[data-state="approved"] { background-color: #050505; border-color: #52525b; }
+    html.dark .subject-card[data-state="en_curso"] { background-color: #12061f; }
+    html.dark .subject-card[data-state="cursada"] { background-color: #001210; }
+    html.dark .subject-card[data-state="enabled"] { background-color: #000000; border-color: #3b82f6; }
+    html.dark .subject-card[data-state="locked"] { background-color: #000000; border-color: #3f3f46; }
+    html.dark .subject-card[data-state="locked"]:hover { background-color: #0d0d0d; border-color: #71717a; }
+    html.dark #chain-banner { background-color: #0d0a1f; }
+    html.dark #exam-banner { background-color: #1f1204; }
+
+    /* ══════════ IMPRESIÓN / PDF ══════════ */
+    #print-report { display: none; }
+    @media print {
+      @page { size: A4; margin: 12mm; }
+      html, body { background: #ffffff !important; background-image: none !important; }
+      body > *:not(#print-report) { display: none !important; }
+      #print-report { display: block !important; color: #0f172a; font-family: Inter, system-ui, sans-serif; font-size: 10.5px; line-height: 1.35; }
+      #print-report h1 { font-size: 20px; font-weight: 900; margin: 0; }
+      #print-report .sub { color: #475569; margin: 2px 0 12px; }
+      #print-report h2 { font-size: 13px; font-weight: 900; margin: 16px 0 6px; border-bottom: 2px solid #0f172a; padding-bottom: 3px; break-after: avoid; }
+      #print-report h3 { font-size: 11px; font-weight: 800; margin: 10px 0 4px; break-after: avoid; }
+      #print-report table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+      #print-report tr { break-inside: avoid; }
+      #print-report th, #print-report td { border: 1px solid #cbd5e1; padding: 3px 6px; text-align: left; vertical-align: top; }
+      #print-report th { background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      #print-report .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+      #print-report .kpi { border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 8px; }
+      #print-report .kpi b { display: block; font-size: 16px; }
+      #print-report .kpi span { color: #64748b; font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+      #print-report .st-approved { font-weight: 800; }
+      #print-report .muted { color: #64748b; font-weight: 500; }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen text-slate-800 flex flex-col">
+
+  <script>
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      navigator.serviceWorker.register('service-worker.js').catch(err => console.log('SW setup falló:', err));
+    }
+  </script>
+
+  <!-- ══════════════════════════════════════════
+       MODALES DEL SISTEMA
+  ══════════════════════════════════════════ -->
+  
+  <div id="onboarding-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md p-8 shadow-2xl text-center border border-slate-100 transform scale-95 transition-transform duration-200">
+      <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-5 border-4 border-blue-100">
+        <span class="text-4xl">📊</span>
+      </div>
+      <h2 class="text-2xl font-black mb-3 text-slate-900 tracking-tight">Portal de Planificación</h2>
+      <p class="text-sm text-slate-600 mb-6 leading-relaxed">
+        Gestioná tu progreso académico con un diseño optimizado.<br><br>
+        <span class="inline-block bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-bold mb-1">APROBADA</span> — Materias superadas.<br>
+        <span class="inline-block bg-purple-50 border border-purple-400 text-purple-700 px-2 py-0.5 rounded text-[10px] font-bold mb-1">EN CURSO</span> — Cursando actualmente.<br>
+        <span class="inline-block bg-teal-50 border border-teal-400 text-teal-700 px-2 py-0.5 rounded text-[10px] font-bold mb-1">FINAL PENDIENTE</span> — Cursada aprobada, falta rendir el final.<br>
+        <span class="inline-block bg-white border border-blue-500 text-blue-700 px-2 py-0.5 rounded text-[10px] font-bold mb-1">HABILITADA</span> — Listas para cursar.<br>
+        <span class="inline-block bg-slate-50 border border-dashed border-slate-300 text-slate-500 px-2 py-0.5 rounded text-[10px] font-bold mb-1">BLOQUEADA</span> — Faltan correlativas.<br>
+      </p>
+      <button onclick="closeOnboarding()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl transition shadow-md">Comenzar a planificar</button>
+    </div>
+  </div>
+
+  <div id="status-modal" class="modal-backdrop fixed inset-0 z-[80] flex items-center justify-center p-4 hidden" onclick="closeStatusModal(event)">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black mb-1 text-slate-900 leading-tight" id="status-subject-name">Nombre Materia</h2>
+      <p class="text-xs text-slate-500 mb-5 font-mono">Gestión de estado</p>
+      
+      <input type="hidden" id="status-subject-id">
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Situación Actual:</label>
+          <select id="status-select" onchange="toggleGradeInput()" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50">
+            <option value="enabled">▶ Habilitada (Sin cursar)</option>
+            <option value="en_curso">⏳ En Curso (Cursando actualmente)</option>
+            <option value="cursada">📝 Cursada aprobada (final pendiente)</option>
+            <option value="approved">✅ Aprobada (final rendido)</option>
+          </select>
+        </div>
+        
+        <div id="grade-container" class="hidden">
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Nota Final (mínimo 4):</label>
+          <input type="number" id="status-grade" min="4" max="10" step="0.01" oninput="validateGrade(this)" placeholder="Ej: 8.50" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50">
+        </div>
+      </div>
+      
+      <div class="flex gap-3 justify-end mt-6">
+        <button onclick="closeStatusModal()" class="px-5 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition flex-1">Cancelar</button>
+        <button onclick="saveSubjectStatus()" class="px-5 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition flex-1">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="sync-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden" onclick="closeSyncModal(event)">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>💾</span> Sincronización y respaldo</h2>
+      <p class="text-xs text-slate-500 mb-5 leading-relaxed">El código lleva tu progreso, horarios y períodos. El archivo de respaldo lleva <b>todo</b> (también mesas de examen y notas).</p>
+      
+      <div class="space-y-6 overflow-y-auto">
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+          <h3 class="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">1. Exportar (Copiar Código)</h3>
+          <div class="flex gap-2">
+            <input type="text" id="sync-export-code" readonly class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono bg-white text-slate-400 outline-none truncate">
+            <button onclick="copySyncCode()" id="btn-copy-sync" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm">Copiar</button>
+            <button onclick="openQrShow()" title="Ver como QR" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm">📱</button>
+          </div>
+          <button onclick="shareSyncWhatsApp()" class="mt-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5">
+            <span>📲</span> Compartir por WhatsApp
+          </button>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+          <h3 class="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2">2. Importar (Pegar Código)</h3>
+          <div class="flex gap-2">
+            <input type="text" id="sync-import-code" placeholder="Pegá tu código acá..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs font-mono bg-white focus:ring-2 focus:ring-emerald-500 outline-none">
+            <button onclick="openQrScan()" class="mb-2 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5"><span>📷</span> Escanear un QR</button>
+          <button onclick="importSyncCode()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm">Cargar</button>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
+          <h3 class="text-[10px] font-black uppercase tracking-widest text-indigo-600 mb-2">3. Respaldo completo en archivo</h3>
+          <div class="flex gap-2">
+            <button onclick="downloadBackup()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm">⬇ Descargar (.json)</button>
+            <button onclick="document.getElementById('backup-file').click()" class="flex-1 bg-slate-800 hover:bg-slate-900 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm">⬆ Cargar respaldo</button>
+            <input type="file" id="backup-file" accept="application/json,.json" class="hidden" onchange="importBackupFile(this)">
+          </div>
+        </div>
+      </div>
+      <button onclick="closeSyncModal()" class="w-full mt-4 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cerrar</button>
+    </div>
+  </div>
+
+  <div id="confirm-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
+      <h2 class="text-xl font-black mb-2 text-slate-900 flex items-center gap-2">⚠️ Liquidar Datos</h2>
+      <p class="text-sm text-slate-600 mb-4 leading-relaxed">¿Estás seguro de reiniciar tu balance? Se borrará todo tu historial, notas y horarios.</p>
+      <label class="flex items-center gap-2 text-xs font-bold text-slate-600 mb-5 cursor-pointer">
+        <input type="checkbox" id="reset-backup-first" checked class="w-4 h-4"> Descargar un respaldo antes de borrar
+      </label>
+      <div class="flex gap-3 justify-end">
+        <button onclick="closeConfirmModal()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
+        <button onclick="executeReset()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition">Sí, reiniciar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="alert-modal" class="modal-backdrop fixed inset-0 z-[100] flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
+      <h2 id="alert-title" class="text-xl font-black mb-3 text-slate-900 flex items-center gap-2"></h2>
+      <p id="alert-message" class="text-sm text-slate-600 mb-6 leading-relaxed"></p>
+      <button onclick="closeAlertModal()" class="w-full px-4 py-3 rounded-xl text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 transition">Entendido</button>
+    </div>
+  </div>
+
+  <div id="schedule-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 hidden" onclick="closeSchedule(event)">
+    <div class="bg-white rounded-3xl w-full max-w-5xl h-[90vh] sm:h-[85vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation()">
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
+        <div>
+          <h2 class="text-xl font-black flex items-center gap-2 tracking-tight"><span>📅</span> Planificador de Horarios</h2>
+        </div>
+        <button onclick="closeSchedule()" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
+      </div>
+      <div id="sched-tabs" class="px-4 pt-3 pb-1 bg-slate-50 flex items-center gap-2 flex-wrap shrink-0">
+        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-1">Ver:</span>
+        <button class="sched-tab active" data-view="all" onclick="setScheduleView('all')">Todo el año</button>
+        <button class="sched-tab" data-view="1" onclick="setScheduleView('1')">1° cuatrimestre</button>
+        <button class="sched-tab" data-view="2" onclick="setScheduleView('2')">2° cuatrimestre</button>
+        <div class="ml-auto flex gap-2">
+          <button onclick="exportScheduleImage()" class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition shadow-sm">🖼️ Imagen</button>
+          <button onclick="openCalModal()" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition shadow-sm">📆 Calendario</button>
+        </div>
+      </div>
+      <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row gap-3 shrink-0">
+        <select id="sched-subject" class="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none truncate"></select>
+        <div class="flex flex-wrap gap-3 items-center">
+          <select id="sched-day" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none">
+            <option value="Lunes">Lunes</option>
+            <option value="Martes">Martes</option>
+            <option value="Miércoles">Miércoles</option>
+            <option value="Jueves">Jueves</option>
+            <option value="Viernes">Viernes</option>
+            <option value="Sábado">Sábado</option>
+          </select>
+          <div class="flex items-center gap-1.5 flex-1 sm:flex-none">
+            <input type="time" id="sched-start" aria-label="Hora de inicio" class="min-w-0 flex-1 sm:w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            <span class="text-xs font-bold text-slate-400">a</span>
+            <input type="time" id="sched-end" aria-label="Hora de fin" class="min-w-0 flex-1 sm:w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <button onclick="addScheduleItem()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm">Agregar</button>
+        </div>
+      </div>
+      <div class="flex-1 overflow-x-auto p-4 bg-slate-100">
+        <div class="flex gap-4 min-w-max h-full" id="schedule-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="simulador-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden" onclick="closeSimulador(event)">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between gap-2">
+        <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 tracking-tight">
+          <span class="text-blue-600">📈</span> Proyección de Cursada
+        </h2>
+        <button onclick="closeSimulador()" aria-label="Cerrar" class="shrink-0 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">✕</button>
+      </div>
+      <p class="text-xs text-slate-500 mt-2 mb-5 leading-relaxed">El sistema calculará las opciones estratégicas para destrabar la carrera.</p>
+      <div class="flex items-center gap-3 mb-5">
+        <input type="number" id="sim-qty" value="3" min="1" max="10" class="w-20 px-3 py-2.5 border-2 border-slate-200 rounded-xl text-center font-bold text-slate-700 font-mono focus:border-blue-500 focus:ring-0 outline-none transition">
+        <button onclick="runSimulador()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-xl shadow-md transition">Calcular Plan</button>
+      </div>
+      <div id="sim-results" class="mt-4 max-h-[45vh] overflow-y-auto pr-2 space-y-3"></div>
+      <div class="mt-5 pt-4 border-t border-slate-200">
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">🎓 Proyección de egreso</h3>
+        <div class="flex items-center gap-2 mb-2">
+          <input type="number" id="grad-pace" min="1" max="20" value="3" onchange="runGraduationProjection()" class="w-16 px-2 py-2 border-2 border-slate-200 rounded-xl text-center font-bold text-slate-700 font-mono focus:border-blue-500 outline-none">
+          <span class="text-xs text-slate-500 font-medium">materias por cuatrimestre</span>
+        </div>
+        <div id="grad-result" class="text-xs text-slate-700 leading-relaxed"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="exams-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 hidden" onclick="closeExamsModal(event)">
+    <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation()">
+      <div class="bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
+        <h2 class="text-xl font-black flex items-center gap-2 tracking-tight"><span>📝</span> Mesas de examen</h2>
+        <button onclick="closeExamsModal()" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
+      </div>
+      <div class="p-4 bg-slate-50 border-b border-slate-200 shrink-0">
+        <p class="text-[11px] text-slate-500 mb-3 leading-relaxed">Cargá la fecha de la mesa de las materias con <b>cursada aprobada</b>. Cuando falte una semana o menos, aparece un aviso arriba de todo, y podés llevarlas a tu calendario desde Horarios → Calendario.</p>
+        <div class="flex flex-col sm:flex-row gap-2">
+          <select id="exam-subject" class="flex-1 min-w-0 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none"></select>
+          <div class="flex gap-2">
+            <input type="date" id="exam-date" aria-label="Fecha de la mesa" class="min-w-0 flex-1 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            <input type="time" id="exam-time" aria-label="Hora de la mesa" class="min-w-0 w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <button onclick="addExam()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm">Guardar</button>
+        </div>
+      </div>
+      <div id="exam-list" class="p-4 space-y-3 overflow-y-auto bg-slate-100 flex-1"></div>
+    </div>
+  </div>
+
+  <div id="cal-modal" class="modal-backdrop fixed inset-0 z-[70] flex items-center justify-center p-4 hidden" onclick="closeCalModal(event)">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>📆</span> Llevar al calendario</h2>
+      <p class="text-xs text-slate-500 mb-5 leading-relaxed">Genera un archivo <b>.ics</b> que podés abrir con Google Calendar, Outlook o el calendario del celular. Cada materia se repite todas las semanas dentro del rango.</p>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Período</label>
+          <select id="cal-view" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="all">Todo el año</option>
+            <option value="1">1° cuatrimestre</option>
+            <option value="2">2° cuatrimestre</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Primera semana</label>
+            <input type="date" id="cal-start" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Última semana</label>
+            <input type="date" id="cal-end" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+        </div>
+        <label class="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+          <input type="checkbox" id="cal-exams" checked class="w-4 h-4"> Incluir mesas de examen (con aviso el día anterior)
+        </label>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button onclick="closeCalModal()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
+        <button onclick="generateCalendar()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition">Descargar .ics</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="report-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-4 hidden" onclick="closeReportModal(event)">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-4"><span>📄</span> Exportar reporte</h2>
+      <div class="space-y-3">
+        <button onclick="closeReportModal(); exportMap()" class="w-full text-left px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 transition">
+          <span class="block text-sm font-black">🖼️ Imagen del mapa curricular</span>
+          <span class="block text-[11px] font-medium mt-0.5">Un PNG con todas las materias y su estado.</span>
+        </button>
+        <div class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-200">
+          <p class="text-sm font-black text-slate-800">🖨️ Imprimir o guardar como PDF</p>
+          <div class="mt-3 space-y-2 text-sm font-medium text-slate-700">
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="rp-materias" checked class="w-4 h-4"> Materias por año (estado y notas)</label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="rp-horarios" checked class="w-4 h-4"> Horarios (del período que estés viendo)</label>
+            <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="rp-mesas" checked class="w-4 h-4"> Mesas de examen</label>
+          </div>
+          <button onclick="printReport()" class="w-full mt-4 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition">Abrir vista de impresión</button>
+          <p class="text-[11px] text-slate-500 mt-2 leading-snug">En el diálogo de impresión elegí <b>Guardar como PDF</b> como destino.</p>
+        </div>
+      </div>
+      <button onclick="closeReportModal()" class="w-full mt-4 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cerrar</button>
+    </div>
+  </div>
+
+  <div id="name-modal" class="modal-backdrop fixed inset-0 z-[80] flex items-center justify-center p-4 hidden" onclick="closeNameModal(event)">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>👤</span> Alumno de este perfil</h2>
+      <p class="text-xs text-slate-500 mb-4 leading-relaxed">El nombre aparece arriba de todo y en los reportes, horarios, calendario y respaldos, para saber de quién es el perfil cargado. Queda guardado solo en este navegador.</p>
+      <label for="student-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Nombre y apellido</label>
+      <input id="student-input" type="text" maxlength="60" autocomplete="name" placeholder="Ej: Iván Pérez" onkeydown="if(event.key==='Enter'){event.preventDefault();saveStudentName();}" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+      <div class="flex gap-3 mt-5">
+        <button onclick="closeNameModal()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
+        <button onclick="saveStudentName()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="qr-show-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden" onclick="closeQrShow(event)">
+    <div class="bg-white rounded-3xl max-w-xs w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200 text-center" onclick="event.stopPropagation()">
+      <h2 class="text-lg font-black text-slate-900 mb-1">📱 Escaneá este código</h2>
+      <p class="text-[11px] text-slate-500 mb-4">Abrí "Escanear un QR" en el otro dispositivo y apuntá la cámara acá.</p>
+      <div id="qr-canvas-holder" class="flex items-center justify-center min-h-[220px]"></div>
+      <button onclick="closeQrShow()" class="w-full mt-4 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cerrar</button>
+    </div>
+  </div>
+
+  <div id="qr-scan-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden" onclick="closeQrScan(event)">
+    <div class="bg-white rounded-3xl max-w-xs w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200 text-center" onclick="event.stopPropagation()">
+      <h2 class="text-lg font-black text-slate-900 mb-3">📷 Escanear código</h2>
+      <video id="qr-video" class="w-full rounded-xl bg-slate-900 aspect-square object-cover"></video>
+      <p id="qr-scan-status" class="text-[11px] text-slate-500 mt-3"></p>
+      <button onclick="closeQrScan()" class="w-full mt-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
+    </div>
+  </div>
+
+  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[150] hidden items-center gap-3 bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-2xl border border-slate-700 max-w-[90vw]" role="status" aria-live="polite">
+    <span id="toast-msg" class="truncate"></span>
+    <button id="toast-undo" onclick="undoLast()" class="shrink-0 text-sky-300 hover:text-white underline underline-offset-2">Deshacer</button>
+  </div>
+
+  <div id="print-report"></div>
+
+  <!-- ══════════════════════════════════════════
+       HEADER PRINCIPAL DASHBOARD
+  ══════════════════════════════════════════ -->
+  <header class="bg-slate-900 text-white py-6 px-4 sm:px-6 shadow-xl relative z-30">
+    <div class="max-w-screen-2xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
+      
+      <div class="flex items-center justify-center lg:justify-start gap-4 w-full lg:w-auto">
+        <div class="flex-1 text-center lg:text-left">
+          <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">DGCyE · ISFD N°100 · ECONOMÍA</p>
+          <h1 class="text-2xl sm:text-3xl font-black mt-0.5 tracking-tight text-white">
+            Planificador Curricular
+          </h1>
+          <button id="btn-student" onclick="openNameModal()" class="mt-3 inline-flex max-w-full items-center gap-2 text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3.5 py-1.5 rounded-full transition" title="Cambiar el nombre del alumno de este perfil">
+            <span>👤</span>
+            <span id="student-label" class="truncate">Agregar nombre del alumno</span>
+            <span class="text-slate-400 shrink-0">✎</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="flex justify-between sm:justify-end items-center gap-4 sm:gap-8 bg-slate-800/50 rounded-2xl px-5 py-4 border border-slate-700 w-full lg:w-auto">
+        <div class="text-center sm:text-right flex flex-col flex-1 sm:flex-none">
+          <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Promedio</p>
+          <div class="flex items-baseline gap-1 justify-center sm:justify-end">
+            <span class="text-2xl sm:text-4xl font-black text-white font-mono tracking-tighter" id="promedio-label">-</span>
+          </div>
+        </div>
+
+        <div class="w-px h-10 sm:h-12 bg-slate-700"></div>
+
+        <div class="text-center sm:text-right flex flex-col flex-1 sm:flex-none">
+          <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1" title="Horas con final aprobado sobre el total de horas del plan">Avance Global</p>
+          <div class="flex items-baseline gap-1 justify-center sm:justify-end">
+            <span class="text-2xl sm:text-4xl font-black text-white font-mono tracking-tighter" id="pct-label">0</span>
+            <span class="text-sm sm:text-lg font-bold text-blue-400">%</span>
+          </div>
+        </div>
+        
+        <div class="w-px h-10 sm:h-12 bg-slate-700"></div>
+        
+        <div class="text-center sm:text-right flex flex-col flex-1 sm:flex-none">
+          <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Carga Horaria</p>
+          <div class="flex items-baseline gap-1 justify-center sm:justify-end">
+            <span class="text-2xl sm:text-4xl font-black text-white font-mono tracking-tighter" id="hs-count">0</span>
+            <span id="hs-total" class="text-[10px] sm:text-xs font-bold text-slate-400">HS</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════
+       BARRA STICKY: HERRAMIENTAS Y PROGRESO
+  ══════════════════════════════════════════ -->
+  <div class="sticky top-0 z-20 flex flex-col shadow-sm">
+    <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
+      <div class="max-w-screen-2xl mx-auto px-4 py-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
+        
+        <div class="flex w-full lg:w-auto flex-1 gap-3">
+          <div class="relative flex-1">
+            <span class="absolute left-3 top-2.5 text-slate-400">🔍</span>
+            <input type="text" id="search-input" placeholder="Buscar materia..." class="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-800 transition-all font-medium truncate">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-start lg:justify-end gap-2 w-full lg:w-auto overflow-x-auto hide-scrollbar pb-1 lg:pb-0 pt-1 lg:pt-0">
+          
+          <label class="flex shrink-0 items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl border border-blue-200 transition shadow-sm">
+            <input type="checkbox" id="toggle-enabled-only" class="sr-only peer" onchange="applyFilterStyles()">
+            <div class="w-7 h-4 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all relative"></div>
+            <span>Modo Inscripción</span>
+          </label>
+
+          <select id="term-filter" onchange="setTermFilter(this.value)" title="Mostrar solo las materias de un cuatrimestre (las anuales siempre aparecen). Definí en qué cuatrimestre se dicta cada materia desde su ficha ⓘ → Mis notas." class="shrink-0 text-xs font-bold text-slate-700 bg-slate-50 px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="all">Todos los períodos</option>
+            <option value="1">1° cuatrimestre</option>
+            <option value="2">2° cuatrimestre</option>
+          </select>
+          
+          <div class="w-px h-6 bg-slate-300 hidden lg:block shrink-0 mx-1"></div>
+
+          <!-- BOTÓN INSTALAR (Inicia oculto, se muestra si el navegador lo permite) -->
+          <button id="btn-install" onclick="installApp()" class="hidden shrink-0 text-xs bg-slate-900 text-white px-3 py-2 rounded-xl font-bold hover:bg-slate-800 transition shadow-sm flex items-center gap-1.5">
+            <span>📱</span> Instalar App
+          </button>
+          
+          <button onclick="openSchedule()" class="shrink-0 text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm">
+            <span>📅</span> Horarios
+          </button>
+          <button onclick="openExamsModal()" class="shrink-0 text-xs bg-teal-50 text-teal-700 px-3 py-2 rounded-xl font-bold border border-teal-400 transition flex items-center gap-1.5 shadow-sm">
+            <span>📝</span> Mesas
+          </button>
+          <button onclick="openSimulador()" class="shrink-0 text-xs bg-cyan-50 text-cyan-700 px-3 py-2 rounded-xl font-bold border border-cyan-200 hover:bg-cyan-100 transition flex items-center gap-1.5 shadow-sm">
+            <span>📈</span> Proyectar
+          </button>
+          <button onclick="openSyncModal()" class="shrink-0 text-xs bg-amber-50 text-amber-700 px-3 py-2 rounded-xl font-bold border border-amber-200 hover:bg-amber-100 transition flex items-center gap-1.5 shadow-sm">
+            <span>💾</span> Sincronizar
+          </button>
+          <button onclick="openReportModal()" id="btn-export" class="shrink-0 text-xs bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
+            <span>📄</span> Reporte
+          </button>
+          <button id="btn-undo" onclick="undoLast()" disabled class="shrink-0 text-xs bg-slate-50 text-slate-700 px-3 py-2 rounded-xl font-bold border border-slate-300 hover:bg-slate-200 transition flex items-center gap-1.5 shadow-sm" title="Deshacer el último cambio (Ctrl+Z)">
+            <span>↶</span> <span class="hidden xl:inline">Deshacer</span>
+          </button>
+          <button id="btn-theme" onclick="toggleTheme()" class="shrink-0 text-sm bg-slate-50 text-slate-700 w-9 h-9 rounded-xl border border-slate-300 hover:bg-slate-200 transition shadow-sm flex items-center justify-center" title="Cambiar tema">🌙</button>
+          <button onclick="confirmReset()" class="shrink-0 text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm" title="Liquidar Datos">
+            <span>🔄</span> <span class="lg:hidden">Reset</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+      <div class="max-w-screen-2xl mx-auto px-4 py-2 flex items-center">
+        
+        <div class="flex items-center gap-3 w-full">
+          <span class="text-[10px] font-black text-slate-400 whitespace-nowrap uppercase tracking-widest shrink-0">
+            <span id="approved-count" class="text-slate-800 text-sm font-mono">0</span> / <span id="total-count" class="font-mono">0</span><span id="pend-label" class="normal-case tracking-normal text-teal-600 ml-1"></span>
+          </span>
+          <div class="flex flex-1 bg-slate-100 rounded-full h-2 overflow-hidden shadow-inner border border-slate-200" title="Azul: horas con final aprobado · Verde agua: horas con cursada aprobada (final pendiente)">
+            <div id="progress-bar" class="h-full bg-blue-600 relative" style="width:0%"></div>
+            <div id="progress-bar-cursada" class="h-full bg-teal-400" style="width:0%"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div id="chain-banner" class="hidden bg-indigo-50 border-b border-indigo-200">
+      <div class="max-w-screen-2xl mx-auto px-4 py-2 flex items-center justify-between gap-3 text-xs font-bold text-indigo-700">
+        <span id="chain-banner-text" class="min-w-0 flex-1 flex items-center gap-1.5"></span>
+        <button onclick="clearChain()" class="shrink-0 bg-white border border-indigo-200 px-3 py-1 rounded-lg hover:bg-blue-100 transition">Quitar ✕</button>
+      </div>
+    </div>
+    <div id="exam-banner" onclick="openExamsModal()" class="hidden cursor-pointer bg-amber-50 border-b border-amber-200">
+      <div class="max-w-screen-2xl mx-auto px-4 py-2 text-xs font-bold text-amber-700">
+        <span id="exam-banner-text" class="block truncate"></span>
+      </div>
+    </div>
+
+  </div> 
+
+  <!-- ══════════════════════════════════════════
+       GRILLA CURRICULAR & ZONA DE EXPORTACIÓN
+  ══════════════════════════════════════════ -->
+  <div id="export-area" class="pb-8 flex-1">
+    
+    <div id="export-watermark" class="hidden mx-auto max-w-screen-2xl px-4 pt-8 pb-4">
+      <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-xl flex justify-between items-center border-l-8 border-blue-500">
+        <div>
+          <h2 class="text-3xl font-black mb-2 tracking-tight">Reporte de Avance Académico</h2>
+          <p class="text-base text-slate-300">Profesorado en Economía — ISFD N°100 — DGCyE</p>
+          <p id="export-student" class="text-lg font-bold text-white mt-3 hidden"></p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs uppercase tracking-widest text-slate-400 font-bold mb-1">Fecha de Emisión</p>
+          <p id="export-date" class="text-xl font-mono text-white font-bold bg-white/10 px-4 py-2 rounded-xl"></p>
+        </div>
+      </div>
+    </div>
+
+    <main id="main-grid" class="max-w-screen-2xl mx-auto px-4 sm:px-6 pb-16 pt-8 overflow-x-auto min-h-[50vh]">
+      <div id="grid-container">
+        <!-- Generado por JS -->
+      </div>
+    </main>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MODAL DE INFORMACIÓN MATERIA
+  ══════════════════════════════════════════ -->
+  <div id="modal-backdrop" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 hidden" onclick="closeModal(event)">
+    <div id="modal-box" class="bg-white w-full max-w-lg shadow-2xl rounded-3xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
+      
+      <div id="modal-header" class="p-5 sm:p-6 text-white bg-slate-900 border-b border-slate-700 relative overflow-hidden shrink-0">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 10px 10px;"></div>
+        <div class="relative z-10 flex justify-between items-start gap-3">
+          <div>
+            <span id="modal-badge" class="text-[9px] sm:text-[10px] uppercase tracking-widest font-black bg-white/20 text-white px-3 py-1 rounded-full shadow-sm backdrop-blur-sm border border-white/20 inline-block mb-3"></span>
+            <h2 id="modal-title" class="text-xl sm:text-2xl font-black leading-tight tracking-tight text-white drop-shadow-md"></h2>
+          </div>
+          <button onclick="closeModal()" class="text-white hover:text-slate-200 bg-white/20 hover:bg-white/30 border border-white/20 rounded-full w-9 h-9 shrink-0 flex items-center justify-center transition shadow-sm text-base">✕</button>
+        </div>
+      </div>
+      
+      <div class="p-5 sm:p-7 space-y-5 text-sm text-slate-700 bg-slate-50 overflow-y-auto">
+        <div class="grid grid-cols-3 gap-3 sm:gap-4">
+          <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <p class="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Formato</p>
+            <p class="font-black text-slate-800 text-[11px] sm:text-sm leading-tight break-words" id="modal-formato">—</p>
+          </div>
+          <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <p class="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Régimen</p>
+            <p class="font-black text-slate-800 text-[11px] sm:text-sm leading-tight break-words" id="modal-regimen">—</p>
+          </div>
+          <div class="bg-white rounded-2xl p-3 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
+            <p class="text-[9px] sm:text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">Inversión Hs</p>
+            <p class="font-black text-blue-600 text-base sm:text-lg font-mono leading-tight" id="modal-hs">—</p>
+          </div>
+        </div>
+        
+        <div id="modal-corr-section" class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl p-4 sm:p-5">
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-slate-500 mb-2 flex items-center gap-2"><span>🔒</span> Requisitos Previos</h3>
+          <p id="modal-corr" class="text-sm font-bold text-slate-700 leading-snug"></p>
+        </div>
+
+        <div>
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-blue-600 mb-2">Finalidad Formativa</h3>
+          <p id="modal-finalidades" class="leading-relaxed text-sm text-slate-600 font-medium"></p>
+        </div>
+        
+        <div>
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-blue-600 mb-3">Núcleos de Contenido</h3>
+          <ul id="modal-contenidos" class="list-none space-y-2 text-sm text-slate-600 font-medium bg-slate-50 p-4 rounded-2xl border border-slate-100 shadow-sm"></ul>
+        </div>
+
+        <div id="modal-notes-section" class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+          <h3 class="text-[10px] uppercase tracking-widest font-black text-blue-600 flex items-center gap-2"><span>🗒️</span> Mis notas <span class="text-slate-400 font-bold normal-case tracking-normal">(se guardan solas)</span></h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Docente</label>
+              <input id="note-teacher" type="text" maxlength="80" oninput="onNoteInput()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Código de Classroom</label>
+              <input id="note-room" type="text" maxlength="40" oninput="onNoteInput()" placeholder="Ej: a1b2c3d" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+          </div>
+          <div id="note-term-wrap">
+            <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Se dicta en</label>
+            <select id="note-term" onchange="onNoteInput()" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+              <option value="">Sin definir</option>
+              <option value="1">1° cuatrimestre</option>
+              <option value="2">2° cuatrimestre</option>
+              <option value="B">Ambos cuatrimestres</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Notas</label>
+            <textarea id="note-text" rows="4" maxlength="2000" oninput="onNoteInput()" placeholder="Parciales, TP, bibliografía, recordatorios..." class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none resize-y"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ─────────────────────────────────────────────
+   INSTALACIÓN PWA AUTOMÁTICA SEGURA
+───────────────────────────────────────────── */
+let deferredPrompt;
+/* Al abrir un modal se fija la página con position:fixed (en vez de solo overflow:hidden), que es
+   lo que evita que el navegador la mande de golpe al principio al cerrarlo. */
+let __scrollLockY = 0;
+function lockScroll() {
+  __scrollLockY = window.scrollY;
+  document.body.style.position = 'fixed';
+  document.body.style.top = `-${__scrollLockY}px`;
+  document.body.style.left = '0'; document.body.style.right = '0';
+}
+function unlockScroll() {
+  document.body.style.position = ''; document.body.style.top = ''; document.body.style.left = ''; document.body.style.right = '';
+  window.scrollTo(0, __scrollLockY);
+}
+/* Confetti (~6 KB) y html2canvas (~200 KB) solo se descargan cuando realmente hacen falta
+   (festejo del 100% / exportar imagen), no en cada carga de la página. */
+const __libCache = {};
+function loadLib(url) {
+  if (__libCache[url]) return __libCache[url];
+  __libCache[url] = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = url; s.onload = resolve; s.onerror = () => { delete __libCache[url]; reject(new Error('No se pudo cargar ' + url)); };
+    document.head.appendChild(s);
+  });
+  return __libCache[url];
+}
+const loadConfetti = () => loadLib('https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js');
+const loadHtml2Canvas = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+const loadQRCode = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js');
+const loadJsQR = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/jsqr/1.4.0/jsQR.js');
+
+function openQrShow() {
+  const code = document.getElementById('sync-export-code').value;
+  if (!code || /^Error/.test(code)) { showAlert('⚠️ Atención', 'No se pudo generar el código.'); return; }
+  const holder = document.getElementById('qr-canvas-holder');
+  holder.innerHTML = '<p class="text-xs text-slate-400 py-16">Generando…</p>';
+  openBox('qr-show-modal');
+  loadQRCode().then(() => {
+    holder.innerHTML = '';
+    new QRCode(holder, { text: code, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.L });
+  }).catch(() => { holder.innerHTML = '<p class="text-xs text-red-500 py-16">No se pudo generar el QR (¿sin internet?).</p>'; });
+}
+function closeQrShow(e) { closeBox('qr-show-modal', e); }
+
+let __qrStream = null, __qrRAF = null;
+function openQrScan() {
+  const status = document.getElementById('qr-scan-status');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    status.textContent = 'Este navegador no puede usar la cámara acá (probá con https:// y un navegador más nuevo).';
+    openBox('qr-scan-modal');
+    return;
+  }
+  status.textContent = 'Cargando lector...';
+  openBox('qr-scan-modal');
+  const getCam = () => navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } })
+    .catch(() => navigator.mediaDevices.getUserMedia({ video: true }));
+  Promise.all([loadJsQR(), getCam()])
+    .then(([, stream]) => {
+      __qrStream = stream;
+      const video = document.getElementById('qr-video');
+      video.srcObject = stream;
+      video.setAttribute('playsinline', 'true');
+      video.play();
+      status.textContent = 'Apuntá al código QR...';
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const tick = () => {
+        if (!__qrStream) return;
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+          canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const found = jsQR(img.data, img.width, img.height);
+          if (found && found.data) {
+            closeQrScan();
+            document.getElementById('sync-import-code').value = found.data;
+            importSyncCode();
+            return;
+          }
+        }
+        __qrRAF = requestAnimationFrame(tick);
+      };
+      __qrRAF = requestAnimationFrame(tick);
+    })
+    .catch(() => { status.textContent = 'No se pudo activar la cámara (revisá los permisos o probá con internet).'; });
+}
+function closeQrScan(e) {
+  closeBox('qr-scan-modal', e);
+  if (__qrRAF) cancelAnimationFrame(__qrRAF);
+  __qrRAF = null;
+  if (__qrStream) { __qrStream.getTracks().forEach(t => t.stop()); __qrStream = null; }
+}
+
+let DEPS = {};   // mapa materia → materias que la tienen como correlativa
+const isAppInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallBtn();
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  hideInstallBtn();
+});
+
+function showInstallBtn() {
+  if (isAppInstalled) return;
+  const btn = document.getElementById('btn-install');
+  if (btn) btn.classList.remove('hidden');
+}
+
+function hideInstallBtn() {
+  const btn = document.getElementById('btn-install');
+  if (btn) btn.classList.add('hidden');
+}
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') hideInstallBtn();
+      deferredPrompt = null;
+    });
+  } else {
+    showInstallHelp();
+  }
+}
+
+/* El navegador no siempre dispara el aviso de instalación (ya la instalaste, lo descartaste antes,
+   abriste el archivo local, usás Firefox...). En ese caso explicamos el camino manual. */
+function showInstallHelp() {
+  const ua = navigator.userAgent;
+  let msg;
+  if (location.protocol === 'file:') {
+    msg = 'Estás abriendo el archivo desde tu disco, y así el navegador no permite instalarla. Publicala en una dirección <b>https://</b> (por ejemplo GitHub Pages o Netlify) y abrila desde ahí.';
+  } else if (/iPhone|iPad|iPod/.test(ua)) {
+    msg = 'En Safari: tocá <b>Compartir</b> y después <b>Agregar a inicio</b>.';
+  } else if (/Firefox\//.test(ua) && !/Android/.test(ua)) {
+    msg = 'Firefox de escritorio no permite instalar apps web. Abrila con <b>Chrome</b> o <b>Edge</b>.';
+  } else if (/Edg\//.test(ua)) {
+    msg = 'En Edge: menú <b>⋯</b> → <b>Aplicaciones</b> → <b>Instalar este sitio como aplicación</b>. Si ya la instalaste, buscala en el menú Inicio.';
+  } else {
+    msg = 'En Chrome: menú <b>⋮</b> → <b>Transmitir, guardar y compartir</b> → <b>Instalar página como aplicación</b> (o el ícono de instalar en la barra de direcciones). Si ya la instalaste, buscala en el menú Inicio.';
+  }
+  showAlert('📱 Instalar la app', msg);
+}
+
+/* ─────────────────────────────────────────────
+   VALIDADOR DE NOTAS EN TIEMPO REAL
+───────────────────────────────────────────── */
+function validateGrade(el) {
+  if (el.value === '') return;
+  const n = parseFloat(el.value);
+  if (isNaN(n)) return;
+  if (n < 0) { el.value = ''; return; }
+  if (n > 10) { el.value = 10; return; }
+  const m = el.value.match(/^(\d+)\.(\d{3,})$/);   // máximo 2 decimales
+  if (m) el.value = m[1] + '.' + m[2].substring(0, 2);
+}
+
+/* ── Utilidades ── */
+function normalizeText(s) {
+  return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+}
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function safeGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+function safeSet(key, val) { try { localStorage.setItem(key, val); } catch (e) { console.warn('No se pudo guardar:', e); } }
+function loadJSON(key) {
+  try { const raw = safeGet(key); return raw ? JSON.parse(raw) : null; }
+  catch (e) { console.warn('Datos dañados en', key, e); return null; }
+}
+
+/* ─────────────────────────────────────────────
+   DATOS DEL PLAN DE ESTUDIOS
+───────────────────────────────────────────── */
+const SUBJECTS = [
+  // 1ER AÑO
+  { id: 'pedagogia', name: 'Pedagogía', year: 1, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Introducir a los/as estudiantes en el campo de la Pedagogía.', contenidos: ['La educación como práctica social y política','Historia de la pedagogía moderna','Escuela, conocimiento y poder','Corrientes pedagógicas contemporáneas'] },
+  { id: 'educacion-transformaciones', name: 'Educación y transformaciones sociales contemporáneas', year: 1, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Abordar los vínculos entre educación y sociedad a la luz de los cambios actuales.', contenidos: ['Modernidad, postmodernidad y educación','Globalización y desigualdad educativa','Políticas de inclusión y exclusión escolar','Identidades, diversidad y cultura escolar'] },
+  { id: 'esi', name: 'ESI — Educación Sexual Integral', year: 1, campo: 'CFG', formato: 'Taller', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Brindar herramientas conceptuales y didácticas para abordar la ESI.', contenidos: ['Marco normativo','Perspectiva de géneros y derechos','Cuerpo, salud y relaciones interpersonales','ESI y enseñanza disciplinar'] },
+  { id: 'cultura-digital', name: 'Cultura Digital y educación', year: 1, campo: 'CFG', formato: 'Taller', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Reflexionar sobre el impacto de las tecnologías digitales en la cultura y educación.', contenidos: ['Sociedad de la información y del conocimiento','Cultura participativa y redes sociales','Tecnologías digitales en el aula','Ciudadanía digital y ética en la red'] },
+  { id: 'matematica-cs-economicas', name: 'Matemática aplicada a las Ciencias Económicas', year: 1, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Proveer los fundamentos matemáticos necesarios para el análisis económico.', contenidos: ['Funciones y gráficos económicos','Cálculo diferencial e integral aplicado','Sistemas de ecuaciones lineales','Introducción a la estadística descriptiva'] },
+  { id: 'historia-mundial', name: 'Historia Económica y Social Mundial', year: 1, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Analizar los procesos históricos de larga duración que configuraron el sistema económico mundial.', contenidos: ['Feudalismo y transición al capitalismo','Revolución Industrial y expansión europea','Imperialismo y primera globalización','Crisis de 1929 y pos-segunda guerra mundial','Globalización neoliberal y sus críticas'] },
+  { id: 'intro-economia-politica', name: 'Introducción a la Economía Política', year: 1, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: [], finalidades: 'Introducir los conceptos fundamentales de la Economía Política como ciencia social crítica.', contenidos: ['El objeto de la Economía Política','Valor, trabajo y mercancía','Oferta, demanda y formación de precios','Distribución del ingreso y clases sociales','El rol del Estado en la economía'] },
+  { id: 'teoria-organizaciones', name: 'Teoría de las organizaciones', year: 1, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Estudiar las organizaciones como fenómeno social complejo.', contenidos: ['Concepto y tipología de organizaciones','Escuelas del pensamiento organizacional','Cultura y clima organizacional','Organizaciones y entorno: enfoque sistémico'] },
+  { id: 'sic-i', name: 'Sistemas de Información Contable I', year: 1, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Introducir los fundamentos de la contabilidad como sistema de información.', contenidos: ['Partida doble y ecuación patrimonial','El ciclo contable','Registración de operaciones básicas','Estados contables básicos'] },
+  { id: 'practica-i', name: 'Práctica Docente I', year: 1, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 128, prereqs: [], finalidades: 'Iniciar el recorrido por instituciones educativas para observar el trabajo docente.', contenidos: ['El rol docente y la construcción de la identidad profesional','Observación participante en instituciones escolares','Análisis del contexto institucional y comunitario','Primeras intervenciones pedagógicas supervisadas'] },
+  
+  // 2DO AÑO
+  { id: 'didactica-curriculum', name: 'Didáctica y currículum', year: 2, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['pedagogia'], finalidades: 'Analizar la Didáctica como campo de conocimiento y el currículum como construcción social.', contenidos: ['La Didáctica: objeto, enfoques y tradiciones','Diseño curricular: niveles y componentes','Programación de la enseñanza','Evaluación: concepciones y prácticas'] },
+  { id: 'psicologia-aprendizaje', name: 'Psicología del aprendizaje', year: 2, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Comprender los procesos psicológicos involucrados en el aprendizaje escolar.', contenidos: ['Teorías del aprendizaje: conductismo, cognitivismo, socioconstructivismo','Desarrollo cognitivo y aprendizaje escolar','Motivación, emoción y aprendizaje','Atención a la diversidad en el aula'] },
+  { id: 'analisis-instituciones', name: 'Análisis de las instituciones educativas', year: 2, campo: 'CFG', formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Analizar las instituciones educativas desde enfoques organizacionales y sociológicos.', contenidos: ['La institución educativa como organización','Cultura, clima y malestar institucional','Poder, autoridad y conflicto en la escuela','El proyecto institucional como herramienta de gestión'] },
+  { id: 'pensamiento-politico', name: 'Pensamiento político pedagógico latinoamericano', year: 2, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['pedagogia'], finalidades: 'Recuperar el pensamiento pedagógico latinoamericano desde una perspectiva descolonizadora.', contenidos: ['Simón Rodríguez y la educación popular','Paulo Freire: pedagogía del oprimido','Pedagogías críticas en América Latina','Educación, Estado e identidad nacional en Argentina'] },
+  { id: 'sic-ii', name: 'Sistemas de Información Contable II', year: 2, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: ['sic-i'], finalidades: 'Profundizar en los sistemas contables de mayor complejidad.', contenidos: ['Ajuste por inflación en contabilidad','Bienes de cambio, bienes de uso e intangibles','Estado de resultados y flujo de fondos','Normas contables profesionales argentinas'] },
+  { id: 'historia-argentina', name: 'Historia Económica y Social Argentina', year: 2, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['historia-mundial'], finalidades: 'Analizar el desarrollo histórico de la economía argentina en el contexto mundial.', contenidos: ['Economía colonial y independencia','Modelo agroexportador (1880–1930)','Industrialización por sustitución de importaciones','Neoliberalismo, crisis de 2001 y pos-convertibilidad'] },
+  { id: 'economia-politica-i', name: 'Economía Política I', year: 2, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['intro-economia-politica', 'historia-mundial'], finalidades: 'Profundizar en las categorías centrales de la Economía Política.', contenidos: ['El capital: producción, circulación y acumulación','Dinero, crédito y capital financiero','Crisis económicas: enfoques teóricos','Estado y política económica'] },
+  { id: 'administracion', name: 'Administración', year: 2, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: ['teoria-organizaciones'], finalidades: 'Estudiar los procesos administrativos y herramientas de gestión.', contenidos: ['Planeamiento estratégico y operativo','Estructura organizacional y diseño','Dirección, liderazgo y motivación','Control de gestión y tablero de comando'] },
+  { id: 'derecho-cs-economicas', name: 'Elementos de Derecho para Ciencias Económicas', year: 2, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Brindar los fundamentos del derecho privado y público relevantes.', contenidos: ['Introducción al Código Civil y Comercial','Contratos: tipos y elementos','Derecho laboral básico','Derecho tributario y sociedades comerciales'] },
+  { id: 'herramientas-estadisticas', name: 'Herramientas estadísticas para el análisis económico', year: 2, campo: 'CFE', formato: 'Taller', regimen: 'Cuatrimestral', hs: 32, prereqs: ['matematica-cs-economicas'], finalidades: 'Desarrollar competencias en el uso de herramientas estadísticas cuantitativas.', contenidos: ['Estadística descriptiva e inferencial','Correlación y regresión lineal','Series de tiempo: tendencia y estacionalidad','Uso de hojas de cálculo para análisis económico'] },
+  { id: 'practica-ii', name: 'Práctica Docente II', year: 2, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 128, prereqs: ['practica-i', 'educacion-transformaciones', 'intro-economia-politica'], finalidades: 'Ampliar el conocimiento sobre la institución escolar e intervenir en situaciones de enseñanza.', contenidos: ['La planificación como hipótesis de trabajo','Estrategias de enseñanza en Ciencias Económicas','Gestión del aula y convivencia escolar','Análisis reflexivo de las primeras intervenciones'] },
+  
+  // 3ER AÑO
+  { id: 'politica-educativa', name: 'Política educativa argentina', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['pensamiento-politico'], finalidades: 'Analizar el sistema educativo argentino en sus dimensiones normativas y políticas.', contenidos: ['El Estado y la política educativa','Sistema educativo argentino: estructura y niveles','Financiamiento educativo y políticas de igualdad','Reformas educativas en Argentina'] },
+  { id: 'problemas-filosoficos', name: 'Problemas filosóficos de la educación', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Reflexionar sobre los fundamentos filosóficos de la educación.', contenidos: ['Epistemología y educación','Ética docente y deontología profesional','Filosofía política y educación democrática','El problema de la autoridad pedagógica'] },
+  { id: 'trayectorias-jovenes', name: 'Trayectorias educativas de jóvenes y adultos', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32, prereqs: ['esi', 'cultura-digital'], finalidades: 'Analizar las trayectorias educativas en los contextos actuales.', contenidos: ['Juventudes: diversidad de trayectorias vitales','Educación de jóvenes y adultos: marcos normativos','Dispositivos institucionales de acompañamiento','TIC y educación de adultos'] },
+  { id: 'economia-politica-ii', name: 'Economía Política II', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['intro-economia-politica', 'matematica-cs-economicas'], finalidades: 'Avanzar en el estudio de las economías capitalistas contemporáneas.', contenidos: ['Financiarización y capital especulativo','Economía internacional: teorías y debates','Mundialización del capital y empresas transnacionales','Crisis del neoliberalismo y alternativas'] },
+  { id: 'sistemas-administrativos', name: 'Sistemas Administrativos', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['teoria-organizaciones', 'sic-i'], finalidades: 'Estudiar los sistemas administrativos, flujos de información y control interno.', contenidos: ['Sistemas y procedimientos administrativos','Manuales de organización y funciones','Control interno: concepto y componentes','Gestión documental y flujos de trabajo'] },
+  { id: 'administracion-financiera', name: 'Administración financiera', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['matematica-cs-economicas'], finalidades: 'Desarrollar competencias para el análisis financiero y toma de decisiones.', contenidos: ['Valor tiempo del dinero y matemática financiera','Análisis del riesgo y la rentabilidad','Presupuesto de capital y evaluación de proyectos','Estructura de capital y política de dividendos'] },
+  { id: 'analisis-estados-contables', name: 'Análisis de Estados Contables', year: 3, campo: 'CFE', formato: 'Taller', regimen: 'Anual', hs: 64, prereqs: ['sic-ii'], finalidades: 'Desarrollar la capacidad de interpretar y analizar estados contables.', contenidos: ['Lectura crítica de estados contables','Ratios e indicadores financieros','Análisis horizontal y vertical','Casos reales de empresas argentinas'] },
+  { id: 'didactica-cs-economicas', name: 'Didáctica de las Ciencias Económicas', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['intro-economia-politica', 'teoria-organizaciones', 'sic-i', 'didactica-curriculum'], finalidades: 'Articular los saberes disciplinares con la Didáctica para diseñar propuestas de enseñanza.', contenidos: ['Transposición didáctica en Ciencias Económicas','Diseño de secuencias didácticas','Recursos y materiales para la enseñanza','Evaluación de aprendizajes en Ciencias Económicas'] },
+  { id: 'derechos-esca', name: 'Derechos Económicos, Sociales, Culturales y Ambientales', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Abordar los derechos como marco para el análisis crítico de políticas públicas.', contenidos: ['Marco normativo internacional y nacional','Derecho al trabajo, salud, educación y vivienda','Ambiente y desarrollo sostenible','Movimientos sociales y exigibilidad de derechos'] },
+  { id: 'sociologia-organizaciones', name: 'Sociología de las organizaciones', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32, prereqs: ['teoria-organizaciones'], finalidades: 'Analizar las organizaciones desde una perspectiva sociológica.', contenidos: ['Perspectivas clásicas: Weber, Durkheim, Marx','Burocracia y racionalidad organizacional','Poder, control y resistencia en las organizaciones','Organizaciones y sociedad civil'] },
+  { id: 'practica-iii', name: 'Práctica Docente III', year: 3, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['practica-ii', 'didactica-curriculum', 'economia-politica-i'], finalidades: 'Asumir progresivamente la responsabilidad de planificar y evaluar secuencias de enseñanza.', contenidos: ['Residencia progresiva en aulas de nivel secundario','Planificación de unidades y clases','Relación docente-alumno y gestión del aula','Análisis reflexivo de la práctica propia'] },
+
+  // 4TO AÑO
+  { id: 'reflexion-filosofica', name: 'Reflexión filosófico-política de la práctica docente', year: 4, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['politica-educativa'], finalidades: 'Profundizar la reflexión crítica sobre la práctica docente orientada a la emancipación.', contenidos: ['Ética y compromiso político del docente','Educación, democracia y ciudadanía','El docente como intelectual transformador','Perspectivas poscríticas en educación'] },
+  { id: 'derechos-interculturalidad', name: 'Derechos, interculturalidad y ciudadanía', year: 4, campo: 'CFG', formato: 'Seminario', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Reflexionar sobre la diversidad cultural y el enfoque intercultural.', contenidos: ['Interculturalidad crítica y derechos humanos','Pueblos originarios y educación intercultural bilingüe','Migraciones, xenofobia y escuela','Educación antirracista y perspectiva afrodescendiente'] },
+  { id: 'eoi-cfg', name: 'Espacio de Opción Institucional (CFG)', year: 4, campo: 'CFG', formato: 'Taller', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Espacio de definición institucional.', contenidos: ['Definido por el ISFD N°100 según su proyecto institucional'] },
+  { id: 'problemas-ensenanza', name: 'Problemas de la enseñanza de las Ciencias Económicas', year: 4, campo: 'CFE', formato: 'Ateneo', regimen: 'Anual', hs: 64, prereqs: ['didactica-cs-economicas'], finalidades: 'Analizar colectivamente los principales problemas de la enseñanza en secundaria.', contenidos: ['Problemas epistémicos de la Economía como disciplina escolar','La motivación y el interés en Ciencias Económicas','TIC y nuevos recursos para la enseñanza económica','Evaluación alternativa: portfolio, proyectos, rúbricas'] },
+  { id: 'politica-economica', name: 'Política Económica', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['economia-politica-ii'], finalidades: 'Estudiar instrumentos y objetivos de la política económica y su aplicación histórica.', contenidos: ['Política fiscal, monetaria y cambiaria','Inflación y estabilización económica','Política de ingresos y distribución','Casos de estudio: Argentina'] },
+  { id: 'problemas-desarrollo', name: 'Problemáticas del Desarrollo Latinoamericano', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['economia-politica-ii'], finalidades: 'Examinar las problemáticas del desarrollo económico en América Latina.', contenidos: ['Teoría de la dependencia y estructuralismo cepalino','Neoextractivismo y economías de enclave','Integración regional latinoamericana','Buen vivir y alternativas al desarrollo'] },
+  { id: 'economia-politica-iii', name: 'Economía Política III', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: ['economia-politica-ii'], finalidades: 'Profundizar en grandes debates: financiarización, trabajo, Estado y poscapitalismo.', contenidos: ['El debate sobre el fin del trabajo','Economía popular, social y solidaria','Renta básica universal y redistribución','Perspectivas ecosocialistas y feministas'] },
+  { id: 'diseno-proyectos', name: 'Diseño de Proyectos Organizacionales', year: 4, campo: 'CFE', formato: 'Taller', regimen: 'Anual', hs: 96, prereqs: ['administracion'], finalidades: 'Desarrollar competencias para el diseño y evaluación de proyectos en contextos reales.', contenidos: ['Marco lógico para la planificación de proyectos','Estudio de prefactibilidad técnica y financiera','Formulación de proyectos de economía social','Monitoreo, evaluación y sistematización de proyectos'] },
+  { id: 'eoi-cfe', name: 'Espacio de Opción Institucional (CFE)', year: 4, campo: 'CFE', formato: 'A definir', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Espacio de definición institucional para profundizar en Ciencias Económicas.', contenidos: ['Definido por el ISFD N°100 según su proyecto institucional'] },
+  { id: 'practica-iv', name: 'Práctica Docente IV — Residencia', year: 4, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['practica-iii'], finalidades: 'Asumir la conducción del proceso de enseñanza de manera integral completando la residencia.', contenidos: ['Residencia docente autónoma en nivel secundario','Elaboración del portfolio de residencia','Reflexión crítica sobre la práctica profesional','Coloquio integrador y presentación final'] }
+];
+
+/* ─────────────────────────────────────────────
+   ESTADO GLOBAL (V2) & LOCAL STORAGE
+───────────────────────────────────────────── */
+const NOTA_MINIMA = 4;                             // nota mínima de aprobación
+const FINAL_REQUIERE_CORRELATIVAS_ACREDITADAS = true;   // para rendir un final hay que tener los finales de las correlativas aprobados
+const DAYS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+const emptySchedule = () => Object.fromEntries(DAYS.map(d => [d, []]));
+
+const state = {
+  userSubjects: {},
+  searchQuery: '',
+  totalHs: 0,
+  schedule: emptySchedule(),
+  student: '',
+  exams: {},
+  notes: {},
+  scheduleView: 'all',
+  termFilter: 'all'
+};
+
+const CAMPO_COLORS = {
+  CFG: { bg: 'bg-[#1e3a8a]', label: 'CFG', title: 'Formación General' },
+  CFE: { bg: 'bg-[#059669]', label: 'CFE', title: 'Formación Específica' },
+  CPD: { bg: 'bg-[#d97706]', label: 'CPD', title: 'Práctica Docente' },
+};
+
+/* Limpia datos guardados/importados: descarta materias que ya no existen, estados raros y notas inválidas */
+function sanitizeUserSubjects(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  Object.keys(raw).forEach(id => {
+    if (!SUBJECTS.some(s => s.id === id)) return;
+    const v = raw[id];
+    if (!v || !['approved', 'cursada', 'en_curso'].includes(v.status)) return;
+    let g = (v.status !== 'approved' || v.grade === null || v.grade === undefined || v.grade === '') ? null : Number(v.grade);
+    if (g !== null && (isNaN(g) || g < NOTA_MINIMA || g > 10)) g = null;
+    out[id] = { status: v.status, grade: g };
+  });
+  return out;
+}
+
+function sanitizeSchedule(raw) {
+  const out = emptySchedule();
+  if (!raw || typeof raw !== 'object') return out;
+  DAYS.forEach(day => {
+    if (!Array.isArray(raw[day])) return;
+    raw[day].forEach(item => {
+      if (item && SUBJECTS.some(s => s.id === item.id)) {
+        out[day].push({ id: item.id, time: String(item.time || 'Sin horario definido').slice(0, 40) });
+      }
+    });
+  });
+  return out;
+}
+
+function init() {
+  const oldSaved = safeGet('isfd100_aprobadas');
+  if (oldSaved && !safeGet('isfd100_data_v2')) {
+    try {
+      JSON.parse(oldSaved).forEach(id => { state.userSubjects[id] = { status: 'approved', grade: null }; });
+      state.userSubjects = sanitizeUserSubjects(state.userSubjects);
+      saveState();
+    } catch (e) { console.warn('Migración v1 falló', e); }
+  }
+
+  const savedV2 = loadJSON('isfd100_data_v2');
+  if (savedV2) state.userSubjects = sanitizeUserSubjects(savedV2);
+
+  const savedSchedule = loadJSON('isfd100_horarios');
+  if (savedSchedule) state.schedule = sanitizeSchedule(savedSchedule);
+
+  const savedExams = loadJSON('isfd100_mesas');
+  if (savedExams) state.exams = sanitizeExams(savedExams);
+
+  const savedNotes = loadJSON('isfd100_notas');
+  if (savedNotes) state.notes = sanitizeNotes(savedNotes);
+
+  state.student = sanitizeStudent(safeGet('isfd100_alumno'));
+
+  state.totalHs = SUBJECTS.reduce((acc, s) => acc + s.hs, 0);
+
+  calculateDependencies();
+
+  if (!safeGet('isfd100_onboarding')) {
+    document.getElementById('onboarding-modal').classList.remove('hidden');
+    setTimeout(() => { document.getElementById('onboarding-modal').children[0].classList.add('scale-100'); }, 10);
+  }
+
+  renderGrid();
+  updateAllCards();
+  updateProgress();
+  syncThemeButton();
+  updateUndoButton();
+  updateStudentUI();
+
+  showInstallBtn();   // siempre visible salvo que ya estés dentro de la app instalada
+
+  document.getElementById('search-input').addEventListener('input', (e) => {
+    state.searchQuery = normalizeText(e.target.value.trim());
+    applyFilterStyles();
+  });
+}
+
+function saveState() {
+  safeSet('isfd100_data_v2', JSON.stringify(state.userSubjects));
+  safeSet('isfd100_horarios', JSON.stringify(state.schedule));
+  safeSet('isfd100_mesas', JSON.stringify(state.exams));
+  safeSet('isfd100_notas', JSON.stringify(state.notes));
+  safeSet('isfd100_alumno', state.student || '');
+}
+
+/* ─────────────────────────────────────────────
+   ALGORITMO DE RUTA CRÍTICA
+───────────────────────────────────────────── */
+function calculateDependencies() {
+  const dependentsMap = {};
+  SUBJECTS.forEach(s => dependentsMap[s.id] = []);
+  
+  SUBJECTS.forEach(s => {
+    s.prereqs.forEach(pre => {
+      if (dependentsMap[pre]) dependentsMap[pre].push(s.id);
+    });
+  });
+
+  DEPS = dependentsMap;
+
+  function countAllDownstream(id, visited = new Set()) {
+    visited.add(id);
+    dependentsMap[id].forEach(dep => {
+      if (!visited.has(dep)) countAllDownstream(dep, visited);
+    });
+    return visited;
+  }
+
+  SUBJECTS.forEach(s => {
+    const downstream = countAllDownstream(s.id);
+    downstream.delete(s.id); 
+    s.bottleneckCount = downstream.size;
+  });
+}
+
+// Algoritmo de Compresión de Código Corto (v4: el horario va con encodeURIComponent,
+// así soporta guiones largos, comas, barras, emojis, etc. sin romper btoa ni el separador)
+function generateShortCode() {
+  const uParts = [];
+  Object.keys(state.userSubjects).forEach(id => {
+    const idx = SUBJECTS.findIndex(s => s.id === id);
+    if (idx === -1) return;
+    const sub = state.userSubjects[id];
+    const st = sub.status === 'approved' ? 'a' : sub.status === 'cursada' ? 'f' : 'c';
+    const gr = (sub.grade !== null && sub.grade !== undefined) ? sub.grade : '';
+    uParts.push(`${idx}${st}${gr}`);
+  });
+
+  const sParts = [];
+  DAYS.forEach((day, dIdx) => {
+    (state.schedule[day] || []).forEach(item => {
+      const idx = SUBJECTS.findIndex(s => s.id === item.id);
+      if (idx !== -1) sParts.push(`${dIdx}-${idx}-${encodeURIComponent(item.time || '')}`);
+    });
+  });
+
+  const tParts = [];
+  SUBJECTS.forEach((s, idx) => {
+    const t = state.notes[s.id]?.term;
+    if (t === '1' || t === '2' || t === 'B') tParts.push(`${idx}${t}`);
+  });
+
+  return btoa(`v7|${uParts.join(',')}|${sParts.join(',')}|${tParts.join(',')}|${encodeURIComponent(state.student || '')}`).replace(/=/g, '');
+}
+
+function decodeShortCode(encoded) {
+  let str = encoded.replace(/\s+/g, '');
+  while (str.length % 4 !== 0) str += '=';
+
+  const decoded = atob(str);
+  const parts = decoded.split('|');
+  const version = parts[0];
+
+  if (!['v3', 'v4', 'v5', 'v6', 'v7'].includes(version)) {
+    const data = JSON.parse(decoded);          // formato viejo (v2)
+    if (data && data.v === 2) return { u: sanitizeUserSubjects(data.u), s: sanitizeSchedule(data.s) };
+    throw new Error('Invalid');
+  }
+
+  const newU = {};
+  if (parts[1]) {
+    parts[1].split(',').forEach(p => {
+      const match = p.match(/^(\d+)([acf])(.*)$/);
+      if (match) {
+        const idx = parseInt(match[1], 10);
+        const status = match[2] === 'a' ? 'approved' : match[2] === 'f' ? 'cursada' : 'en_curso';
+        const grade = match[3] ? parseFloat(match[3]) : null;
+        if (SUBJECTS[idx]) newU[SUBJECTS[idx].id] = { status, grade };
+      }
+    });
+  }
+
+  const newS = emptySchedule();
+  if (parts[2]) {
+    parts[2].split(',').forEach(p => {
+      const match = p.match(/^(\d+)-(\d+)-(.*)$/);
+      if (match) {
+        const dIdx = parseInt(match[1], 10);
+        const sIdx = parseInt(match[2], 10);
+        let time = match[3];
+        if (version !== 'v3') { try { time = decodeURIComponent(time); } catch (e) {} }
+        if (DAYS[dIdx] && SUBJECTS[sIdx]) newS[DAYS[dIdx]].push({ id: SUBJECTS[sIdx].id, time });
+      }
+    });
+  }
+  const newT = {};
+  if (parts[3]) {
+    parts[3].split(',').forEach(p => {
+      const m = p.match(/^(\d+)([12B])$/);
+      if (m && SUBJECTS[parseInt(m[1], 10)]) newT[SUBJECTS[parseInt(m[1], 10)].id] = m[2];
+    });
+  }
+  let name = '';
+  if (parts[4]) { try { name = sanitizeStudent(decodeURIComponent(parts[4])); } catch (e) { name = ''; } }
+  return { u: sanitizeUserSubjects(newU), s: sanitizeSchedule(newS), t: newT, a: name };
+}
+
+/* ─────────────────────────────────────────────
+   RENDERIZADO DE GRILLA (Solo Año)
+───────────────────────────────────────────── */
+function renderGrid() {
+  const container = document.getElementById('grid-container');
+  container.innerHTML = '';
+
+  const byYear = { 1: [], 2: [], 3: [], 4: [] };
+  SUBJECTS.forEach(s => byYear[s.year].push(s));
+
+  [1, 2, 3, 4].forEach(yr => {
+    const col = document.createElement('div');
+    col.className = 'year-col flex flex-col gap-5';
+    col.innerHTML = `
+      <div class="border-b-[3px] border-slate-300 pb-2 mb-1 font-black text-xl text-slate-800 flex items-center justify-between">
+        <span>${yr}° Año</span> 
+        <span class="text-[10px] font-bold bg-white border border-slate-200 text-slate-500 px-2.5 py-1 rounded-lg uppercase tracking-wider shadow-sm">${byYear[yr].length} MAT.</span>
+      </div>`;
+    byYear[yr].forEach(s => col.appendChild(createCard(s)));
+    container.appendChild(col);
+  });
+}
+
+function createCard(subject) {
+  const card = document.createElement('div');
+  card.className = 'subject-card group';
+  card.dataset.state = 'locked';
+  card.id = `card-${subject.id}`;
+  card.tabIndex = 0;
+  card.setAttribute('role', 'button');
+  
+  const isBottleneck = subject.bottleneckCount >= 3;
+  const bottleneckHtml = isBottleneck 
+    ? `<span class="bg-red-100 text-red-700 border border-red-200 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shadow-sm ml-2" title="Esta materia traba el cursado de otras ${subject.bottleneckCount} materias">🔥 Ruta Crítica</span>` 
+    : '';
+
+  card.innerHTML = `
+    <div class="flex justify-between items-start mb-3">
+      <div class="flex items-center">
+        <span class="campo-badge ${CAMPO_COLORS[subject.campo].bg} px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-sm">${CAMPO_COLORS[subject.campo].label}</span>
+        ${bottleneckHtml}
+      </div>
+      <span class="status-icon text-lg leading-none"></span>
+    </div>
+    <h3 class="font-black text-[15px] leading-snug mb-1.5 pr-2 transition-colors">${subject.name}</h3>
+    <p class="subtitle text-[11px] font-bold tracking-wide uppercase font-mono transition-colors">${subject.regimen} · ${subject.hs}hs</p>
+    <div class="card-extras flex-wrap gap-1.5 mt-2" style="display:none"></div>
+    
+    <div class="card-divider mt-auto pt-3.5 border-t flex justify-between items-center transition-colors">
+      <span class="status-label text-[10px] font-black uppercase tracking-widest transition-colors"></span>
+      <div class="flex items-center gap-1.5">
+        <button onclick="toggleChain(event, '${subject.id}')" data-id="${subject.id}" class="info-btn chain-btn w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center transition shadow-sm" title="Resaltar cadena de correlativas" aria-label="Resaltar cadena de correlativas de ${subject.name}">🔗</button>
+        <button onclick="openModal(event, '${subject.id}')" class="info-btn w-8 h-8 rounded-full text-sm font-bold flex items-center justify-center transition shadow-sm" title="Ver Info">i</button>
+      </div>
+    </div>
+  `;
+  
+  card.addEventListener('click', (e) => {
+    if (e.target.closest('.info-btn')) return;
+    handleCardClick(subject.id);
+  });
+  card.addEventListener('keydown', (e) => {
+    if (e.target !== card) return;
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(subject.id); }
+  });
+  
+  card.addEventListener('mouseenter', () => onCardEnter(subject.id));
+  card.addEventListener('mouseleave', onCardLeave);
+
+  return card;
+}
+
+/* ─────────────────────────────────────────────
+   LOGICA & ACTUALIZACIÓN DE ESTADOS DOM
+───────────────────────────────────────────── */
+function isSubjectEnabled(id) {
+  const subject = SUBJECTS.find(s => s.id === id);
+  if (!subject) return false;
+  return subject.prereqs.every(prereqCursadaOk);
+}
+
+/* Para CURSAR una materia alcanza con tener la cursada aprobada de las correlativas (o el final). */
+function prereqCursadaOk(pid) {
+  const st = state.userSubjects[pid]?.status;
+  return st === 'cursada' || st === 'approved';
+}
+
+/* Para RENDIR/acreditar el final hay que tener acreditadas (final aprobado) las correlativas. */
+function finalBlockers(subject) {
+  return subject.prereqs.filter(pid => state.userSubjects[pid]?.status !== 'approved');
+}
+
+function handleCardClick(id) {
+  const isEnabled = isSubjectEnabled(id);
+  const currentStatus = state.userSubjects[id] ? state.userSubjects[id].status : null;
+  
+  if (!isEnabled && !currentStatus) return;
+  openStatusModal(id);
+}
+
+function openStatusModal(id) {
+  const subject = SUBJECTS.find(s => s.id === id);
+  document.getElementById('status-subject-name').textContent = subject.name;
+  document.getElementById('status-subject-id').value = id;
+  
+  const currentStatus = state.userSubjects[id]?.status || 'enabled';
+  const grade = state.userSubjects[id]?.grade ?? '';
+  
+  document.getElementById('status-select').value = currentStatus;
+  document.getElementById('status-grade').value = grade;
+  
+  toggleGradeInput();
+
+  const modal = document.getElementById('status-modal');
+  modal.classList.remove('hidden');
+  setTimeout(() => { modal.children[0].classList.remove('scale-95'); modal.children[0].classList.add('scale-100'); }, 10);
+}
+
+function closeStatusModal(e) {
+  if (e && e.target !== document.getElementById('status-modal') && e.type === 'click') return;
+  const modal = document.getElementById('status-modal');
+  modal.children[0].classList.remove('scale-100');
+  modal.children[0].classList.add('scale-95');
+  setTimeout(() => { modal.classList.add('hidden'); }, 150);
+}
+
+function toggleGradeInput() {
+  const val = document.getElementById('status-select').value;
+  const container = document.getElementById('grade-container');
+  if (val === 'approved') {
+    container.classList.remove('hidden');
+  } else {
+    container.classList.add('hidden');
+  }
+}
+
+function saveSubjectStatus() {
+  const id = document.getElementById('status-subject-id').value;
+  const newStatus = document.getElementById('status-select').value;
+  const gradeInput = document.getElementById('status-grade').value;
+  let grade = null;
+
+  if (newStatus === 'approved' && gradeInput !== '') {
+    grade = parseFloat(gradeInput);
+    if (isNaN(grade) || grade < NOTA_MINIMA || grade > 10) {
+      showAlert('⚠️ Atención', `La nota de aprobación tiene que estar entre ${NOTA_MINIMA} y 10.`);
+      return;
+    }
+  }
+
+  const subject = SUBJECTS.find(s => s.id === id);
+  const prevStatus = state.userSubjects[id]?.status;
+
+  if (prevStatus === 'cursada' && newStatus !== 'cursada' && newStatus !== 'approved' && state.exams[id] && (state.exams[id].date || state.exams[id].attempts)) {
+    const when = state.exams[id].date ? ` (${fmtDateShort(state.exams[id].date)})` : '';
+    if (!confirm(`Tenés una mesa cargada para ${subject.name}${when}. Si cambiás el estado, va a dejar de verse en "Mesas". ¿Continuar?`)) return;
+  }
+
+  // Para acreditar el final, las correlativas tienen que estar acreditadas
+  if (newStatus === 'approved' && FINAL_REQUIERE_CORRELATIVAS_ACREDITADAS) {
+    const faltan = finalBlockers(subject);
+    if (faltan.length > 0) {
+      const names = faltan.map(pid => SUBJECTS.find(x => x.id === pid).name);
+      showAlert('🛑 Final bloqueado', `Para rendir <b>${subject.name}</b> primero necesitás tener aprobado el final de:<br><br><span class="text-xs text-slate-500 font-mono">▪ ${names.join('<br>▪ ')}</span><br><br>Podés dejarla como <b>Cursada aprobada (final pendiente)</b>.`);
+      return;
+    }
+  }
+
+  // Coherencia hacia adelante: no se puede "bajar" una materia si otras que dependen de ella ya están en marcha
+  const broken = SUBJECTS.filter(d => d.prereqs.includes(id) && state.userSubjects[d.id]).filter(d => {
+    const ds = state.userSubjects[d.id].status;
+    if (ds === 'approved' && FINAL_REQUIERE_CORRELATIVAS_ACREDITADAS) return newStatus !== 'approved';
+    return newStatus !== 'cursada' && newStatus !== 'approved';
+  });
+  if (broken.length > 0) {
+    showAlert('🛑 Movimiento Bloqueado', `Con ese estado se rompen las correlativas de:<br><br><span class="text-xs text-slate-500 font-mono">▪ ${broken.map(d => d.name).join('<br>▪ ')}</span><br><br>Primero cambiá el estado de esas materias.`);
+    return;
+  }
+
+  pushUndo(`${subject.name} → ${STATUS_LABEL[newStatus]}`);
+
+  const previouslyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
+
+  if (newStatus === 'enabled') {
+    delete state.userSubjects[id];
+  } else {
+    state.userSubjects[id] = { status: newStatus, grade: grade };
+  }
+
+  saveState();
+  updateAllCards();
+  updateProgress();
+  closeStatusModal();
+
+  if (newStatus === 'approved' || newStatus === 'cursada') {
+    const currentlyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
+    currentlyEnabled.forEach(newId => {
+      if (!previouslyEnabled.has(newId)) {
+        const card = document.getElementById(`card-${newId}`);
+        if (card) {
+          card.classList.remove('animate-unlock');
+          void card.offsetWidth;
+          card.classList.add('animate-unlock');
+        }
+      }
+    });
+  }
+}
+
+function updateAllCards() {
+  SUBJECTS.forEach(subject => {
+    const card = document.getElementById(`card-${subject.id}`);
+    if (!card) return;
+
+    const iconEl = card.querySelector('.status-icon');
+    const labelEl = card.querySelector('.status-label');
+    const uData = state.userSubjects[subject.id];
+
+    // Limpia lo que pudo dejar el estado anterior (título, cursor de ayuda, subrayado)
+    labelEl.removeAttribute('title');
+    labelEl.style.cursor = '';
+    labelEl.style.textDecoration = '';
+
+    if (uData && uData.status === 'approved') {
+      card.dataset.state = 'approved';
+      iconEl.innerHTML = '✓';
+      labelEl.innerHTML = (uData.grade !== null && uData.grade !== undefined) ? `Aprobada (Nota: ${uData.grade})` : 'Aprobada';
+    }
+    else if (uData && uData.status === 'cursada') {
+      card.dataset.state = 'cursada';
+      iconEl.innerHTML = '📝';
+      const blockers = FINAL_REQUIERE_CORRELATIVAS_ACREDITADAS ? finalBlockers(subject) : [];
+      if (blockers.length > 0) {
+        labelEl.innerHTML = `Final pendiente · 🔒 ${blockers.length}`;
+        labelEl.title = `Para rendir el final falta aprobar:\n• ${blockers.map(pid => SUBJECTS.find(x => x.id === pid).name).join('\n• ')}`;
+        labelEl.style.cursor = 'help';
+        labelEl.style.textDecoration = 'underline dashed';
+      } else {
+        labelEl.innerHTML = 'Final pendiente';
+      }
+    }
+    else if (uData && uData.status === 'en_curso') {
+      card.dataset.state = 'en_curso';
+      iconEl.innerHTML = '⏳';
+      labelEl.innerHTML = 'En Curso';
+    }
+    else if (isSubjectEnabled(subject.id)) {
+      card.dataset.state = 'enabled';
+      iconEl.innerHTML = '▶';
+      labelEl.innerHTML = 'Habilitada';
+    }
+    else {
+      card.dataset.state = 'locked';
+      iconEl.innerHTML = '🔒';
+      const missingIds = subject.prereqs.filter(pid => !prereqCursadaOk(pid));
+      const missingNames = missingIds.map(pid => SUBJECTS.find(x => x.id === pid).name);
+
+      labelEl.innerHTML = `Req: ${missingIds.length} mat.`;
+      labelEl.title = `Falta aprobar la cursada de:\n• ${missingNames.join('\n• ')}`;
+      labelEl.style.cursor = 'help';
+      labelEl.style.textDecoration = 'underline dashed';
+    }
+  });
+  SUBJECTS.forEach(renderCardExtras);
+  applyFilterStyles();
+  updateExamBanner();
+  applyChain();
+  if (isOpen('exams-modal')) renderExamsModal();
+}
+
+function applyFilterStyles() {
+  const q = state.searchQuery;
+  const toggleEnabledEl = document.getElementById('toggle-enabled-only');
+  const showOnlyEnabled = toggleEnabledEl ? toggleEnabledEl.checked : false;
+  // Con la cadena FIJADA (tocada, no solo pasada con el mouse), se oculta lo que no es parte de ella — igual que Modo Inscripción
+  const chainPre = chainPinned ? chainClosure(chainPinned, 'pre') : null;
+  const chainPost = chainPinned ? chainClosure(chainPinned, 'post') : null;
+
+  SUBJECTS.forEach(subject => {
+    const card = document.getElementById(`card-${subject.id}`);
+    if (!card) return;
+    
+    let visible = true;
+    
+    if (q && !normalizeText(subject.name).includes(q)) visible = false;
+    
+    if (state.termFilter !== 'all' && !termVisible(subjectTerm(subject), state.termFilter)) visible = false;
+
+    if (showOnlyEnabled) {
+      if (!isSubjectEnabled(subject.id) || state.userSubjects[subject.id]) {
+        visible = false;
+      }
+    }
+
+    if (chainPinned && !(subject.id === chainPinned || chainPre.has(subject.id) || chainPost.has(subject.id))) {
+      visible = false;
+    }
+
+    if (visible) {
+      card.classList.remove('hidden', 'filter-dimmed');
+      card.classList.add('filter-active');
+    } else {
+      card.classList.remove('filter-active');
+      if(q || showOnlyEnabled || state.termFilter !== 'all' || chainPinned) {
+         card.classList.add('hidden');
+         card.classList.remove('filter-dimmed');
+      } else {
+         card.classList.add('filter-dimmed');
+         card.classList.remove('hidden');
+      }
+    }
+  });
+}
+
+let wasComplete = null;
+function updateProgress() {
+  const total = SUBJECTS.length;
+  const totalHs = state.totalHs || SUBJECTS.reduce((acc, s) => acc + s.hs, 0);
+
+  let approvedCount = 0, cursadaCount = 0;
+  let approvedHs = 0, cursadaHs = 0;
+  let gradesSum = 0, gradesCount = 0;
+
+  SUBJECTS.forEach(s => {
+    const u = state.userSubjects[s.id];
+    if (!u) return;
+    if (u.status === 'approved') {
+      approvedCount++;
+      approvedHs += s.hs;
+      if (u.grade !== null && u.grade !== undefined) { gradesSum += u.grade; gradesCount++; }
+    } else if (u.status === 'cursada') {
+      cursadaCount++;
+      cursadaHs += s.hs;
+    }
+  });
+
+  // El avance se mide por carga horaria (finales aprobados). Nunca muestra 100 hasta tenerlo todo.
+  const complete = total > 0 && approvedCount === total;
+  let pct = totalHs === 0 ? 0 : Math.round((approvedHs / totalHs) * 100);
+  if (!complete && pct >= 100) pct = 99;
+
+  const promedio = gradesCount > 0 ? (gradesSum / gradesCount).toFixed(2) : '-';
+
+  document.getElementById('progress-bar').style.width = (totalHs ? (approvedHs / totalHs) * 100 : 0) + '%';
+  document.getElementById('progress-bar-cursada').style.width = (totalHs ? (cursadaHs / totalHs) * 100 : 0) + '%';
+  document.getElementById('pct-label').textContent = pct;
+  document.getElementById('approved-count').textContent = approvedCount;
+  document.getElementById('total-count').textContent = total;
+  document.getElementById('pend-label').textContent = cursadaCount > 0 ? ` · ${cursadaCount} con final pendiente` : '';
+  document.getElementById('hs-count').textContent = approvedHs;
+  document.getElementById('hs-total').textContent = `/ ${totalHs} HS`;
+  document.getElementById('promedio-label').textContent = promedio;
+
+  // Confeti solo en el momento en que completás la carrera (no en cada carga); recién ahí se descarga la librería
+  if (complete && wasComplete === false) {
+    loadConfetti().then(() => confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, zIndex: 9999, colors: ['#2563eb', '#1e40af', '#60a5fa'] })).catch(() => {});
+  }
+  wasComplete = complete;
+}
+
+/* ─────────────────────────────────────────────
+   SISTEMA DE SINCRONIZACIÓN
+───────────────────────────────────────────── */
+function openSyncModal() {
+  const modal = document.getElementById('sync-modal');
+  const exportInput = document.getElementById('sync-export-code');
+  
+  try {
+    exportInput.value = generateShortCode();
+  } catch(e) {
+    exportInput.value = "Error generando código";
+  }
+
+  document.getElementById('sync-import-code').value = '';
+  
+  modal.classList.remove('hidden'); 
+  setTimeout(() => {
+    modal.children[0].classList.remove('scale-95');
+    modal.children[0].classList.add('scale-100');
+  }, 10);
+}
+
+function closeSyncModal(e) {
+  if (e && e.target !== document.getElementById('sync-modal') && e.type === 'click') return;
+  const modal = document.getElementById('sync-modal');
+  modal.children[0].classList.remove('scale-100');
+  modal.children[0].classList.add('scale-95');
+  setTimeout(() => { modal.classList.add('hidden'); }, 150);
+}
+
+function shareSyncWhatsApp() {
+  const code = document.getElementById('sync-export-code').value;
+  if (!code || /^Error/.test(code)) { showAlert('⚠️ Atención', 'No se pudo generar el código para compartir.'); return; }
+  const quien = state.student ? ` de ${state.student}` : '';
+  const text = `Mi progreso del Planificador Curricular (Economía · ISFD N°100)${quien}:\n\n${code}\n\nPara verlo: abrí la app → "Sincronizar y respaldo" → pegalo en "Importar".`;
+  if (navigator.share) {
+    navigator.share({ title: 'Planificador Curricular', text }).catch(() => {});
+  } else {
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+  }
+}
+async function copySyncCode() {
+  const input = document.getElementById('sync-export-code');
+  const btn = document.getElementById('btn-copy-sync');
+  let ok = false;
+
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(input.value);
+      ok = true;
+    }
+  } catch (e) { /* cae al método viejo */ }
+
+  if (!ok) {
+    try {
+      input.focus();
+      input.select();
+      input.setSelectionRange(0, input.value.length);
+      ok = document.execCommand('copy');
+    } catch (e) {}
+  }
+
+  btn.innerText = ok ? '¡Copiado!' : 'Copialo a mano';
+  setTimeout(() => btn.innerText = 'Copiar', 2000);
+}
+
+function importSyncCode() {
+  const val = document.getElementById('sync-import-code').value.trim();
+  if (!val) return;
+
+  let data;
+  try {
+    data = decodeShortCode(val);
+  } catch (err) {
+    showAlert('❌ Error', "Código incorrecto o dañado. Asegurate de haber copiado todo el texto sin espacios extra.");
+    return;
+  }
+
+  const hasData = Object.keys(state.userSubjects).length > 0 || DAYS.some(d => (state.schedule[d] || []).length > 0);
+  if (hasData && !confirm('Esto reemplaza tu progreso y tus horarios actuales por los del código. ¿Continuar?')) return;
+
+  pushUndo('Código importado');
+  state.userSubjects = data.u;
+  state.schedule = data.s;
+  if (data.t) Object.keys(data.t).forEach(id => setNote(id, { term: data.t[id] }));
+  if (data.a) state.student = data.a;   // los códigos viejos no traen nombre: en ese caso queda el actual
+  saveState();
+  refreshAll();
+  updateStudentUI();
+  closeSyncModal();
+  showAlert('✅ ¡Éxito!', data.a ? `Perfil de <b>${esc(data.a)}</b> sincronizado exitosamente.` : "Perfil sincronizado exitosamente.");
+}
+
+/* ─────────────────────────────────────────────
+   MODALES Y UTILIDADES CUSTOM
+───────────────────────────────────────────── */
+function openModal(event, id) {
+  event.stopPropagation();
+  const subject = SUBJECTS.find(s => s.id === id);
+  if (!subject) return;
+
+  const ccBg = CAMPO_COLORS[subject.campo].bg.replace('bg-[', '').replace(']', '');
+  document.getElementById('modal-header').style.backgroundColor = ccBg;
+  
+  document.getElementById('modal-badge').textContent = `${CAMPO_COLORS[subject.campo].label} — ${CAMPO_COLORS[subject.campo].title}`;
+  
+  document.getElementById('modal-title').className = "text-xl sm:text-2xl font-black leading-tight tracking-tight text-white drop-shadow-md";
+  document.getElementById('modal-title').textContent = subject.name;
+  
+  document.getElementById('modal-formato').textContent = subject.formato;
+  document.getElementById('modal-regimen').textContent = subject.regimen;
+  document.getElementById('modal-hs').textContent = subject.hs;
+  document.getElementById('modal-finalidades').textContent = subject.finalidades;
+  
+  const ul = document.getElementById('modal-contenidos');
+  ul.innerHTML = subject.contenidos.map(c => `<li><span class="text-blue-500 mr-2 font-black">»</span> ${c}</li>`).join('');
+
+  const corrList = subject.prereqs.map(pid => `<span class="text-slate-400 mr-1">▪</span> ${SUBJECTS.find(x=>x.id===pid).name}`).join('<br>');
+  const corrText = subject.prereqs.length === 0 ? 'Materia de libre acceso'
+    : corrList + '<br><span class="block mt-3 text-[11px] font-medium text-slate-500 leading-snug">Para cursar: cursada aprobada de estas materias. Para rendir el final: final aprobado de estas materias.</span>';
+  document.getElementById('modal-corr').innerHTML = corrText;
+  fillNotesSection(id);
+
+  const backdrop = document.getElementById('modal-backdrop');
+  backdrop.classList.remove('hidden');
+  
+  setTimeout(() => {
+    document.getElementById('modal-box').classList.remove('scale-95');
+    document.getElementById('modal-box').classList.add('scale-100');
+  }, 10);
+  
+  lockScroll();
+}
+
+function closeModal(event) {
+  if (event && event.target !== document.getElementById('modal-backdrop') && event.type === 'click') return;
+  flushNotes();
+  const box = document.getElementById('modal-box');
+  if(box) {
+    box.classList.remove('scale-100');
+    box.classList.add('scale-95');
+  }
+  
+  setTimeout(() => {
+    document.getElementById('modal-backdrop').classList.add('hidden');
+    unlockScroll();
+  }, 150);
+}
+
+function closeOnboarding() {
+  safeSet('isfd100_onboarding', 'true');
+  const box = document.getElementById('onboarding-modal').children[0];
+  box.classList.remove('scale-100');
+  box.classList.add('scale-95');
+  setTimeout(() => { document.getElementById('onboarding-modal').classList.add('hidden'); }, 150);
+}
+
+function confirmReset() {
+  const modal = document.getElementById('confirm-modal');
+  modal.classList.remove('hidden');
+  setTimeout(() => {
+    modal.children[0].classList.remove('scale-95');
+    modal.children[0].classList.add('scale-100');
+  }, 10);
+}
+
+function closeConfirmModal() {
+  const modal = document.getElementById('confirm-modal');
+  modal.children[0].classList.remove('scale-100');
+  modal.children[0].classList.add('scale-95');
+  setTimeout(() => { modal.classList.add('hidden'); }, 150);
+}
+
+function executeReset() {
+  if (document.getElementById('reset-backup-first').checked) downloadBackup();
+  closeConfirmModal();
+  pushUndo('Reinicio de datos');
+  state.userSubjects = {};
+  state.schedule = emptySchedule();
+  state.exams = {};
+  state.notes = {};
+  saveState();
+  refreshAll();
+}
+
+function showAlert(title, msg) {
+  document.getElementById('alert-title').innerHTML = title;
+  document.getElementById('alert-message').innerHTML = msg;
+  const modal = document.getElementById('alert-modal');
+  modal.classList.remove('hidden');
+  setTimeout(() => {
+    modal.children[0].classList.remove('scale-95');
+    modal.children[0].classList.add('scale-100');
+  }, 10);
+}
+
+function closeAlertModal() {
+  const modal = document.getElementById('alert-modal');
+  modal.children[0].classList.remove('scale-100');
+  modal.children[0].classList.add('scale-95');
+  setTimeout(() => { modal.classList.add('hidden'); }, 150);
+}
+
+/* ─────────────────────────────────────────────
+   ARMADOR DE HORARIOS & SIMULADOR
+───────────────────────────────────────────── */
+function openSchedule() {
+  const modal = document.getElementById('schedule-modal');
+  modal.classList.remove('hidden');
+
+  updateSchedTabs();
+  buildScheduleOptions();
+  renderScheduleGrid();
+
+  setTimeout(() => {
+    modal.children[0].classList.remove('scale-95');
+    modal.children[0].classList.add('scale-100');
+  }, 10);
+  lockScroll();
+}
+
+function closeSchedule(e) {
+  if (e && e.target !== document.getElementById('schedule-modal') && e.type === 'click') return;
+  const modal = document.getElementById('schedule-modal');
+  modal.children[0].classList.remove('scale-100');
+  modal.children[0].classList.add('scale-95');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+    unlockScroll();
+  }, 150);
+}
+
+/* Lee un rango horario de un texto ("18:00 a 20:00", "18 a 20", "18hs - 20hs"). null si no se puede interpretar. */
+function parseTimeRange(text) {
+  if (!text) return null;
+  const re = /(\d{1,2})(?:\s*[:.h]\s*(\d{2}))?/g;
+  const found = [];
+  let m;
+  while ((m = re.exec(String(text))) !== null && found.length < 2) {
+    const h = parseInt(m[1], 10);
+    const min = m[2] ? parseInt(m[2], 10) : 0;
+    if (h > 24 || min > 59) return null;
+    found.push(h * 60 + min);
+  }
+  if (found.length < 2 || found[1] <= found[0]) return null;
+  return { start: found[0], end: found[1] };
+}
+
+function openSimulador() { 
+  const modal = document.getElementById('simulador-modal');
+  modal.classList.remove('hidden'); 
+  const savedPace = safeGet('isfd100_ritmo');
+  if (savedPace) document.getElementById('grad-pace').value = savedPace;
+  runGraduationProjection();
+  setTimeout(() => {
+    modal.children[0].classList.remove('scale-95');
+    modal.children[0].classList.add('scale-100');
+  }, 10);
+}
+
+/* Cuatrimestre "de calendario" actual, para ubicar la proyección en una fecha real (aproximado) */
+function currentAcademicPeriod() {
+  const d = new Date();
+  return { year: d.getFullYear(), period: (d.getMonth() + 1) <= 7 ? 1 : 2 };
+}
+function addPeriods(year, period, n) {
+  let y = year, p = period;
+  while (n-- > 0) { p++; if (p > 2) { p = 1; y++; } }
+  return `${p}° cuatrimestre de ${y}`;
+}
+/* Cadena más larga de correlativas todavía sin el final aprobado: el piso real de cuatrimestres, sea cual sea el ritmo */
+function minGraduationWaves() {
+  const remainingIds = new Set(SUBJECTS.filter(s => state.userSubjects[s.id]?.status !== 'approved').map(s => s.id));
+  const cache = {};
+  function waveOf(id) {
+    if (cache[id] !== undefined) return cache[id];
+    const pend = SUBJECT_BY_ID[id].prereqs.filter(p => remainingIds.has(p));
+    return cache[id] = pend.length ? 1 + Math.max(...pend.map(waveOf)) : 1;
+  }
+  let max = 0;
+  remainingIds.forEach(id => { max = Math.max(max, waveOf(id)); });
+  return { remainingCount: remainingIds.size, minWaves: max };
+}
+function runGraduationProjection() {
+  const out = document.getElementById('grad-result');
+  let pace = parseInt(document.getElementById('grad-pace').value, 10);
+  if (isNaN(pace) || pace < 1) pace = 1;
+  pace = Math.min(20, pace);
+  safeSet('isfd100_ritmo', String(pace));
+
+  const { remainingCount, minWaves } = minGraduationWaves();
+  if (remainingCount === 0) { out.innerHTML = '🎉 ¡Ya tenés el final de todas las materias aprobado!'; return; }
+
+  const periods = Math.max(minWaves, Math.ceil(remainingCount / pace));
+  const { year, period } = currentAcademicPeriod();
+  out.innerHTML = `Con ${pace} materia${pace === 1 ? '' : 's'} por cuatrimestre, terminarías el final de todo alrededor del <b>${addPeriods(year, period, periods)}</b> (unos ${periods} cuatrimestres más).` +
+    `<span class="block mt-2 text-[11px] text-slate-500 leading-snug">Te faltan ${remainingCount} finales. Por cómo se encadenan las correlativas, necesitás al menos ${minWaves} cuatrimestre${minWaves === 1 ? '' : 's'} sí o sí, sea cual sea tu ritmo. Es una estimación orientativa: no distingue anuales de cuatrimestrales ni tiene en cuenta cupos o superposición de horarios.</span>`;
+}
+
+function closeSimulador(e) {
+  if (e && e.target !== document.getElementById('simulador-modal') && e.type === 'click') return;
+  const modal = document.getElementById('simulador-modal');
+  modal.children[0].classList.remove('scale-100');
+  modal.children[0].classList.add('scale-95');
+  setTimeout(() => {
+    modal.classList.add('hidden');
+  }, 150);
+}
+
+function runSimulador() {
+  let qty = parseInt(document.getElementById('sim-qty').value, 10);
+  if (isNaN(qty)) qty = 3;
+  qty = Math.min(10, Math.max(1, qty));
+
+  const enabled = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.userSubjects[s.id]);
+  enabled.sort((a, b) => {
+    if (b.bottleneckCount !== a.bottleneckCount) return b.bottleneckCount - a.bottleneckCount;
+    return a.year - b.year;
+  });
+  const selected = enabled.slice(0, qty);
+
+  // Materias con cursada aprobada cuyas correlativas ya tienen final: se puede rendir ya
+  const finales = SUBJECTS.filter(s => state.userSubjects[s.id]?.status === 'cursada' && finalBlockers(s).length === 0);
+  finales.sort((a, b) => (b.bottleneckCount - a.bottleneckCount) || (a.year - b.year));
+
+  const container = document.getElementById('sim-results');
+  if (selected.length === 0 && finales.length === 0) {
+    container.innerHTML = '<p class="text-sm text-blue-600 font-bold text-center py-4">¡Excelente balance! No hay materias pendientes en este momento.</p>';
+    return;
+  }
+
+  const simCard = (s, detail) => `
+    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex justify-between items-center shadow-sm">
+      <div>
+        <div class="flex items-center gap-1.5">
+          <p class="text-sm font-black text-slate-800 leading-tight">${s.name}</p>
+          ${s.bottleneckCount >= 3 ? '<span title="Ruta Crítica">🔥</span>' : ''}
+        </div>
+        <p class="text-[11px] text-slate-500 mt-1 font-mono">${detail}</p>
+      </div>
+      <button onclick="handleCardClick('${s.id}'); closeSimulador();" class="text-[10px] uppercase font-bold bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1.5 rounded-lg hover:bg-blue-600 hover:text-white transition shadow-sm">Gestionar</button>
+    </div>`;
+
+  let html = '';
+  if (finales.length) {
+    html += `<p class="text-[11px] text-slate-500 font-medium mb-3">📝 Finales que ya podés rendir (las correlativas ya están aprobadas):</p>`;
+    html += finales.map(s => simCard(s, `Final pendiente · Año ${s.year}`)).join('');
+  }
+  if (selected.length) {
+    html += `<p class="text-[11px] text-slate-500 font-medium ${finales.length ? 'mt-4 ' : ''}mb-3">Plan sugerido. Estas materias están libres de trabas y priorizan la <b>Ruta Crítica</b> para destrabar correlativas posteriores:</p>`;
+    html += selected.map(s => simCard(s, `${s.regimen} · Año ${s.year}`)).join('');
+  }
+  container.innerHTML = html;
+}
+
+/* ── Exportar a Imagen ── */
+function exportMap() {
+  const btn = document.getElementById('btn-export');
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML = '⏳ <span class="hidden xl:inline">Calculando...</span>';
+  btn.disabled = true;
+
+  const scrollX = window.scrollX;
+  const scrollY = window.scrollY;
+  window.scrollTo(0, 0);
+
+  const area = document.getElementById('export-area');
+  const main = area.querySelector('main');
+  const watermark = document.getElementById('export-watermark');
+  const grid = document.getElementById('grid-container');
+  
+  const origAreaWidth = area.style.width;
+  const origMainOverflow = main.style.overflow;
+  const origMainMaxWidth = main.style.maxWidth;
+  const origMainWidth = main.style.width;
+  
+  grid.classList.add('export-4col');
+  const fullWidth = Math.max(main.scrollWidth, 1400);
+  area.style.width = fullWidth + 'px';
+  main.style.overflow = 'visible';
+  main.style.maxWidth = 'none';
+  main.style.width = fullWidth + 'px';
+  
+  document.getElementById('export-date').textContent = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
+  watermark.classList.remove('hidden');
+
+  const isMobile = window.innerWidth < 768;
+
+  setTimeout(() => {
+    loadHtml2Canvas().then(() => html2canvas(area, { 
+      backgroundColor: document.documentElement.classList.contains('dark') ? '#0b1220' : '#f8fafc',
+      scale: isMobile ? 1 : 2, 
+      scrollX: 0,
+      scrollY: 0,
+      useCORS: true
+    }).then(canvas => {
+      area.style.width = origAreaWidth;
+      main.style.overflow = origMainOverflow;
+      main.style.maxWidth = origMainMaxWidth;
+      main.style.width = origMainWidth;
+      grid.classList.remove('export-4col');
+      watermark.classList.add('hidden');
+      window.scrollTo(scrollX, scrollY);
+      
+      const link = document.createElement('a');
+      link.download = 'Reporte-ISFD100.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      
+      btn.innerHTML = originalHTML;
+      btn.disabled = false;
+    }).catch(err => {
+      console.error("Error exportando:", err);
+      area.style.width = origAreaWidth;
+      main.style.overflow = origMainOverflow;
+      main.style.maxWidth = origMainMaxWidth;
+      main.style.width = origMainWidth;
+      grid.classList.remove('export-4col');
+      watermark.classList.add('hidden');
+      window.scrollTo(scrollX, scrollY);
+      btn.innerHTML = originalHTML;
+      btn.disabled = false;
+    })).catch(() => {
+      area.style.width = origAreaWidth;
+      main.style.overflow = origMainOverflow;
+      main.style.maxWidth = origMainMaxWidth;
+      main.style.width = origMainWidth;
+      grid.classList.remove('export-4col');
+      watermark.classList.add('hidden');
+      window.scrollTo(scrollX, scrollY);
+      btn.innerHTML = originalHTML;
+      btn.disabled = false;
+      showAlert('⚠️ Sin conexión', 'No se pudo descargar lo necesario para generar la imagen. Probá de nuevo con internet.');
+    });
+  }, 400);
+}
+
+/* ═════════════════════════════════════════════
+   NUEVAS FUNCIONES
+   cadena de correlativas · deshacer · mesas de examen · notas por materia · períodos
+   exportar horarios (imagen / calendario) · respaldo en archivo · modo oscuro · impresión/PDF
+═════════════════════════════════════════════ */
+const SUBJECT_BY_ID = Object.fromEntries(SUBJECTS.map(s => [s.id, s]));
+const STATUS_LABEL = { enabled: 'Habilitada', en_curso: 'En curso', cursada: 'Cursada aprobada', approved: 'Aprobada' };
+const TERM_LABEL = { A: 'Anual', '1': '1° cuat.', '2': '2° cuat.', B: '1° y 2° cuat.', '': 'Período sin definir' };
+const VIEW_LABEL = { all: 'Todo el año', '1': '1° cuatrimestre', '2': '2° cuatrimestre' };
+const CAMPO_HEX = { CFG: '#1e3a8a', CFE: '#059669', CPD: '#d97706' };
+const BACKUP_APP = 'planificador-isfd100';
+
+/* ── Utilidades ── */
+const pad2 = n => String(n).padStart(2, '0');
+function todayISO() { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; }
+function isoToUTC(iso) { const [y, m, d] = iso.split('-').map(Number); return Date.UTC(y, m - 1, d); }
+function isValidISO(s) {
+  if (typeof s !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  try { return new Date(isoToUTC(s)).toISOString().slice(0, 10) === s; } catch (e) { return false; }
+}
+function addDaysISO(iso, n) { return new Date(isoToUTC(iso) + n * 86400000).toISOString().slice(0, 10); }
+function daysUntil(iso) { return Math.round((isoToUTC(iso) - isoToUTC(todayISO())) / 86400000); }
+function fmtDateShort(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' }).replace('.', '');
+}
+function fmtDateLong(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+}
+function relDaysLabel(n) {
+  if (n === 0) return 'Hoy';
+  if (n === 1) return 'Mañana';
+  if (n > 1) return `En ${n} días`;
+  if (n === -1) return 'Ayer';
+  return `Hace ${-n} días`;
+}
+function isTypingTarget(el) {
+  return !!el && (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) || el.isContentEditable);
+}
+function isOpen(id) { const m = document.getElementById(id); return !!m && !m.classList.contains('hidden'); }
+function openBox(id) {
+  const m = document.getElementById(id);
+  m.classList.remove('hidden');
+  setTimeout(() => { m.children[0].classList.remove('scale-95'); m.children[0].classList.add('scale-100'); }, 10);
+}
+function closeBox(id, e) {
+  const m = document.getElementById(id);
+  if (!m || m.classList.contains('hidden')) return;
+  if (e && e.target !== m && e.type === 'click') return;
+  m.children[0].classList.remove('scale-100');
+  m.children[0].classList.add('scale-95');
+  setTimeout(() => m.classList.add('hidden'), 150);
+}
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* ── Nombre del alumno ── */
+const BASE_TITLE = document.title;
+function sanitizeStudent(v) {
+  return String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+}
+function fileSlug(s) {
+  return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30);
+}
+function updateStudentUI() {
+  const has = !!state.student;
+  const label = document.getElementById('student-label');
+  if (label) {
+    label.textContent = has ? state.student : 'Agregar nombre del alumno';
+    label.parentElement.title = has ? `Perfil de ${state.student} (tocá para cambiarlo)` : 'Agregar el nombre del alumno de este perfil';
+  }
+  const wm = document.getElementById('export-student');
+  if (wm) { wm.textContent = has ? `Alumno/a: ${state.student}` : ''; wm.classList.toggle('hidden', !has); }
+  document.title = has ? `${BASE_TITLE} — ${state.student}` : BASE_TITLE;
+}
+function openNameModal() {
+  document.getElementById('student-input').value = state.student;
+  openBox('name-modal');
+  setTimeout(() => { const i = document.getElementById('student-input'); i.focus(); i.select(); }, 60);
+}
+function closeNameModal(e) { closeBox('name-modal', e); }
+function saveStudentName() {
+  const v = sanitizeStudent(document.getElementById('student-input').value);
+  if (v !== state.student) {
+    pushUndo(v ? `Alumno: ${v}` : 'Nombre del alumno quitado');
+    state.student = v;
+    saveState();
+    updateStudentUI();
+  }
+  closeNameModal();
+}
+
+/* ── Modo oscuro ── */
+function applyTheme(dark) {
+  document.documentElement.classList.toggle('dark', dark);
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.setAttribute('content', dark ? '#020617' : '#0f172a');
+  syncThemeButton();
+}
+function toggleTheme() {
+  const dark = !document.documentElement.classList.contains('dark');
+  applyTheme(dark);
+  safeSet('isfd100_theme', dark ? 'dark' : 'light');
+}
+function syncThemeButton() {
+  const b = document.getElementById('btn-theme');
+  if (!b) return;
+  const dark = document.documentElement.classList.contains('dark');
+  b.textContent = dark ? '☀️' : '🌙';
+  b.title = dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+}
+
+/* ── Deshacer ── */
+const undoStack = [];
+let toastTimer = null;
+
+function snapshotData() {
+  return JSON.stringify({ u: state.userSubjects, s: state.schedule, e: state.exams, n: state.notes, a: state.student });
+}
+function pushUndo(label) {
+  undoStack.push({ label, data: snapshotData() });
+  if (undoStack.length > 30) undoStack.shift();
+  updateUndoButton();
+  showToast(label, true);
+}
+function undoLast() {
+  const entry = undoStack.pop();
+  if (!entry) { showToast('No hay nada para deshacer', false); return; }
+  const d = JSON.parse(entry.data);
+  state.userSubjects = sanitizeUserSubjects(d.u);
+  state.schedule = sanitizeSchedule(d.s);
+  state.exams = sanitizeExams(d.e);
+  state.notes = sanitizeNotes(d.n);
+  state.student = sanitizeStudent(d.a);
+  saveState();
+  refreshAll();
+  updateStudentUI();
+  showToast(`Deshecho: ${entry.label}`, false);
+}
+function updateUndoButton() {
+  const b = document.getElementById('btn-undo');
+  if (b) b.disabled = undoStack.length === 0;
+}
+function showToast(msg, withUndo) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  document.getElementById('toast-msg').textContent = msg;
+  document.getElementById('toast-undo').classList.toggle('hidden', !withUndo);
+  t.classList.remove('hidden');
+  t.classList.add('flex');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.classList.add('hidden'); t.classList.remove('flex'); }, withUndo ? 7000 : 2500);
+}
+function refreshAll() {
+  updateAllCards();
+  updateProgress();
+  if (isOpen('schedule-modal')) { buildScheduleOptions(); renderScheduleGrid(); }
+  if (currentInfoId && isOpen('modal-backdrop')) fillNotesSection(currentInfoId);
+  applyChain();
+  updateUndoButton();
+}
+
+/* ── Cadena de correlativas ── */
+let chainPinned = null, chainHover = null, chainTimer = null;
+
+function chainClosure(id, dir) {
+  const seen = new Set();
+  const stack = [id];
+  while (stack.length) {
+    const cur = stack.pop();
+    const next = dir === 'pre' ? (SUBJECT_BY_ID[cur]?.prereqs || []) : (DEPS[cur] || []);
+    next.forEach(n => { if (!seen.has(n)) { seen.add(n); stack.push(n); } });
+  }
+  return seen;
+}
+function applyChain() {
+  const id = chainPinned || chainHover;
+  const banner = document.getElementById('chain-banner');
+  document.querySelectorAll('.chain-btn').forEach(b => b.classList.toggle('pinned', b.dataset.id === chainPinned));
+  const cards = document.querySelectorAll('.subject-card');
+  cards.forEach(c => c.classList.remove('chain-dim', 'chain-pre', 'chain-post', 'chain-self'));
+  if (!id) { banner.classList.add('hidden'); applyFilterStyles(); return; }
+  const pre = chainClosure(id, 'pre'), post = chainClosure(id, 'post');
+  cards.forEach(c => {
+    const cid = c.id.replace('card-', '');
+    if (cid === id) c.classList.add('chain-self');
+    else if (pre.has(cid)) c.classList.add('chain-pre');
+    else if (post.has(cid)) c.classList.add('chain-post');
+    else if (!chainPinned) c.classList.add('chain-dim');   // al pasar el mouse (sin tocar), solo se atenúa
+  });
+  // Al FIJAR la cadena (tocar el botón) se oculta el resto, como en Modo Inscripción
+  applyFilterStyles();
+  if (chainPinned) {
+    const name = esc(SUBJECT_BY_ID[id].name);
+    document.getElementById('chain-banner-text').innerHTML =
+      `<span class="truncate font-black">🔗 ${name}</span>` +
+      `<span class="shrink-0 whitespace-nowrap"><span class="text-amber-700">🔸 Necesita ${pre.size}</span> · <span class="text-indigo-700">🔹 Destraba ${post.size}</span></span>` +
+      `<span class="hidden md:inline shrink-0 text-slate-500 font-medium">(el resto queda oculto)</span>`;
+    banner.classList.remove('hidden');
+  } else {
+    banner.classList.add('hidden');
+  }
+}
+function toggleChain(event, id) {
+  if (event) event.stopPropagation();
+  chainPinned = chainPinned === id ? null : id;
+  applyChain();
+}
+function clearChain() { chainPinned = null; chainHover = null; clearTimeout(chainTimer); applyChain(); }
+function canHover() { try { return window.matchMedia('(hover: hover)').matches; } catch (e) { return false; } }
+function onCardEnter(id) {
+  if (!canHover()) return;
+  clearTimeout(chainTimer);
+  chainTimer = setTimeout(() => { chainHover = id; applyChain(); }, 180);
+}
+function onCardLeave() {
+  clearTimeout(chainTimer);
+  if (chainHover) { chainHover = null; applyChain(); }
+}
+
+/* ── Períodos (cuatrimestres) ── */
+function subjectTerm(s) {
+  if (s.regimen === 'Anual') return 'A';
+  return state.notes[s.id]?.term || '';
+}
+function termsOverlap(a, b) {
+  if (!a || !b || a === 'A' || b === 'A' || a === 'B' || b === 'B') return true;
+  return a === b;
+}
+function termVisible(t, view) { return view === 'all' || !t || t === 'A' || t === 'B' || t === view; }
+function setTermFilter(v) { state.termFilter = v; applyFilterStyles(); }
+
+/* ── Notas por materia ── */
+const NOTE_EMPTY = { teacher: '', room: '', text: '', term: '' };
+let currentInfoId = null, noteTimer = null;
+
+function getNote(id) { return Object.assign({}, NOTE_EMPTY, state.notes[id] || {}); }
+function isNoteEmpty(n) { return !n.teacher && !n.room && !n.link && !n.text && !n.term; }
+function setNote(id, patch) {
+  const n = Object.assign(getNote(id), patch);
+  if (isNoteEmpty(n)) delete state.notes[id]; else state.notes[id] = n;
+}
+function sanitizeNotes(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  Object.keys(raw).forEach(id => {
+    if (!SUBJECT_BY_ID[id]) return;
+    const v = raw[id];
+    if (!v || typeof v !== 'object') return;
+    const n = {
+      teacher: String(v.teacher || '').slice(0, 80).trim(),
+      room: String(v.room || '').slice(0, 40).trim(),
+      text: String(v.text || '').slice(0, 2000).trimEnd(),
+      term: ['1', '2', 'B'].includes(v.term) ? v.term : ''
+    };
+    if (!isNoteEmpty(n)) out[id] = n;
+  });
+  return out;
+}
+function fillNotesSection(id) {
+  currentInfoId = id;
+  const subject = SUBJECT_BY_ID[id];
+  const n = getNote(id);
+  document.getElementById('note-teacher').value = n.teacher;
+  document.getElementById('note-room').value = n.room;
+  document.getElementById('note-text').value = n.text;
+  document.getElementById('note-term').value = n.term;
+  document.getElementById('note-term-wrap').classList.toggle('hidden', subject.regimen === 'Anual');
+}
+function onNoteInput() {
+  clearTimeout(noteTimer);
+  noteTimer = setTimeout(saveNotesFromForm, 350);
+}
+function saveNotesFromForm() {
+  clearTimeout(noteTimer);
+  noteTimer = null;
+  const id = currentInfoId;
+  if (!id) return;
+  setNote(id, {
+    teacher: document.getElementById('note-teacher').value.slice(0, 80).trim(),
+    room: document.getElementById('note-room').value.slice(0, 40).trim(),
+    text: document.getElementById('note-text').value.slice(0, 2000),
+    term: SUBJECT_BY_ID[id].regimen === 'Anual' ? '' : document.getElementById('note-term').value
+  });
+  saveState();
+  renderCardExtras(SUBJECT_BY_ID[id]);
+  applyFilterStyles();
+  if (isOpen('schedule-modal')) { buildScheduleOptions(); renderScheduleGrid(); }
+}
+function flushNotes() {
+  if (noteTimer) saveNotesFromForm();
+  currentInfoId = null;
+}
+
+/* ── Mesas de examen ── */
+function sanitizeExams(raw) {
+  const out = {};
+  if (!raw || typeof raw !== 'object') return out;
+  Object.keys(raw).forEach(id => {
+    if (!SUBJECT_BY_ID[id]) return;
+    const v = raw[id];
+    if (!v || typeof v !== 'object') return;
+    const date = isValidISO(v.date) ? v.date : '';
+    const time = /^([01]\d|2[0-3]):[0-5]\d$/.test(v.time || '') ? v.time : '';
+    let attempts = parseInt(v.attempts, 10);
+    if (isNaN(attempts) || attempts < 0) attempts = 0;
+    out[id] = { date, time: date ? time : '', attempts: Math.min(attempts, 20) };
+  });
+  return out;
+}
+function googleCalUrl(name, dateISO, time) {
+  const title = encodeURIComponent('Mesa de examen: ' + name);
+  let dates;
+  if (time) {
+    const [y, m, d] = dateISO.split('-').map(Number);
+    const [hh, mm] = time.split(':').map(Number);
+    const start = Date.UTC(y, m - 1, d, hh + 3, mm);   // ART = UTC-3
+    const fmt = ms => new Date(ms).toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+    dates = `${fmt(start)}/${fmt(start + 2 * 3600000)}`;
+  } else {
+    dates = `${dateISO.replace(/-/g, '')}/${addDaysISO(dateISO, 1).replace(/-/g, '')}`;
+  }
+  return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dates}&details=${title}`;
+}
+function examChip(n) {
+  const cls = n < 0 ? 'bg-red-100 text-red-700 border-red-200'
+    : n <= 7 ? 'bg-amber-50 text-amber-700 border-amber-200'
+    : 'bg-slate-100 text-slate-600 border-slate-200';
+  return `<span class="shrink-0 text-[10px] font-black uppercase tracking-wide px-2 py-1 rounded-lg border ${cls}">${relDaysLabel(n)}</span>`;
+}
+function openExamsModal() { renderExamsModal(); openBox('exams-modal'); }
+function closeExamsModal(e) { closeBox('exams-modal', e); }
+function renderExamsModal() {
+  const sel = document.getElementById('exam-subject');
+  const prev = sel.value;
+  const cands = SUBJECTS.filter(s => state.userSubjects[s.id]?.status === 'cursada');
+  sel.innerHTML = cands.length
+    ? '<option value="" disabled selected>Materia con final pendiente...</option>' + cands.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('')
+    : '<option value="" disabled selected>Todavía no tenés cursadas aprobadas</option>';
+  if (prev && cands.some(s => s.id === prev)) sel.value = prev;
+
+  const entries = Object.keys(state.exams).map(id => ({ id, s: SUBJECT_BY_ID[id], e: state.exams[id] })).filter(x => x.s);
+  const pending = entries.filter(x => state.userSubjects[x.id]?.status === 'cursada');
+  pending.sort((a, b) => {
+    if (a.e.date && b.e.date) return a.e.date.localeCompare(b.e.date) || a.e.time.localeCompare(b.e.time);
+    if (a.e.date) return -1;
+    if (b.e.date) return 1;
+    return a.s.name.localeCompare(b.s.name);
+  });
+  const history = entries.filter(x => state.userSubjects[x.id]?.status === 'approved');
+
+  let html = '';
+  if (pending.length === 0) {
+    html += '<p class="text-xs text-slate-400 text-center italic py-6">No hay mesas cargadas.</p>';
+  }
+  pending.forEach(({ id, s, e }) => {
+    const n = e.date ? daysUntil(e.date) : null;
+    const when = e.date ? `${esc(fmtDateLong(e.date))}${e.time ? ' · ' + e.time + ' hs' : ''}` : 'Sin fecha todavía';
+    html += `
+      <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
+        <div class="flex justify-between items-start gap-2">
+          <div class="min-w-0">
+            <p class="text-sm font-black text-slate-800 leading-tight">${esc(s.name)}</p>
+            <p class="text-xs text-slate-500 font-mono mt-1 capitalize">${when}</p>
+          </div>
+          ${n === null ? '' : examChip(n)}
+        </div>
+        ${e.date ? `<a href="${googleCalUrl(s.name, e.date, e.time)}" target="_blank" rel="noopener" class="inline-block mt-2 text-[11px] font-bold text-blue-600 hover:underline">📅 Agregar a Google Calendar</a>` : ''}
+        ${n !== null && n < 0 ? '<p class="text-[11px] text-red-600 font-bold mt-2">La fecha ya pasó: actualizala o sumá un intento.</p>' : ''}
+        <div class="flex items-center justify-between mt-3 gap-2 flex-wrap">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600">
+            <span>Veces que rendí:</span>
+            <button onclick="changeAttempts('${id}', -1)" aria-label="Restar intento" class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 hover:bg-slate-200 transition">−</button>
+            <span class="font-mono w-5 text-center">${e.attempts}</span>
+            <button onclick="changeAttempts('${id}', 1)" aria-label="Sumar intento" class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 hover:bg-slate-200 transition">+</button>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openStatusModal('${id}')" class="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition">✅ Aprobé</button>
+            <button onclick="removeExam('${id}')" class="text-[11px] font-bold px-3 py-1.5 rounded-lg bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition">Quitar</button>
+          </div>
+        </div>
+      </div>`;
+  });
+  if (history.length) {
+    html += '<p class="text-[10px] font-black uppercase tracking-widest text-slate-400 pt-2">Ya aprobadas</p>';
+    history.forEach(({ s, e }) => {
+      html += `<div class="bg-white border border-slate-200 rounded-xl px-3 py-2 opacity-70 flex justify-between gap-2 text-xs">
+        <span class="font-bold text-slate-700">${esc(s.name)}</span>
+        <span class="text-slate-500 font-mono">${e.attempts ? `rendí ${e.attempts} ${e.attempts === 1 ? 'vez' : 'veces'} antes` : 'a la primera'}</span>
+      </div>`;
+    });
+  }
+  document.getElementById('exam-list').innerHTML = html;
+}
+function addExam() {
+  const id = document.getElementById('exam-subject').value;
+  const date = document.getElementById('exam-date').value;
+  const time = document.getElementById('exam-time').value;
+  if (!id) { showAlert('⚠️ Atención', 'Elegí primero una materia con cursada aprobada.'); return; }
+  if (time && !date) { showAlert('⚠️ Atención', 'Si cargás una hora, cargá también la fecha.'); return; }
+  if (date && !isValidISO(date)) { showAlert('⚠️ Atención', 'La fecha no es válida.'); return; }
+  const prev = state.exams[id];
+  pushUndo(`Mesa de ${SUBJECT_BY_ID[id].name}`);
+  state.exams[id] = { date, time: date ? time : '', attempts: prev ? prev.attempts : 0 };
+  saveState();
+  updateAllCards();
+  document.getElementById('exam-date').value = '';
+  document.getElementById('exam-time').value = '';
+}
+function changeAttempts(id, delta) {
+  const e = state.exams[id];
+  if (!e) return;
+  const next = Math.min(20, Math.max(0, e.attempts + delta));
+  if (next === e.attempts) return;
+  pushUndo(`Intentos de ${SUBJECT_BY_ID[id].name}`);
+  e.attempts = next;
+  saveState();
+  updateAllCards();
+}
+function removeExam(id) {
+  if (!state.exams[id]) return;
+  pushUndo(`Mesa quitada: ${SUBJECT_BY_ID[id].name}`);
+  delete state.exams[id];
+  saveState();
+  updateAllCards();
+}
+function upcomingExams(maxDays) {
+  return SUBJECTS
+    .filter(s => state.userSubjects[s.id]?.status === 'cursada' && state.exams[s.id]?.date)
+    .map(s => ({ s, e: state.exams[s.id], days: daysUntil(state.exams[s.id].date) }))
+    .filter(x => x.days >= 0 && x.days <= maxDays)
+    .sort((a, b) => a.days - b.days || a.e.time.localeCompare(b.e.time));
+}
+function updateExamBanner() {
+  const el = document.getElementById('exam-banner');
+  if (!el) return;
+  const up = upcomingExams(7);
+  if (!up.length) { el.classList.add('hidden'); return; }
+  const f = up[0];
+  document.getElementById('exam-banner-text').innerHTML =
+    `📅 <b>${relDaysLabel(f.days)}</b>: mesa de <b>${esc(f.s.name)}</b>${f.e.time ? ' · ' + f.e.time + ' hs' : ''}${up.length > 1 ? ` · y ${up.length - 1} más esta semana` : ''}`;
+  el.classList.remove('hidden');
+}
+
+/* ── Chips en las tarjetas (mesa, notas, período) ── */
+function renderCardExtras(subject) {
+  const card = document.getElementById(`card-${subject.id}`);
+  if (!card) return;
+  const el = card.querySelector('.card-extras');
+  if (!el) return;
+  const chips = [];
+  const u = state.userSubjects[subject.id];
+  const ex = state.exams[subject.id];
+  const note = state.notes[subject.id];
+  if (u?.status === 'cursada' && ex && ex.date) {
+    const n = daysUntil(ex.date);
+    chips.push(`<span class="card-chip ${n < 0 ? 'danger' : n <= 7 ? 'warn' : ''}" title="Mesa de examen: ${esc(relDaysLabel(n))}">📅 ${esc(fmtDateShort(ex.date))}</span>`);
+  }
+  if (u?.status === 'cursada' && ex && ex.attempts > 0) {
+    chips.push(`<span class="card-chip" title="Veces que rendiste el final">↻ ${ex.attempts}</span>`);
+  }
+  if (note && (note.text || note.teacher || note.room)) {
+    chips.push('<span class="card-chip" title="Tenés notas en esta materia">🗒️ Notas</span>');
+  }
+  const t = subjectTerm(subject);
+  if (t === '1' || t === '2' || t === 'B') chips.push(`<span class="card-chip">${TERM_LABEL[t]}</span>`);
+  el.innerHTML = chips.join('');
+  el.style.display = chips.length ? 'flex' : 'none';
+}
+
+/* ── Horarios: armado, conflictos y vistas por período ── */
+function setScheduleView(v) {
+  state.scheduleView = v;
+  updateSchedTabs();
+  buildScheduleOptions();
+  renderScheduleGrid();
+}
+function updateSchedTabs() {
+  document.querySelectorAll('#sched-tabs .sched-tab').forEach(b => b.classList.toggle('active', b.dataset.view === state.scheduleView));
+}
+function buildScheduleOptions() {
+  const sel = document.getElementById('sched-subject');
+  const prev = sel.value;
+  const view = state.scheduleView;
+  const fits = s => termVisible(subjectTerm(s), view);
+  const byYear = (a, b) => a.year - b.year;
+  const opt = s => `<option value="${s.id}">${s.bottleneckCount >= 3 ? '🔥 ' : ''}${s.name} (Año ${s.year})</option>`;
+  const enCurso = SUBJECTS.filter(s => state.userSubjects[s.id]?.status === 'en_curso' && fits(s)).sort(byYear);
+  const habilitadas = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.userSubjects[s.id] && fits(s)).sort(byYear);
+  sel.innerHTML = '<option value="" disabled selected>Seleccioná una materia...</option>'
+    + (enCurso.length ? `<optgroup label="⏳ En curso">${enCurso.map(opt).join('')}</optgroup>` : '')
+    + (habilitadas.length ? `<optgroup label="▶ Habilitadas">${habilitadas.map(opt).join('')}</optgroup>` : '');
+  if (prev && sel.querySelector(`option[value="${prev}"]`)) sel.value = prev;
+}
+function findConflicts(day, time, term, skipIndex = -1) {
+  const r = parseTimeRange(time);
+  if (!r) return [];
+  const out = [];
+  (state.schedule[day] || []).forEach((it, i) => {
+    if (i === skipIndex) return;
+    const sub = SUBJECT_BY_ID[it.id];
+    if (!sub || !termsOverlap(term, subjectTerm(sub))) return;
+    const o = parseTimeRange(it.time);
+    if (o && r.start < o.end && o.start < r.end) out.push(it);
+  });
+  return out;
+}
+function collectScheduleItems(view) {
+  const out = [];
+  DAYS.forEach(day => (state.schedule[day] || []).forEach((item, index) => {
+    const subject = SUBJECT_BY_ID[item.id];
+    if (!subject) return;
+    const term = subjectTerm(subject);
+    if (!termVisible(term, view)) return;
+    const note = state.notes[item.id] || {};
+    out.push({
+      day, index, item, subject, term, time: item.time, range: parseTimeRange(item.time),
+      room: note.room || '', teacher: note.teacher || '',
+      conflict: findConflicts(day, item.time, term, index).length > 0
+    });
+  }));
+  return out;
+}
+function sortScheduleItems(a, b) {
+  const d = DAYS.indexOf(a.day) - DAYS.indexOf(b.day);
+  if (d) return d;
+  if (a.range && b.range) return a.range.start - b.range.start;
+  if (a.range) return -1;
+  if (b.range) return 1;
+  return 0;
+}
+function addScheduleItem() {
+  const subId = document.getElementById('sched-subject').value;
+  const day = document.getElementById('sched-day').value;
+  const start = document.getElementById('sched-start').value;
+  const end = document.getElementById('sched-end').value;
+
+  if (!subId) { showAlert('⚠️ Atención', "Por favor, seleccioná una materia primero."); return; }
+  if ((start && !end) || (!start && end)) {
+    showAlert('⚠️ Atención', "Completá la hora de inicio y la de fin (o dejá las dos vacías).");
+    return;
+  }
+  if (start && end && end <= start) {
+    showAlert('⚠️ Atención', "La hora de fin tiene que ser posterior a la de inicio.");
+    return;
+  }
+
+  const subject = SUBJECT_BY_ID[subId];
+  const time = (start && end) ? `${start} a ${end}` : 'Sin horario definido';
+
+  if (!state.schedule[day]) state.schedule[day] = [];
+  if (state.schedule[day].some(it => it.id === subId && it.time === time)) {
+    showAlert('⚠️ Atención', "Esa materia ya está cargada ese día y en ese horario.");
+    return;
+  }
+
+  // Si estás mirando un cuatrimestre y la materia no tenía período, queda asignada a ese
+  const view = state.scheduleView;
+  const assign = (subject.regimen !== 'Anual' && !subjectTerm(subject) && (view === '1' || view === '2')) ? view : null;
+
+  pushUndo(`Horario: ${subject.name} (${day})`);
+  if (assign) setNote(subId, { term: assign });
+  const term = subjectTerm(subject);
+  const conflicts = findConflicts(day, time, term);
+  state.schedule[day].push({ id: subId, time });
+
+  saveState();
+  renderScheduleGrid();
+  renderCardExtras(subject);
+  document.getElementById('sched-start').value = '';
+  document.getElementById('sched-end').value = '';
+
+  if (conflicts.length) {
+    const names = conflicts.map(c => `<b>${esc(SUBJECT_BY_ID[c.id]?.name || c.id)}</b> (${esc(c.time)})`).join('<br>');
+    showAlert('⚠️ Superposición', `Ese horario se pisa con:<br><br>${names}`);
+  }
+}
+function removeScheduleItem(day, index) {
+  const it = state.schedule[day]?.[index];
+  if (!it) return;
+  pushUndo(`Horario quitado: ${SUBJECT_BY_ID[it.id]?.name || it.id}`);
+  state.schedule[day].splice(index, 1);
+  saveState();
+  renderScheduleGrid();
+}
+function renderScheduleGrid() {
+  const grid = document.getElementById('schedule-grid');
+  const view = state.scheduleView;
+  const items = collectScheduleItems(view).sort(sortScheduleItems);
+  let html = '';
+
+  DAYS.forEach(day => {
+    const entries = items.filter(i => i.day === day);
+    html += `
+      <div class="bg-white border border-slate-200 rounded-xl flex flex-col min-w-[200px] w-[200px] shadow-sm">
+        <h4 class="font-black text-slate-800 bg-slate-100 p-3 rounded-t-xl border-b border-slate-200">${day}</h4>
+        <div class="p-3 flex flex-col gap-3 min-h-[150px]">
+    `;
+    if (entries.length === 0) {
+      html += `<p class="text-xs text-slate-400 text-center mt-4 italic">Día libre</p>`;
+    } else {
+      entries.forEach(it => {
+        const subject = it.subject;
+        const approved = state.userSubjects[subject.id]?.status === 'approved';
+        const borderCol = it.conflict ? 'border-red-500'
+          : subject.campo === 'CFG' ? 'border-blue-500'
+          : subject.campo === 'CFE' ? 'border-emerald-500' : 'border-amber-500';
+        const termChip = (view === 'all' && (it.term === '1' || it.term === '2' || it.term === 'B'))
+          ? `<span class="inline-block mt-1 text-[9px] font-black uppercase tracking-wide bg-slate-100 text-slate-600 border border-slate-200 px-1.5 py-0.5 rounded">${TERM_LABEL[it.term]}</span>` : '';
+        html += `
+          <div class="${it.conflict ? 'bg-red-50' : 'bg-slate-50'} ${approved ? 'opacity-60' : ''} p-3 rounded-lg border-l-4 ${borderCol} border-y border-r border-slate-200 shadow-sm relative group">
+            <p class="text-[11px] font-bold text-slate-800 leading-tight pr-7">${subject.name}</p>
+            <p class="text-[10px] text-blue-600 font-mono mt-1 font-bold">${esc(it.time)}</p>
+            ${it.room ? `<p class="text-[10px] text-slate-500 font-medium mt-1">🏫 Classroom: ${esc(it.room)}</p>` : ''}
+            ${it.teacher ? `<p class="text-[10px] text-slate-500 font-medium">👤 ${esc(it.teacher)}</p>` : ''}
+            ${termChip}
+            ${it.conflict ? '<p class="text-[10px] text-red-600 font-black mt-1">⚠ Se superpone</p>' : ''}
+            ${approved ? '<p class="text-[10px] text-slate-500 font-bold mt-1">✓ Ya aprobada</p>' : ''}
+            <button onclick="removeScheduleItem('${day}', ${it.index})" aria-label="Quitar" class="absolute top-1.5 right-1.5 w-6 h-6 bg-red-100 text-red-600 rounded-md opacity-100 sm:opacity-0 group-hover:opacity-100 focus:opacity-100 transition flex items-center justify-center text-xs font-black shadow-sm">✕</button>
+          </div>
+        `;
+      });
+    }
+    html += `</div></div>`;
+  });
+  grid.innerHTML = html;
+}
+
+/* ── Exportar horarios como imagen ── */
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+function fitText(ctx, text, maxW) {
+  text = String(text);
+  if (ctx.measureText(text).width <= maxW) return text;
+  while (text.length > 1 && ctx.measureText(text + '…').width > maxW) text = text.slice(0, -1);
+  return text + '…';
+}
+function wrapText(ctx, text, maxW, maxLines) {
+  const words = String(text).split(/\s+/);
+  const lines = [];
+  let cur = '';
+  words.forEach(w => {
+    const t = cur ? cur + ' ' + w : w;
+    if (!cur || ctx.measureText(t).width <= maxW) cur = t;
+    else { lines.push(cur); cur = w; }
+  });
+  if (cur) lines.push(cur);
+  if (maxLines && lines.length > maxLines) {
+    lines.length = maxLines;
+    lines[maxLines - 1] = fitText(ctx, lines[maxLines - 1] + '…', maxW);
+  }
+  return lines;
+}
+function drawScheduleCanvas(view) {
+  const items = collectScheduleItems(view).sort(sortScheduleItems);
+  if (!items.length) return null;
+  const measure = document.createElement('canvas').getContext('2d');
+  if (!measure) return null;
+
+  const FONT = 'system-ui, "Segoe UI", Roboto, Arial, sans-serif';
+  const colW = 250, gap = 14, pad = 28, headH = 100, dayH = 38, cardGap = 10, px = 14, py = 12;
+  const days = DAYS.filter(d => d !== 'Sábado' || items.some(i => i.day === 'Sábado'));
+
+  const layout = days.map(d => {
+    const cards = items.filter(i => i.day === d).map(it => {
+      measure.font = `bold 13px ${FONT}`;
+      const nameLines = wrapText(measure, it.subject.name, colW - px * 2 - 8, 3);
+      measure.font = `12px ${FONT}`;
+      const extra = [];
+      if (it.room) extra.push(fitText(measure, `Classroom: ${it.room}`, colW - px * 2 - 8));
+      if (it.teacher) extra.push(fitText(measure, `Docente: ${it.teacher}`, colW - px * 2 - 8));
+      const termText = (view === 'all' && (it.term === '1' || it.term === '2' || it.term === 'B')) ? TERM_LABEL[it.term] : '';
+      const h = py * 2 + nameLines.length * 17 + 20 + extra.length * 16 + (termText ? 16 : 0) + (it.conflict ? 16 : 0);
+      return { it, nameLines, extra, termText, h };
+    });
+    return { day: d, cards };
+  });
+
+  const colHeights = layout.map(c => c.cards.reduce((a, k) => a + k.h + cardGap, 0));
+  const maxCol = Math.max(60, ...colHeights);
+  const W = pad * 2 + days.length * colW + (days.length - 1) * gap;
+  const H = headH + dayH + 14 + maxCol + pad;
+  const S = 2;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = W * S;
+  canvas.height = H * S;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(S, S);
+
+  ctx.fillStyle = '#f1f5f9';
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#0f172a';
+  ctx.fillRect(0, 0, W, headH);
+  ctx.fillStyle = '#3b82f6';
+  ctx.fillRect(0, 0, 8, headH);
+
+  ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `900 26px ${FONT}`;
+  ctx.fillText('Horarios de cursada', pad, 44);
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = `600 13px ${FONT}`;
+  const fecha = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
+  ctx.fillText(`${VIEW_LABEL[view]} · Profesorado en Economía · ISFD N°100`, pad, 68);
+  ctx.fillText((state.student ? `Alumno/a: ${fitText(ctx, state.student, 420)} · ` : '') + `Emitido el ${fecha}`, pad, 88);
+
+  layout.forEach((col, ci) => {
+    const x = pad + ci * (colW + gap);
+    let y = headH + 14;
+    ctx.fillStyle = '#e2e8f0';
+    roundRect(ctx, x, y, colW, dayH, 10);
+    ctx.fill();
+    ctx.fillStyle = '#0f172a';
+    ctx.font = `900 14px ${FONT}`;
+    ctx.fillText(col.day, x + 14, y + 24);
+    y += dayH + 10;
+
+    if (!col.cards.length) {
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = `italic 12px ${FONT}`;
+      ctx.fillText('Día libre', x + colW / 2 - 24, y + 24);
+      return;
+    }
+    col.cards.forEach(k => {
+      ctx.fillStyle = 'rgba(15,23,42,0.06)';
+      roundRect(ctx, x, y + 2, colW, k.h, 10);
+      ctx.fill();
+      ctx.fillStyle = k.it.conflict ? '#fef2f2' : '#ffffff';
+      roundRect(ctx, x, y, colW, k.h, 10);
+      ctx.fill();
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = k.it.conflict ? '#ef4444' : (CAMPO_HEX[k.it.subject.campo] || '#475569');
+      roundRect(ctx, x, y, 7, k.h, 3);
+      ctx.fill();
+
+      let ty = y + py + 12;
+      ctx.fillStyle = '#0f172a';
+      ctx.font = `bold 13px ${FONT}`;
+      k.nameLines.forEach(l => { ctx.fillText(l, x + px + 6, ty); ty += 17; });
+      ctx.fillStyle = '#2563eb';
+      ctx.font = `bold 13px ui-monospace, Menlo, Consolas, monospace`;
+      ctx.fillText(k.it.time, x + px + 6, ty + 3);
+      ty += 20;
+      ctx.fillStyle = '#64748b';
+      ctx.font = `12px ${FONT}`;
+      k.extra.forEach(l => { ctx.fillText(l, x + px + 6, ty); ty += 16; });
+      if (k.termText) { ctx.fillStyle = '#475569'; ctx.fillText(k.termText, x + px + 6, ty); ty += 16; }
+      if (k.it.conflict) { ctx.fillStyle = '#dc2626'; ctx.font = `bold 12px ${FONT}`; ctx.fillText('¡Se superpone con otra materia!', x + px + 6, ty); }
+      y += k.h + cardGap;
+    });
+  });
+  return canvas;
+}
+function exportScheduleImage() {
+  const canvas = drawScheduleCanvas(state.scheduleView);
+  if (!canvas) { showAlert('⚠️ Atención', 'No hay horarios cargados en este período para exportar.'); return; }
+  const name = `Horarios-ISFD100-${state.scheduleView === 'all' ? 'anual' : state.scheduleView + 'C'}.png`;
+  if (canvas.toBlob) canvas.toBlob(b => { if (b) downloadBlob(b, name); }, 'image/png');
+  else { const a = document.createElement('a'); a.download = name; a.href = canvas.toDataURL('image/png'); a.click(); }
+}
+
+/* ── Exportar al calendario (.ics) ── */
+function icsEscape(s) { return String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
+function utf8Len(s) { return encodeURIComponent(s).replace(/%[0-9A-F]{2}/gi, 'x').length; }
+function icsFold(line) {
+  if (utf8Len(line) <= 75) return line;
+  let out = '', cur = '', bytes = 0;
+  for (const ch of line) {
+    const b = utf8Len(ch);
+    if (bytes + b > 74) { out += cur + '\r\n '; cur = ''; bytes = 1; }
+    cur += ch;
+    bytes += b;
+  }
+  return out + cur;
+}
+function icsStamp(ms) { return new Date(ms).toISOString().slice(0, 19).replace(/[-:]/g, ''); }   // hora "flotante": los campos UTC se usan como reloj local
+function buildICS(opts) {
+  const { view, startISO, endISO, includeExams } = opts;
+  const TZ = 'America/Argentina/Buenos_Aires';
+  const lines = [];
+  const add = l => lines.push(icsFold(l));
+  const now = new Date().toISOString().slice(0, 19).replace(/[-:]/g, '') + 'Z';
+  let uid = 0;
+  const nextUid = () => `${Date.now().toString(36)}-${++uid}@planificador-isfd100`;
+  let skippedNoTime = 0, skippedRange = 0, events = 0;
+
+  add('BEGIN:VCALENDAR');
+  add('VERSION:2.0');
+  add('PRODID:-//Planificador ISFD 100//ES');
+  add('CALSCALE:GREGORIAN');
+  add('METHOD:PUBLISH');
+  add(`X-WR-CALNAME:${icsEscape('Horarios ISFD 100' + (state.student ? ' — ' + state.student : ''))}`);
+  add(`X-WR-TIMEZONE:${TZ}`);
+  add('BEGIN:VTIMEZONE');
+  add(`TZID:${TZ}`);
+  add('BEGIN:STANDARD');
+  add('DTSTART:19700101T000000');
+  add('TZOFFSETFROM:-0300');
+  add('TZOFFSETTO:-0300');
+  add('TZNAME:-03');
+  add('END:STANDARD');
+  add('END:VTIMEZONE');
+
+  const [ey, em, ed] = endISO.split('-').map(Number);
+  const until = new Date(Date.UTC(ey, em - 1, ed, 26, 59, 59)).toISOString().slice(0, 19).replace(/[-:]/g, '') + 'Z';   // 23:59:59 hora local (UTC-3)
+
+  collectScheduleItems(view).forEach(it => {
+    if (!it.range) { skippedNoTime++; return; }
+    const target = DAYS.indexOf(it.day) + 1;                       // Lunes = 1 … Sábado = 6
+    const dow = new Date(isoToUTC(startISO)).getUTCDay();
+    const first = addDaysISO(startISO, (target - dow + 7) % 7);
+    if (first > endISO) { skippedRange++; return; }
+    const hm = m => `${pad2(Math.floor(m / 60))}${pad2(m % 60)}00`;
+    const d0 = first.replace(/-/g, '');
+    const desc = [];
+    if (it.teacher) desc.push(`Docente: ${it.teacher}`);
+        add('BEGIN:VEVENT');
+    add(`UID:${nextUid()}`);
+    add(`DTSTAMP:${now}`);
+    add(`DTSTART;TZID=${TZ}:${d0}T${hm(it.range.start)}`);
+    add(`DTEND;TZID=${TZ}:${d0}T${hm(it.range.end)}`);
+    add(`RRULE:FREQ=WEEKLY;UNTIL=${until}`);
+    add(`SUMMARY:${icsEscape(it.subject.name)}`);
+    if (it.room) add(`LOCATION:${icsEscape(it.room)}`);
+    if (desc.length) add(`DESCRIPTION:${icsEscape(desc.join('\n'))}`);
+    add('END:VEVENT');
+    events++;
+  });
+
+  let examCount = 0;
+  if (includeExams) {
+    SUBJECTS.forEach(s => {
+      const e = state.exams[s.id];
+      if (!e || !e.date || state.userSubjects[s.id]?.status !== 'cursada' || daysUntil(e.date) < 0) return;
+      add('BEGIN:VEVENT');
+      add(`UID:${nextUid()}`);
+      add(`DTSTAMP:${now}`);
+      if (e.time) {
+        const [y, m, d] = e.date.split('-').map(Number);
+        const [hh, mm] = e.time.split(':').map(Number);
+        const t0 = Date.UTC(y, m - 1, d, hh, mm);
+        add(`DTSTART;TZID=${TZ}:${icsStamp(t0)}`);
+        add(`DTEND;TZID=${TZ}:${icsStamp(t0 + 2 * 3600000)}`);
+      } else {
+        add(`DTSTART;VALUE=DATE:${e.date.replace(/-/g, '')}`);
+        add(`DTEND;VALUE=DATE:${addDaysISO(e.date, 1).replace(/-/g, '')}`);
+      }
+      add(`SUMMARY:${icsEscape('Mesa de examen: ' + s.name)}`);
+      add('BEGIN:VALARM');
+      add('ACTION:DISPLAY');
+      add(`DESCRIPTION:${icsEscape('Mesa de examen: ' + s.name)}`);
+      add('TRIGGER:-P1D');
+      add('END:VALARM');
+      add('END:VEVENT');
+      examCount++;
+    });
+  }
+  add('END:VCALENDAR');
+  return { text: lines.join('\r\n') + '\r\n', events, examCount, skippedNoTime, skippedRange };
+}
+function openCalModal() {
+  document.getElementById('cal-view').value = state.scheduleView;
+  const start = todayISO();
+  document.getElementById('cal-start').value = start;
+  document.getElementById('cal-end').value = addDaysISO(start, state.scheduleView === 'all' ? 210 : 119);
+  document.getElementById('cal-exams').checked = true;
+  openBox('cal-modal');
+}
+function closeCalModal(e) { closeBox('cal-modal', e); }
+function generateCalendar() {
+  const view = document.getElementById('cal-view').value;
+  const startISO = document.getElementById('cal-start').value;
+  const endISO = document.getElementById('cal-end').value;
+  const includeExams = document.getElementById('cal-exams').checked;
+  if (!isValidISO(startISO) || !isValidISO(endISO)) { showAlert('⚠️ Atención', 'Completá las fechas de inicio y de fin del período.'); return; }
+  if (endISO < startISO) { showAlert('⚠️ Atención', 'La fecha final tiene que ser posterior a la inicial.'); return; }
+  const r = buildICS({ view, startISO, endISO, includeExams });
+  if (r.events + r.examCount === 0) {
+    showAlert('⚠️ Atención', 'No hay nada para exportar: cargá horarios con hora de inicio y fin' + (includeExams ? ' o mesas con fecha' : '') + '.');
+    return;
+  }
+  downloadBlob(new Blob([r.text], { type: 'text/calendar;charset=utf-8' }), `Horarios-ISFD100-${view === 'all' ? 'anual' : view + 'C'}.ics`);
+  closeCalModal();
+  const notes = [];
+  if (r.skippedNoTime) notes.push(`${r.skippedNoTime} horario(s) sin hora definida no se incluyeron.`);
+  if (r.skippedRange) notes.push(`${r.skippedRange} horario(s) quedaron fuera del rango de fechas.`);
+  showAlert('📆 Calendario listo', `Se generaron ${r.events} clase(s) semanal(es) y ${r.examCount} mesa(s). Abrí el archivo <b>.ics</b> con tu app de calendario para importarlo.${notes.length ? '<br><br><span class="text-xs text-slate-500">' + notes.join('<br>') + '</span>' : ''}`);
+}
+
+/* ── Respaldo en archivo ── */
+function downloadBackup() {
+  const payload = {
+    app: BACKUP_APP, version: 1, exportedAt: new Date().toISOString(),
+    data: { student: state.student, userSubjects: state.userSubjects, schedule: state.schedule, exams: state.exams, notes: state.notes }
+  };
+  const slug = fileSlug(state.student);
+  downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }), `Respaldo-ISFD100-${slug ? slug + '-' : ''}${todayISO()}.json`);
+}
+function importBackupFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { showAlert('❌ Error', 'El archivo es demasiado grande para ser un respaldo.'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    try { applyBackup(JSON.parse(String(reader.result))); }
+    catch (e) { showAlert('❌ Error', 'El archivo no es un respaldo válido de este planificador.'); }
+  };
+  reader.onerror = () => showAlert('❌ Error', 'No se pudo leer el archivo.');
+  reader.readAsText(file);
+  input.value = '';
+}
+function applyBackup(obj) {
+  if (!obj || obj.app !== BACKUP_APP || !obj.data || typeof obj.data !== 'object') throw new Error('Respaldo inválido');
+  const d = obj.data;
+  const next = { u: sanitizeUserSubjects(d.userSubjects), s: sanitizeSchedule(d.schedule), e: sanitizeExams(d.exams), n: sanitizeNotes(d.notes) };
+  const nextStudent = ('student' in d) ? sanitizeStudent(d.student) : state.student;   // respaldos viejos no traen nombre
+  const hasData = Object.keys(state.userSubjects).length > 0 || Object.keys(state.exams).length > 0 || Object.keys(state.notes).length > 0
+    || DAYS.some(day => (state.schedule[day] || []).length > 0);
+  if (hasData && !confirm('Esto reemplaza todo lo que tenés cargado (progreso, horarios, mesas y notas) por el contenido del respaldo. ¿Continuar?')) return;
+  pushUndo('Respaldo cargado');
+  state.userSubjects = next.u; state.schedule = next.s; state.exams = next.e; state.notes = next.n;
+  state.student = nextStudent;
+  saveState();
+  refreshAll();
+  updateStudentUI();
+  closeSyncModal();
+  const when = obj.exportedAt ? new Date(obj.exportedAt).toLocaleDateString('es-AR') : '';
+  showAlert('✅ ¡Listo!', `Respaldo${state.student ? ' de <b>' + esc(state.student) + '</b>' : ''} cargado${when ? ' (guardado el ' + when + ')' : ''}.`);
+}
+
+/* ── Reporte: imagen o impresión / PDF ── */
+function openReportModal() { openBox('report-modal'); }
+function closeReportModal(e) { closeBox('report-modal', e); }
+function buildPrintReport(opts) {
+  const total = SUBJECTS.length;
+  let approved = 0, cursada = 0, hsA = 0, gSum = 0, gN = 0;
+  SUBJECTS.forEach(s => {
+    const u = state.userSubjects[s.id];
+    if (!u) return;
+    if (u.status === 'approved') { approved++; hsA += s.hs; if (u.grade != null) { gSum += u.grade; gN++; } }
+    else if (u.status === 'cursada') cursada++;
+  });
+  const pct = state.totalHs ? Math.min(approved === total ? 100 : 99, Math.round(hsA / state.totalHs * 100)) : 0;
+  const hoy = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  let h = `<h1>Reporte de avance académico</h1>
+    <p class="sub">Profesorado en Economía — ISFD N°100 — DGCyE · Emitido el ${esc(hoy)}</p>
+    ${state.student ? `<p class="sub" style="margin-top:-8px"><b>Alumno/a:</b> ${esc(state.student)}</p>` : ''}
+    <div class="kpis">
+      <div class="kpi"><b>${pct}%</b><span>Avance (por horas)</span></div>
+      <div class="kpi"><b>${approved} / ${total}</b><span>Materias aprobadas</span></div>
+      <div class="kpi"><b>${cursada}</b><span>Finales pendientes</span></div>
+      <div class="kpi"><b>${gN ? (gSum / gN).toFixed(2) : '-'}</b><span>Promedio</span></div>
+      <div class="kpi"><b>${hsA} / ${state.totalHs}</b><span>Horas aprobadas</span></div>
+    </div>`;
+
+  if (opts.materias) {
+    h += '<h2>Materias por año</h2>';
+    [1, 2, 3, 4].forEach(yr => {
+      h += `<h3>${yr}° Año</h3><table><tr><th>Materia</th><th>Campo</th><th>Régimen</th><th>Hs</th><th>Estado</th><th>Nota</th><th>Mesa de examen</th></tr>`;
+      SUBJECTS.filter(s => s.year === yr).forEach(s => {
+        const u = state.userSubjects[s.id];
+        let est = 'Bloqueada';
+        if (u) est = STATUS_LABEL[u.status];
+        else if (isSubjectEnabled(s.id)) est = 'Habilitada';
+        const e = state.exams[s.id];
+        const mesa = (u?.status === 'cursada' && e && (e.date || e.attempts))
+          ? [e.date ? fmtDateShort(e.date) + (e.time ? ' ' + e.time : '') : '', e.attempts ? `rendí ${e.attempts}×` : ''].filter(Boolean).join(' · ') : '';
+        h += `<tr><td class="${u?.status === 'approved' ? 'st-approved' : ''}">${esc(s.name)}</td><td>${esc(s.campo)}</td><td>${esc(s.regimen)}</td><td>${s.hs}</td><td>${esc(est)}</td><td>${u?.status === 'approved' && u.grade != null ? u.grade : ''}</td><td>${esc(mesa)}</td></tr>`;
+      });
+      h += '</table>';
+    });
+  }
+
+  if (opts.horarios) {
+    const view = state.scheduleView;
+    const items = collectScheduleItems(view).sort(sortScheduleItems);
+    h += `<h2>Horarios de cursada <span class="muted">(${esc(VIEW_LABEL[view])})</span></h2>`;
+    if (!items.length) h += '<p class="muted">No hay horarios cargados en este período.</p>';
+    else {
+      h += '<table><tr><th>Día</th><th>Horario</th><th>Materia</th><th>Período</th><th>Classroom</th><th>Docente</th></tr>';
+      items.forEach(it => {
+        h += `<tr><td>${esc(it.day)}</td><td>${esc(it.time)}${it.conflict ? ' ⚠' : ''}</td><td>${esc(it.subject.name)}</td><td>${esc(TERM_LABEL[it.term])}</td><td>${esc(it.room)}</td><td>${esc(it.teacher)}</td></tr>`;
+      });
+      h += '</table>';
+    }
+  }
+
+  if (opts.mesas) {
+    const list = SUBJECTS.filter(s => state.userSubjects[s.id]?.status === 'cursada' && state.exams[s.id] && state.exams[s.id].date)
+      .map(s => ({ s, e: state.exams[s.id] })).sort((a, b) => a.e.date.localeCompare(b.e.date));
+    h += '<h2>Mesas de examen</h2>';
+    if (!list.length) h += '<p class="muted">No hay mesas cargadas.</p>';
+    else {
+      h += '<table><tr><th>Fecha</th><th>Hora</th><th>Materia</th><th>Veces que rendí</th></tr>';
+      list.forEach(({ s, e }) => { h += `<tr><td>${esc(fmtDateLong(e.date))}</td><td>${esc(e.time)}</td><td>${esc(s.name)}</td><td>${e.attempts}</td></tr>`; });
+      h += '</table>';
+    }
+  }
+  return h;
+}
+function printReport() {
+  const opts = {
+    materias: document.getElementById('rp-materias').checked,
+    horarios: document.getElementById('rp-horarios').checked,
+    mesas: document.getElementById('rp-mesas').checked
+  };
+  document.getElementById('print-report').innerHTML = buildPrintReport(opts);
+  closeReportModal();
+  const prevTitle = document.title;
+  document.title = 'Reporte-ISFD100';
+  window.addEventListener('afterprint', () => { document.title = prevTitle; }, { once: true });
+  setTimeout(() => window.print(), 250);
+}
+
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeSimulador();
+    closeConfirmModal();
+    closeAlertModal();
+    closeSchedule();
+    closeStatusModal();
+    closeSyncModal();
+    closeExamsModal();
+    closeCalModal();
+    closeReportModal();
+    closeNameModal();
+    closeQrShow();
+    closeQrScan();
+    if (chainPinned) clearChain();
+  }
+  if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key && e.key.toLowerCase() === 'z' && !isTypingTarget(e.target)) {
+    e.preventDefault();
+    undoLast();
+  }
+});
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
