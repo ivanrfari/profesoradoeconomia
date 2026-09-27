@@ -324,27 +324,27 @@
     html.dark #chain-banner { background-color: #0d0a1f; }
     html.dark #exam-banner { background-color: #1f1204; }
 
-    /* ══════════ IMPRESIÓN / PDF ══════════ */
-    #print-report { display: none; }
+    /* ══════════ IMPRESIÓN / PDF (estilos compartidos con el PDF para WhatsApp) ══════════ */
+    #print-report { display: none; color: #0f172a; font-family: Inter, system-ui, sans-serif; font-size: 10.5px; line-height: 1.35; }
+    #print-report h1 { font-size: 20px; font-weight: 900; margin: 0; }
+    #print-report .sub { color: #475569; margin: 2px 0 12px; }
+    #print-report h2 { font-size: 13px; font-weight: 900; margin: 16px 0 6px; border-bottom: 2px solid #0f172a; padding-bottom: 3px; break-after: avoid; }
+    #print-report h3 { font-size: 11px; font-weight: 800; margin: 10px 0 4px; break-after: avoid; }
+    #print-report table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
+    #print-report tr { break-inside: avoid; }
+    #print-report th, #print-report td { border: 1px solid #cbd5e1; padding: 3px 6px; text-align: left; vertical-align: top; }
+    #print-report th { background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    #print-report .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+    #print-report .kpi { border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 8px; }
+    #print-report .kpi b { display: block; font-size: 16px; }
+    #print-report .kpi span { color: #64748b; font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+    #print-report .st-approved { font-weight: 800; }
+    #print-report .muted { color: #64748b; font-weight: 500; }
     @media print {
       @page { size: A4; margin: 12mm; }
       html, body { background: #ffffff !important; background-image: none !important; }
       body > *:not(#print-report) { display: none !important; }
-      #print-report { display: block !important; color: #0f172a; font-family: Inter, system-ui, sans-serif; font-size: 10.5px; line-height: 1.35; }
-      #print-report h1 { font-size: 20px; font-weight: 900; margin: 0; }
-      #print-report .sub { color: #475569; margin: 2px 0 12px; }
-      #print-report h2 { font-size: 13px; font-weight: 900; margin: 16px 0 6px; border-bottom: 2px solid #0f172a; padding-bottom: 3px; break-after: avoid; }
-      #print-report h3 { font-size: 11px; font-weight: 800; margin: 10px 0 4px; break-after: avoid; }
-      #print-report table { width: 100%; border-collapse: collapse; margin-bottom: 6px; }
-      #print-report tr { break-inside: avoid; }
-      #print-report th, #print-report td { border: 1px solid #cbd5e1; padding: 3px 6px; text-align: left; vertical-align: top; }
-      #print-report th { background: #e2e8f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-      #print-report .kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-      #print-report .kpi { border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 8px; }
-      #print-report .kpi b { display: block; font-size: 16px; }
-      #print-report .kpi span { color: #64748b; font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
-      #print-report .st-approved { font-weight: 800; }
-      #print-report .muted { color: #64748b; font-weight: 500; }
+      #print-report { display: block !important; }
     }
   </style>
 </head>
@@ -3305,7 +3305,7 @@ function shareReportPDF() {
   };
   const el = document.getElementById('print-report');
   el.innerHTML = buildPrintReport(opts);
-  el.style.cssText = 'display:block;position:fixed;left:-9999px;top:0;width:780px;background:#fff;color:#0f172a;font-family:Inter,system-ui,sans-serif;font-size:10.5px;padding:20px;';
+  el.style.cssText = 'display:block;position:fixed;left:-9999px;top:0;width:780px;padding:20px;background:#fff;';
   closeReportModal();
   Promise.all([loadHtml2Canvas(), loadJsPDF()]).then(() => html2canvas(el, { scale: 2 }).then(canvas => {
     el.style.cssText = '';
