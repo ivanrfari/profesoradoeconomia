@@ -17,6 +17,8 @@
   </script>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@800&display=swap" rel="stylesheet">
   <link rel="icon" href="icon-192.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -78,14 +80,14 @@
     /* Aprobada */
     .subject-card[data-state="approved"] {
       background-color: #0f172a; border: 2px solid #0f172a; color: #ffffff;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);
     }
     .subject-card[data-state="approved"] h3 { color: #ffffff; }
     .subject-card[data-state="approved"] .subtitle { color: #94a3b8; }
     .subject-card[data-state="approved"] .card-divider { border-color: #334155; }
     .subject-card[data-state="approved"] .status-label { color: #38bdf8; }
     .subject-card[data-state="approved"] .info-btn { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155;}
-    .subject-card[data-state="approved"]:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3); }
+    .subject-card[data-state="approved"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.4); }
 
     /* En Curso */
     .subject-card[data-state="en_curso"] {
@@ -143,6 +145,12 @@
       100% { transform: scale(1); }
     }
     .animate-unlock { animation: unlockPop 0.5s ease-out; }
+    @keyframes approvePulse {
+      0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.6); }
+      70% { box-shadow: 0 0 0 16px rgba(56, 189, 248, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+    }
+    .just-approved { animation: approvePulse 0.9s ease-out; }
 
     .modal-backdrop { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px); }
     body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -166,6 +174,12 @@
     .subject-card.chain-post::before { content: '🔹 Destraba'; background: #4f46e5; }
     .subject-card.chain-self::before { content: '🔗 Elegida'; background: #0284c7; }
     .info-btn.pinned { box-shadow: 0 0 0 2px #0ea5e9; }
+    #grid-container.list-view .subject-card { padding: 0.7rem 0.85rem; }
+    #grid-container.list-view .subject-card .subtitle { display: none; }
+    #grid-container.list-view .subject-card h3 { font-size: 12.5px; margin-bottom: 2px; }
+    #grid-container.list-view .subject-card .card-divider { padding-top: 6px; margin-top: 6px; }
+    #progress-bar { background: linear-gradient(90deg, #1d4ed8, #60a5fa); }
+    #progress-bar-cursada { background: linear-gradient(90deg, #0d9488, #5eead4); }
 
     /* ── Chips dentro de las tarjetas ── */
     .card-chip { font-size: 9px; font-weight: 800; letter-spacing: 0.03em; padding: 2px 6px; border-radius: 6px; background: rgba(100, 116, 139, 0.16); white-space: nowrap; }
@@ -279,6 +293,15 @@
     html.dark .subject-card[data-state="locked"] .status-label { color: #64748b; }
     html.dark .subject-card[data-state="locked"] .info-btn { background-color: #111827; color: #64748b; border-color: #1e293b; }
     html.dark .subject-card[data-state="locked"]:hover { background-color: #1e293b; border-color: #64748b; }
+
+    #app-header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 55%, #020617 100%),
+                  radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: auto, 16px 16px;
+    }
+    #app-header.shrunk { padding-top: 0.6rem; padding-bottom: 0.6rem; }
+    #app-header.shrunk #app-title { font-size: 1.1rem; }
+    #app-header.shrunk .header-stat-label { display: none; }
 
     /* ══════════ MODO OSCURO "AMOLED": negro puro + más contraste ══════════ */
     html.dark body { background-color: #000000; background-image: radial-gradient(#141414 1px, transparent 1px); }
@@ -637,17 +660,17 @@
   <!-- ══════════════════════════════════════════
        HEADER PRINCIPAL DASHBOARD
   ══════════════════════════════════════════ -->
-  <header class="bg-slate-900 text-white py-6 px-4 sm:px-6 shadow-xl relative z-30">
+  <header id="app-header" class="text-white py-6 px-4 sm:px-6 shadow-xl relative z-30 transition-[padding] duration-300">
     <div class="max-w-screen-2xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
       
       <div class="flex items-center justify-center lg:justify-start gap-4 w-full lg:w-auto">
         <div class="flex-1 text-center lg:text-left">
           <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">DGCyE · ISFD N°100 · ECONOMÍA</p>
-          <h1 class="text-2xl sm:text-3xl font-black mt-0.5 tracking-tight text-white">
+          <h1 id="app-title" class="text-2xl sm:text-3xl font-black mt-0.5 tracking-tight text-white" style="font-family:'Sora',sans-serif">
             Planificador Curricular
           </h1>
           <button id="btn-student" onclick="openNameModal()" class="mt-3 inline-flex max-w-full items-center gap-2 text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3.5 py-1.5 rounded-full transition" title="Cambiar el nombre del alumno de este perfil">
-            <span>👤</span>
+            <span id="student-avatar" class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[9px] font-black shrink-0">👤</span>
             <span id="student-label" class="truncate">Agregar nombre del alumno</span>
             <span class="text-slate-400 shrink-0">✎</span>
           </button>
@@ -656,7 +679,7 @@
       
       <div class="flex justify-between sm:justify-end items-center gap-4 sm:gap-8 bg-slate-800/50 rounded-2xl px-5 py-4 border border-slate-700 w-full lg:w-auto">
         <div class="text-center sm:text-right flex flex-col flex-1 sm:flex-none">
-          <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Promedio</p>
+          <p class="header-stat-label text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Promedio</p>
           <div class="flex items-baseline gap-1 justify-center sm:justify-end">
             <span class="text-2xl sm:text-4xl font-black text-white font-mono tracking-tighter" id="promedio-label">-</span>
           </div>
@@ -712,6 +735,7 @@
             <option value="1">1° cuatrimestre</option>
             <option value="2">2° cuatrimestre</option>
           </select>
+          <button id="btn-density" onclick="toggleDensity()" title="Vista compacta" class="shrink-0 text-sm bg-slate-50 text-slate-700 w-9 h-9 rounded-xl border border-slate-300 hover:bg-slate-200 transition shadow-sm flex items-center justify-center">☰</button>
           
           <div class="w-px h-6 bg-slate-300 hidden lg:block shrink-0 mx-1"></div>
 
@@ -1169,9 +1193,16 @@ const state = {
 };
 
 const CAMPO_COLORS = {
-  CFG: { bg: 'bg-[#1e3a8a]', label: 'CFG', title: 'Formación General' },
-  CFE: { bg: 'bg-[#059669]', label: 'CFE', title: 'Formación Específica' },
-  CPD: { bg: 'bg-[#d97706]', label: 'CPD', title: 'Práctica Docente' },
+  CFG: { bg: 'bg-[#1e3a8a]', label: 'CFG', icon: '📘', title: 'Formación General' },
+  CFE: { bg: 'bg-[#059669]', label: 'CFE', icon: '📗', title: 'Formación Específica' },
+  CPD: { bg: 'bg-[#d97706]', label: 'CPD', icon: '🏫', title: 'Práctica Docente' },
+};
+const STATE_ICONS = {
+  approved: '<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5l4 4 8-9"/></svg>',
+  cursada: '<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4.5 3.5h8l3 3v10h-11z"/><path d="M12.5 3.5v3h3"/><path d="M7 11h6M7 14h4"/></svg>',
+  en_curso: '<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5.5 3h9M5.5 17h9M7 3c0 4 3 4.5 3 7s-3 3-3 7M13 3c0 4-3 4.5-3 7s3 3 3 7"/></svg>',
+  enabled: '<svg viewBox="0 0 20 20" width="15" height="15" fill="currentColor"><path d="M6 3.5l11 6.5-11 6.5z"/></svg>',
+  locked: '<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="9" width="12" height="8" rx="1.5"/><path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9"/></svg>'
 };
 
 /* Limpia datos guardados/importados: descarta materias que ya no existen, estados raros y notas inválidas */
@@ -1240,10 +1271,21 @@ function init() {
   updateAllCards();
   updateProgress();
   syncThemeButton();
+  if (safeGet('isfd100_densidad') === '1') { document.getElementById('grid-container').classList.add('list-view'); document.getElementById('btn-density').textContent = '▦'; }
   updateUndoButton();
   updateStudentUI();
 
-  showInstallBtn();   // siempre visible salvo que ya estés dentro de la app instalada
+  let __hdrTicking = false;
+  window.addEventListener('scroll', () => {
+    if (__hdrTicking) return;
+    __hdrTicking = true;
+    requestAnimationFrame(() => {
+      document.getElementById('app-header').classList.toggle('shrunk', window.scrollY > 60);
+      __hdrTicking = false;
+    });
+  }, { passive: true });
+
+  showInstallBtn();
 
   document.getElementById('search-input').addEventListener('input', (e) => {
     state.searchQuery = normalizeText(e.target.value.trim());
@@ -1410,7 +1452,7 @@ function createCard(subject) {
   card.innerHTML = `
     <div class="flex justify-between items-start mb-3">
       <div class="flex items-center">
-        <span class="campo-badge ${CAMPO_COLORS[subject.campo].bg} px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-sm">${CAMPO_COLORS[subject.campo].label}</span>
+        <span class="campo-badge ${CAMPO_COLORS[subject.campo].bg} px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-sm">${CAMPO_COLORS[subject.campo].icon} ${CAMPO_COLORS[subject.campo].label}</span>
         ${bottleneckHtml}
       </div>
       <span class="status-icon text-lg leading-none"></span>
@@ -1553,6 +1595,7 @@ function saveSubjectStatus() {
   pushUndo(`${subject.name} → ${STATUS_LABEL[newStatus]}`);
 
   const previouslyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
+  const justApproved = newStatus === 'approved' && prevStatus !== 'approved';
 
   if (newStatus === 'enabled') {
     delete state.userSubjects[id];
@@ -1564,6 +1607,11 @@ function saveSubjectStatus() {
   updateAllCards();
   updateProgress();
   closeStatusModal();
+
+  if (justApproved) {
+    const c = document.getElementById(`card-${id}`);
+    if (c) { c.classList.remove('just-approved'); void c.offsetWidth; c.classList.add('just-approved'); }
+  }
 
   if (newStatus === 'approved' || newStatus === 'cursada') {
     const currentlyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
@@ -1596,12 +1644,12 @@ function updateAllCards() {
 
     if (uData && uData.status === 'approved') {
       card.dataset.state = 'approved';
-      iconEl.innerHTML = '✓';
-      labelEl.innerHTML = (uData.grade !== null && uData.grade !== undefined) ? `Aprobada (Nota: ${uData.grade})` : 'Aprobada';
+      iconEl.innerHTML = STATE_ICONS.approved;
+      labelEl.innerHTML = (uData.grade !== null && uData.grade !== undefined) ? `Aprobada (Nota: <span class=\"font-mono\">${uData.grade}</span>)` : 'Aprobada';
     }
     else if (uData && uData.status === 'cursada') {
       card.dataset.state = 'cursada';
-      iconEl.innerHTML = '📝';
+      iconEl.innerHTML = STATE_ICONS.cursada;
       const blockers = FINAL_REQUIERE_CORRELATIVAS_ACREDITADAS ? finalBlockers(subject) : [];
       if (blockers.length > 0) {
         labelEl.innerHTML = `Final pendiente · 🔒 ${blockers.length}`;
@@ -1614,17 +1662,17 @@ function updateAllCards() {
     }
     else if (uData && uData.status === 'en_curso') {
       card.dataset.state = 'en_curso';
-      iconEl.innerHTML = '⏳';
+      iconEl.innerHTML = STATE_ICONS.en_curso;
       labelEl.innerHTML = 'En Curso';
     }
     else if (isSubjectEnabled(subject.id)) {
       card.dataset.state = 'enabled';
-      iconEl.innerHTML = '▶';
+      iconEl.innerHTML = STATE_ICONS.enabled;
       labelEl.innerHTML = 'Habilitada';
     }
     else {
       card.dataset.state = 'locked';
-      iconEl.innerHTML = '🔒';
+      iconEl.innerHTML = STATE_ICONS.locked;
       const missingIds = subject.prereqs.filter(pid => !prereqCursadaOk(pid));
       const missingNames = missingIds.map(pid => SUBJECTS.find(x => x.id === pid).name);
 
@@ -2248,6 +2296,8 @@ function updateStudentUI() {
     label.textContent = has ? state.student : 'Agregar nombre del alumno';
     label.parentElement.title = has ? `Perfil de ${state.student} (tocá para cambiarlo)` : 'Agregar el nombre del alumno de este perfil';
   }
+  const av = document.getElementById('student-avatar');
+  if (av) av.textContent = has ? state.student.trim().charAt(0).toUpperCase() : '👤';
   const wm = document.getElementById('export-student');
   if (wm) { wm.textContent = has ? `Alumno/a: ${state.student}` : ''; wm.classList.toggle('hidden', !has); }
   document.title = has ? `${BASE_TITLE} — ${state.student}` : BASE_TITLE;
@@ -2275,6 +2325,12 @@ function applyTheme(dark) {
   const m = document.querySelector('meta[name="theme-color"]');
   if (m) m.setAttribute('content', dark ? '#020617' : '#0f172a');
   syncThemeButton();
+}
+function toggleDensity() {
+  const grid = document.getElementById('grid-container');
+  const compact = grid.classList.toggle('list-view');
+  safeSet('isfd100_densidad', compact ? '1' : '0');
+  document.getElementById('btn-density').textContent = compact ? '▦' : '☰';
 }
 function toggleTheme() {
   const dark = !document.documentElement.classList.contains('dark');
