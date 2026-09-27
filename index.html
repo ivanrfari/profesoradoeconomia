@@ -611,6 +611,7 @@
             <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="rp-mesas" checked class="w-4 h-4"> Mesas de examen</label>
           </div>
           <button onclick="printReport()" class="w-full mt-4 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition">Abrir vista de impresión</button>
+          <button onclick="shareReportPDF()" class="w-full mt-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md transition">📱 Compartir PDF por WhatsApp</button>
           <p class="text-[11px] text-slate-500 mt-2 leading-snug">En el diálogo de impresión elegí <b>Guardar como PDF</b> como destino.</p>
         </div>
       </div>
@@ -965,6 +966,7 @@ const loadConfetti = () => loadLib('https://cdn.jsdelivr.net/npm/canvas-confetti
 const loadHtml2Canvas = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
 const loadQRCode = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js');
 const loadJsQR = () => loadLib('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js');
+const loadJsPDF = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
 
 function openQrShow() {
   const code = document.getElementById('sync-export-code').value;
@@ -2212,8 +2214,7 @@ function exportMap() {
       
       const link = document.createElement('a');
       link.download = 'Reporte-ISFD100.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      canvas.toBlob(b => { if (b) shareFile(b, 'Reporte-ISFD100.png', 'image/png'); else { link.href = canvas.toDataURL('image/png'); link.click(); } }, 'image/png');
       
       btn.innerHTML = originalHTML;
       btn.disabled = false;
@@ -2306,6 +2307,18 @@ function downloadBlob(blob, filename) {
   a.click();
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+/* Comparte un archivo (imagen o PDF) directo por WhatsApp u otra app instalada; si el navegador no soporta
+   compartir archivos, se descarga como antes. */
+function shareFile(blob, filename, mime) {
+  try {
+    const file = new File([blob], filename, { type: mime });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file] }).catch(() => {});
+      return;
+    }
+  } catch (e) {}
+  downloadBlob(blob, filename);
 }
 
 /* ── Nombre del alumno ── */
@@ -3027,7 +3040,7 @@ function exportScheduleImage() {
   const canvas = drawScheduleCanvas(state.scheduleView);
   if (!canvas) { showAlert('⚠️ Atención', 'No hay horarios cargados en este período para exportar.'); return; }
   const name = `Horarios-ISFD100-${state.scheduleView === 'all' ? 'anual' : state.scheduleView + 'C'}.png`;
-  if (canvas.toBlob) canvas.toBlob(b => { if (b) downloadBlob(b, name); }, 'image/png');
+  if (canvas.toBlob) canvas.toBlob(b => { if (b) shareFile(b, name, 'image/png'); }, 'image/png');
   else { const a = document.createElement('a'); a.download = name; a.href = canvas.toDataURL('image/png'); a.click(); }
 }
 
@@ -3283,6 +3296,25 @@ function printReport() {
   document.title = 'Reporte-ISFD100';
   window.addEventListener('afterprint', () => { document.title = prevTitle; }, { once: true });
   setTimeout(() => window.print(), 250);
+}
+function shareReportPDF() {
+  const opts = {
+    materias: document.getElementById('rp-materias').checked,
+    horarios: document.getElementById('rp-horarios').checked,
+    mesas: document.getElementById('rp-mesas').checked
+  };
+  const el = document.getElementById('print-report');
+  el.innerHTML = buildPrintReport(opts);
+  el.style.cssText = 'display:block;position:fixed;left:-9999px;top:0;width:780px;background:#fff;color:#0f172a;font-family:Inter,system-ui,sans-serif;font-size:10.5px;padding:20px;';
+  closeReportModal();
+  Promise.all([loadHtml2Canvas(), loadJsPDF()]).then(() => html2canvas(el, { scale: 2 }).then(canvas => {
+    el.style.cssText = '';
+    const { jsPDF } = window.jspdf;
+    const w = canvas.width, h = canvas.height;
+    const pdf = new jsPDF({ unit: 'px', format: [w, h] });
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, w, h);
+    shareFile(pdf.output('blob'), 'Reporte-ISFD100.pdf', 'application/pdf');
+  })).catch(() => { el.style.cssText = ''; showAlert('❌ Error', 'No se pudo generar el PDF para compartir.'); });
 }
 
 
