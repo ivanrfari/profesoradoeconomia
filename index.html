@@ -825,6 +825,7 @@
       <div id="grid-container">
         <!-- Generado por JS -->
       </div>
+      <p id="no-results" class="hidden text-center text-slate-400 font-medium py-16">No se encontraron materias con ese filtro.</p>
     </main>
   </div>
 
@@ -1716,6 +1717,7 @@ function updateAllCards() {
 
 function applyFilterStyles() {
   const q = state.searchQuery;
+  let anyVisible = false;
   const toggleEnabledEl = document.getElementById('toggle-enabled-only');
   const showOnlyEnabled = toggleEnabledEl ? toggleEnabledEl.checked : false;
   // Con la cadena FIJADA (tocada, no solo pasada con el mouse), se oculta lo que no es parte de ella — igual que Modo Inscripción
@@ -1745,6 +1747,7 @@ function applyFilterStyles() {
     if (visible) {
       card.classList.remove('hidden', 'filter-dimmed');
       card.classList.add('filter-active');
+      anyVisible = true;
     } else {
       card.classList.remove('filter-active');
       if(q || showOnlyEnabled || state.termFilter !== 'all' || chainPinned) {
@@ -1756,9 +1759,8 @@ function applyFilterStyles() {
       }
     }
   });
+  document.getElementById('no-results').classList.toggle('hidden', anyVisible);
 }
-
-let wasComplete = null;
 function updateProgress() {
   const total = SUBJECTS.length;
   const totalHs = state.totalHs || SUBJECTS.reduce((acc, s) => acc + s.hs, 0);
