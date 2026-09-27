@@ -3307,7 +3307,14 @@ function shareReportPDF() {
   el.innerHTML = buildPrintReport(opts);
   el.style.cssText = 'display:block;position:fixed;left:-9999px;top:0;width:780px;padding:20px;background:#fff;';
   closeReportModal();
-  Promise.all([loadHtml2Canvas(), loadJsPDF()]).then(() => html2canvas(el, { scale: 1.5 }).then(canvas => {
+  const scale = 1.5;
+  // Tablas (con su título) que no se deben partir al cambiar de página.
+  const blocks = [...el.querySelectorAll('table')].map(t => {
+    const prev = t.previousElementSibling;
+    const top = (/^H[23]$/.test(prev?.tagName) ? prev.offsetTop : t.offsetTop) * scale;
+    return { top, bottom: (t.offsetTop + t.offsetHeight) * scale };
+  });
+  Promise.all([loadHtml2Canvas(), loadJsPDF()]).then(() => html2canvas(el, { scale }).then(canvas => {
     el.style.cssText = '';
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ unit: 'pt', format: 'a4' });
@@ -3315,12 +3322,15 @@ function shareReportPDF() {
     const ratio = pw / canvas.width, sliceH = Math.floor(ph / ratio);
     const tmp = document.createElement('canvas'), ctx = tmp.getContext('2d');
     tmp.width = canvas.width;
-    for (let y = 0, first = true; y < canvas.height; y += sliceH, first = false) {
-      const h = Math.min(sliceH, canvas.height - y);
+    for (let y = 0, first = true; y < canvas.height; first = false) {
+      let end = Math.min(y + sliceH, canvas.height);
+      blocks.forEach(b => { if (b.top > y && b.top < end && b.bottom > end) end = b.top; });
+      const h = end - y;
       tmp.height = h;
       ctx.drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
       if (!first) pdf.addPage();
       pdf.addImage(tmp.toDataURL('image/jpeg', 0.85), 'JPEG', m, m, pw, h * ratio);
+      y = end;
     }
     shareFile(pdf.output('blob'), 'Reporte-ISFD100.pdf', 'application/pdf');
   })).catch(() => { el.style.cssText = ''; showAlert('❌ Error', 'No se pudo generar el PDF para compartir.'); });
