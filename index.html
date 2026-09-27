@@ -3307,7 +3307,7 @@ function shareReportPDF() {
   el.innerHTML = buildPrintReport(opts);
   el.style.cssText = 'display:block;position:fixed;left:-9999px;top:0;width:780px;padding:20px;background:#fff;';
   closeReportModal();
-  const scale = 1.5;
+  const scale = 2;
   // Tablas (con su título) que no se deben partir al cambiar de página.
   const blocks = [...el.querySelectorAll('table')].map(t => {
     const prev = t.previousElementSibling;
@@ -3329,7 +3329,7 @@ function shareReportPDF() {
       tmp.height = h;
       ctx.drawImage(canvas, 0, y, canvas.width, h, 0, 0, canvas.width, h);
       if (!first) pdf.addPage();
-      pdf.addImage(tmp.toDataURL('image/jpeg', 0.85), 'JPEG', m, m, pw, h * ratio);
+      pdf.addImage(tmp.toDataURL('image/jpeg', 0.92), 'JPEG', m, m, pw, h * ratio);
       y = end;
     }
     shareFile(pdf.output('blob'), 'Reporte-ISFD100.pdf', 'application/pdf');
