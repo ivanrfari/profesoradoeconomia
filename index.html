@@ -924,6 +924,30 @@ function unlockScroll() {
   document.body.style.position = ''; document.body.style.top = ''; document.body.style.left = ''; document.body.style.right = '';
   window.scrollTo(0, __scrollLockY);
 }
+/* Atrás (Android) cierra la ventana abierta en vez de salir de la app.
+   Detecta cualquier .modal-backdrop visible y usa el historial para interceptar el botón atrás. */
+const __modalCloseFns = {
+  'onboarding-modal': () => closeOnboarding(), 'status-modal': () => closeStatusModal(),
+  'sync-modal': () => closeSyncModal(), 'confirm-modal': () => closeConfirmModal(),
+  'alert-modal': () => closeAlertModal(), 'schedule-modal': () => closeSchedule(),
+  'simulador-modal': () => closeSimulador(), 'exams-modal': () => closeExamsModal(),
+  'cal-modal': () => closeCalModal(), 'report-modal': () => closeReportModal(),
+  'name-modal': () => closeNameModal(), 'qr-show-modal': () => closeQrShow(),
+  'qr-scan-modal': () => closeQrScan(), 'modal-backdrop': () => closeModal()
+};
+let __modalHistPushed = false, __modalClosingFromPop = false;
+function __anyModalOpen() { return !!document.querySelector('.modal-backdrop:not(.hidden)'); }
+new MutationObserver(() => {
+  const open = __anyModalOpen();
+  if (open && !__modalHistPushed) { __modalHistPushed = true; history.pushState({ __modal: true }, ''); }
+  else if (!open && __modalHistPushed && !__modalClosingFromPop) { __modalHistPushed = false; history.back(); }
+}).observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+window.addEventListener('popstate', () => {
+  if (!__modalHistPushed) return;
+  __modalHistPushed = false; __modalClosingFromPop = true;
+  document.querySelectorAll('.modal-backdrop:not(.hidden)').forEach(m => { const fn = __modalCloseFns[m.id]; if (fn) fn(); });
+  setTimeout(() => { __modalClosingFromPop = false; }, 200);
+});
 /* Confetti (~6 KB) y html2canvas (~200 KB) solo se descargan cuando realmente hacen falta
    (festejo del 100% / exportar imagen), no en cada carga de la página. */
 const __libCache = {};
