@@ -1328,6 +1328,11 @@ function init() {
 
   showInstallBtn();
 
+  // Vibración háptica en los botones de la barra superior
+  document.addEventListener('click', e => {
+    if (navigator.vibrate && e.target.closest('.sticky button')) navigator.vibrate(30);
+  });
+
   // Pull-to-refresh visual (arrastrar hacia abajo estando arriba de todo)
   (function () {
     const ind = document.getElementById('ptr-indicator');
@@ -1661,7 +1666,7 @@ function saveSubjectStatus() {
   }
 
   pushUndo(`${subject.name} → ${STATUS_LABEL[newStatus]}`);
-  if (navigator.vibrate) navigator.vibrate(newStatus === 'approved' ? [15, 40, 15] : 15);
+  if (navigator.vibrate) navigator.vibrate(newStatus === 'approved' ? [40, 60, 40] : 30);
 
   const previouslyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
   const justApproved = newStatus === 'approved' && prevStatus !== 'approved';
