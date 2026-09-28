@@ -12,5 +12,10 @@
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Horarios", "short_name": "Horarios", "url": "./index.html?shortcut=horarios", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Reporte", "short_name": "Reporte", "url": "./index.html?shortcut=reporte", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Mesas de examen", "short_name": "Mesas", "url": "./index.html?shortcut=mesas", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
   ]
 }
