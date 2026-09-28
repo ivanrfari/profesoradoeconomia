@@ -3006,13 +3006,13 @@ function drawScheduleCanvas(view) {
   if (!measure) return null;
 
   const FONT = 'system-ui, "Segoe UI", Roboto, Arial, sans-serif';
-  const colW = 290, gap = 16, pad = 32, headH = 104, dayH = 40, cardGap = 12, px = 14, py = 12;
+  const colW = 210, gap = 14, pad = 28, headH = 104, dayH = 40, cardGap = 12, px = 14, py = 12;
   const days = DAYS.filter(d => d !== 'Sábado' || items.some(i => i.day === 'Sábado'));
 
   const layout = days.map(d => {
     const cards = items.filter(i => i.day === d).map(it => {
       measure.font = `bold 13px ${FONT}`;
-      const nameLines = wrapText(measure, it.subject.name, colW - px * 2 - 8, 2);
+      const nameLines = wrapText(measure, it.subject.name, colW - px * 2 - 8, 3);
       measure.font = `12px ${FONT}`;
       const extra = [];
       if (it.room) extra.push(fitText(measure, `Classroom: ${it.room}`, colW - px * 2 - 8));
@@ -3025,11 +3025,11 @@ function drawScheduleCanvas(view) {
   });
 
   const colHeights = layout.map(c => c.cards.reduce((a, k) => a + k.h + cardGap, 0));
-  const perRow = days.length >= 4 ? Math.ceil(days.length / 2) : days.length;
+  const perRow = days.length;
   const rowY = [0];
   for (let i = 0; i < days.length; i += perRow) rowY.push(rowY[rowY.length - 1] + dayH + 10 + Math.max(60, ...colHeights.slice(i, i + perRow)) + 16);
   const W = pad * 2 + perRow * colW + (perRow - 1) * gap;
-  const H = headH + 14 + rowY[rowY.length - 1] + pad - 16;
+  const H = Math.max(headH + 14 + rowY[rowY.length - 1] + pad - 16, Math.round(W * 0.85));
   const S = W * H * 9 > 14e6 ? 2 : 3;
 
   const canvas = document.createElement('canvas');
