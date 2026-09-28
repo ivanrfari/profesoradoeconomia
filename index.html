@@ -301,6 +301,8 @@
     #app-header.shrunk { padding-top: 0.6rem; padding-bottom: 0.6rem; }
     #app-header.shrunk #app-title { font-size: 1.1rem; }
     #app-header.shrunk .header-stat-label { display: none; }
+    #progress-strip.shrunk .progress-count-label { display: none; }
+    #progress-strip.shrunk > div { padding-top: .35rem; padding-bottom: .35rem; }
 
     /* ══════════ MODO OSCURO "AMOLED": negro puro + más contraste ══════════ */
     html.dark body { background-color: #000000; background-image: radial-gradient(#141414 1px, transparent 1px); }
@@ -350,6 +352,11 @@
 </head>
 
 <body class="min-h-screen text-slate-800 flex flex-col">
+  <div id="ptr-indicator" class="fixed left-1/2 -translate-x-1/2 z-[60] bg-slate-900 text-white shadow-lg rounded-full px-3 py-1 text-xs font-bold opacity-0 pointer-events-none transition-opacity" style="top: calc(env(safe-area-inset-top, 0px) + 8px);">↻</div>
+  <div id="splash" class="fixed inset-0 z-[999] flex flex-col items-center justify-center gap-3 bg-slate-900 transition-opacity duration-500">
+    <img src="icon-192.png" width="72" height="72" style="border-radius:20px" alt="">
+    <p class="text-white font-black text-xs tracking-wider">MAPA CURRICULAR ISFD 100</p>
+  </div>
 
   <script>
     if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
@@ -772,11 +779,11 @@
       </div>
     </div>
 
-    <div class="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+    <div id="progress-strip" class="bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-[padding] duration-300">
       <div class="max-w-screen-2xl mx-auto px-4 py-2 flex items-center">
         
         <div class="flex items-center gap-3 w-full">
-          <span class="text-[10px] font-black text-slate-400 whitespace-nowrap uppercase tracking-widest shrink-0">
+          <span class="progress-count-label text-[10px] font-black text-slate-400 whitespace-nowrap uppercase tracking-widest shrink-0">
             <span id="approved-count" class="text-slate-800 text-sm font-mono">0</span> / <span id="total-count" class="font-mono">0</span><span id="pend-label" class="normal-case tracking-normal text-teal-600 ml-1"></span>
           </span>
           <div class="flex flex-1 bg-slate-100 rounded-full h-2 overflow-hidden shadow-inner border border-slate-200" title="Azul: horas con final aprobado · Verde agua: horas con cursada aprobada (final pendiente)">
@@ -793,6 +800,11 @@
       <div class="max-w-screen-2xl mx-auto px-4 py-2 flex items-center justify-between gap-3 text-xs font-bold text-indigo-700">
         <span id="chain-banner-text" class="min-w-0 flex-1 flex items-center gap-1.5"></span>
         <button onclick="clearChain()" class="shrink-0 bg-white border border-indigo-200 px-3 py-1 rounded-lg hover:bg-blue-100 transition">Quitar ✕</button>
+      </div>
+    </div>
+    <div id="today-banner" onclick="openSchedule()" class="hidden cursor-pointer bg-teal-50 border-b border-teal-200">
+      <div class="max-w-screen-2xl mx-auto px-4 py-2 text-xs font-bold text-teal-700">
+        <span id="today-banner-text" class="block truncate"></span>
       </div>
     </div>
     <div id="exam-banner" onclick="openExamsModal()" class="hidden cursor-pointer bg-amber-50 border-b border-amber-200">
@@ -1308,11 +1320,33 @@ function init() {
     __hdrTicking = true;
     requestAnimationFrame(() => {
       document.getElementById('app-header').classList.toggle('shrunk', window.scrollY > 60);
+      document.getElementById('progress-strip').classList.toggle('shrunk', window.scrollY > 60);
       __hdrTicking = false;
     });
   }, { passive: true });
 
   showInstallBtn();
+
+  // Pull-to-refresh visual (arrastrar hacia abajo estando arriba de todo)
+  (function () {
+    const ind = document.getElementById('ptr-indicator');
+    let startY = null, fired = false;
+    document.addEventListener('touchstart', e => { if (window.scrollY === 0) { startY = e.touches[0].clientY; fired = false; } }, { passive: true });
+    document.addEventListener('touchmove', e => {
+      if (startY === null) return;
+      if (e.touches[0].clientY - startY > 60) { fired = true; ind.style.opacity = '1'; ind.textContent = '↻ Soltá para actualizar'; }
+    }, { passive: true });
+    document.addEventListener('touchend', () => {
+      if (fired) {
+        ind.textContent = '✓ Actualizado';
+        renderGrid(); updateAllCards(); updateProgress();
+        setTimeout(() => { ind.style.opacity = '0'; }, 900);
+      }
+      startY = null; fired = false;
+    }, { passive: true });
+  })();
+
+  setTimeout(() => { const sp = document.getElementById('splash'); if (sp) { sp.style.opacity = '0'; setTimeout(() => sp.remove(), 400); } }, 200);
 
   const shortcut = new URLSearchParams(location.search).get('shortcut');
   if (shortcut === 'horarios') openSchedule();
@@ -1626,6 +1660,7 @@ function saveSubjectStatus() {
   }
 
   pushUndo(`${subject.name} → ${STATUS_LABEL[newStatus]}`);
+  if (navigator.vibrate) navigator.vibrate(newStatus === 'approved' ? [15, 40, 15] : 15);
 
   const previouslyEnabled = new Set(SUBJECTS.filter(s => isSubjectEnabled(s.id)).map(s => s.id));
   const justApproved = newStatus === 'approved' && prevStatus !== 'approved';
@@ -1718,6 +1753,7 @@ function updateAllCards() {
   SUBJECTS.forEach(renderCardExtras);
   applyFilterStyles();
   updateExamBanner();
+  renderTodayBanner();
   applyChain();
   if (isOpen('exams-modal')) renderExamsModal();
 }
@@ -2373,9 +2409,14 @@ function applyTheme(dark) {
 }
 function toggleDensity() {
   const grid = document.getElementById('grid-container');
-  const compact = grid.classList.toggle('list-view');
-  safeSet('isfd100_densidad', compact ? '1' : '0');
-  document.getElementById('btn-density').textContent = compact ? '▦' : '☰';
+  grid.style.transition = 'opacity .15s ease';
+  grid.style.opacity = '0';
+  setTimeout(() => {
+    const compact = grid.classList.toggle('list-view');
+    safeSet('isfd100_densidad', compact ? '1' : '0');
+    document.getElementById('btn-density').textContent = compact ? '▦' : '☰';
+    grid.style.opacity = '1';
+  }, 130);
 }
 function toggleTheme() {
   const dark = !document.documentElement.classList.contains('dark');
@@ -2633,14 +2674,16 @@ function renderExamsModal() {
   if (pending.length === 0) {
     html += '<p class="text-xs text-slate-400 text-center italic py-6">No hay mesas cargadas.</p>';
   }
-  pending.forEach(({ id, s, e }) => {
+  const nextIdx = pending.findIndex(p => p.e.date);
+  pending.forEach(({ id, s, e }, i) => {
+    const isNext = i === nextIdx;
     const n = e.date ? daysUntil(e.date) : null;
     const when = e.date ? `${esc(fmtDateLong(e.date))}${e.time ? ' · ' + e.time + ' hs' : ''}` : 'Sin fecha todavía';
     html += `
-      <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-sm">
+      <div class="bg-white border ${isNext ? 'border-blue-400 ring-2 ring-blue-100' : 'border-slate-200'} rounded-xl p-3 shadow-sm">
         <div class="flex justify-between items-start gap-2">
           <div class="min-w-0">
-            <p class="text-sm font-black text-slate-800 leading-tight">${esc(s.name)}</p>
+            <p class="text-sm font-black text-slate-800 leading-tight">${isNext ? '<span class="text-blue-600">🎯 Próxima · </span>' : ''}${esc(s.name)}</p>
             <p class="text-xs text-slate-500 font-mono mt-1 capitalize">${when}</p>
           </div>
           ${n === null ? '' : examChip(n)}
@@ -2710,6 +2753,18 @@ function upcomingExams(maxDays) {
     .map(s => ({ s, e: state.exams[s.id], days: daysUntil(state.exams[s.id].date) }))
     .filter(x => x.days >= 0 && x.days <= maxDays)
     .sort((a, b) => a.days - b.days || a.e.time.localeCompare(b.e.time));
+}
+function renderTodayBanner() {
+  const el = document.getElementById('today-banner');
+  const dow = new Date().getDay();
+  const today = dow === 0 ? null : DAYS[dow - 1];
+  const period = String(currentAcademicPeriod().period);
+  const items = today ? (state.schedule[today] || [])
+    .filter(it => { const s = SUBJECT_BY_ID[it.id]; return s && termVisible(subjectTerm(s), period); })
+    .sort((a, b) => (a.time || '').localeCompare(b.time || '')) : [];
+  if (!items.length) { el.classList.add('hidden'); return; }
+  document.getElementById('today-banner-text').textContent = '📚 Hoy: ' + items.map(it => `${SUBJECT_BY_ID[it.id]?.name} (${it.time || '?'})`).join(' · ');
+  el.classList.remove('hidden');
 }
 function updateExamBanner() {
   const el = document.getElementById('exam-banner');
