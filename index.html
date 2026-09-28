@@ -3006,7 +3006,7 @@ function drawScheduleCanvas(view) {
   if (!measure) return null;
 
   const FONT = 'system-ui, "Segoe UI", Roboto, Arial, sans-serif';
-  const colW = 300, gap = 16, pad = 32, headH = 104, dayH = 40, cardGap = 12, px = 14, py = 12;
+  const colW = 290, gap = 16, pad = 32, headH = 104, dayH = 40, cardGap = 12, px = 14, py = 12;
   const days = DAYS.filter(d => d !== 'Sábado' || items.some(i => i.day === 'Sábado'));
 
   const layout = days.map(d => {
@@ -3025,9 +3025,11 @@ function drawScheduleCanvas(view) {
   });
 
   const colHeights = layout.map(c => c.cards.reduce((a, k) => a + k.h + cardGap, 0));
-  const maxCol = Math.max(60, ...colHeights);
-  const W = pad * 2 + days.length * colW + (days.length - 1) * gap;
-  const H = headH + dayH + 14 + maxCol + pad;
+  const perRow = days.length >= 4 ? Math.ceil(days.length / 2) : days.length;
+  const rowY = [0];
+  for (let i = 0; i < days.length; i += perRow) rowY.push(rowY[rowY.length - 1] + dayH + 10 + Math.max(60, ...colHeights.slice(i, i + perRow)) + 16);
+  const W = pad * 2 + perRow * colW + (perRow - 1) * gap;
+  const H = headH + 14 + rowY[rowY.length - 1] + pad - 16;
   const S = W * H * 9 > 14e6 ? 2 : 3;
 
   const canvas = document.createElement('canvas');
@@ -3056,8 +3058,8 @@ function drawScheduleCanvas(view) {
   ctx.fillText((state.student ? `Alumno/a: ${fitText(ctx, state.student, 420)} · ` : '') + `Emitido el ${fecha}`, pad, 88);
 
   layout.forEach((col, ci) => {
-    const x = pad + ci * (colW + gap);
-    let y = headH + 14;
+    const x = pad + (ci % perRow) * (colW + gap);
+    let y = headH + 14 + rowY[Math.floor(ci / perRow)];
     ctx.fillStyle = '#1e293b';
     roundRect(ctx, x, y, colW, dayH, 10);
     ctx.fill();
