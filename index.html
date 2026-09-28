@@ -3006,13 +3006,13 @@ function drawScheduleCanvas(view) {
   if (!measure) return null;
 
   const FONT = 'system-ui, "Segoe UI", Roboto, Arial, sans-serif';
-  const colW = 250, gap = 14, pad = 28, headH = 100, dayH = 38, cardGap = 10, px = 14, py = 12;
+  const colW = 300, gap = 16, pad = 32, headH = 104, dayH = 40, cardGap = 12, px = 14, py = 12;
   const days = DAYS.filter(d => d !== 'Sábado' || items.some(i => i.day === 'Sábado'));
 
   const layout = days.map(d => {
     const cards = items.filter(i => i.day === d).map(it => {
       measure.font = `bold 13px ${FONT}`;
-      const nameLines = wrapText(measure, it.subject.name, colW - px * 2 - 8, 3);
+      const nameLines = wrapText(measure, it.subject.name, colW - px * 2 - 8, 2);
       measure.font = `12px ${FONT}`;
       const extra = [];
       if (it.room) extra.push(fitText(measure, `Classroom: ${it.room}`, colW - px * 2 - 8));
@@ -3028,7 +3028,7 @@ function drawScheduleCanvas(view) {
   const maxCol = Math.max(60, ...colHeights);
   const W = pad * 2 + days.length * colW + (days.length - 1) * gap;
   const H = headH + dayH + 14 + maxCol + pad;
-  const S = 2;
+  const S = W * H * 9 > 14e6 ? 2 : 3;
 
   const canvas = document.createElement('canvas');
   canvas.width = W * S;
@@ -3038,10 +3038,12 @@ function drawScheduleCanvas(view) {
 
   ctx.fillStyle = '#f1f5f9';
   ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = '#0f172a';
+  const g = ctx.createLinearGradient(0, 0, W, headH);
+  g.addColorStop(0, '#0f172a'); g.addColorStop(1, '#1e3a8a');
+  ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, headH);
-  ctx.fillStyle = '#3b82f6';
-  ctx.fillRect(0, 0, 8, headH);
+  ctx.fillStyle = '#60a5fa';
+  ctx.fillRect(0, headH - 4, W, 4);
 
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = '#ffffff';
@@ -3056,11 +3058,11 @@ function drawScheduleCanvas(view) {
   layout.forEach((col, ci) => {
     const x = pad + ci * (colW + gap);
     let y = headH + 14;
-    ctx.fillStyle = '#e2e8f0';
+    ctx.fillStyle = '#1e293b';
     roundRect(ctx, x, y, colW, dayH, 10);
     ctx.fill();
-    ctx.fillStyle = '#0f172a';
-    ctx.font = `900 14px ${FONT}`;
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `900 15px ${FONT}`;
     ctx.fillText(col.day, x + 14, y + 24);
     y += dayH + 10;
 
