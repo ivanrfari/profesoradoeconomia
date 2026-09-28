@@ -3029,7 +3029,7 @@ function drawScheduleCanvas(view) {
   const rowY = [0];
   for (let i = 0; i < days.length; i += perRow) rowY.push(rowY[rowY.length - 1] + dayH + 10 + Math.max(60, ...colHeights.slice(i, i + perRow)) + 16);
   const W = pad * 2 + perRow * colW + (perRow - 1) * gap;
-  const H = Math.max(headH + 14 + rowY[rowY.length - 1] + pad - 16, Math.round(W * 0.85));
+  const H = headH + 14 + rowY[rowY.length - 1] + pad - 16;
   const S = W * H * 9 > 14e6 ? 2 : 3;
 
   const canvas = document.createElement('canvas');
