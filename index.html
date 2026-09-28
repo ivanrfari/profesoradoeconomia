@@ -1314,6 +1314,11 @@ function init() {
 
   showInstallBtn();
 
+  const shortcut = new URLSearchParams(location.search).get('shortcut');
+  if (shortcut === 'horarios') openSchedule();
+  else if (shortcut === 'reporte') openReportModal();
+  else if (shortcut === 'mesas') openExamsModal();
+
   document.getElementById('search-input').addEventListener('input', (e) => {
     state.searchQuery = normalizeText(e.target.value.trim());
     document.getElementById('search-clear').classList.toggle('hidden', !e.target.value);
