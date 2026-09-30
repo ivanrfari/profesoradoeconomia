@@ -18,7 +18,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@800&family=Inter:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="icon" href="icon-192.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
@@ -104,6 +104,18 @@
     .subject-card[data-state="en_curso"] .status-label { color: #9333ea; }
     .subject-card[data-state="en_curso"] .info-btn { background-color: #ffffff; color: #a855f7; border: 1px solid #d8b4fe;}
     .subject-card[data-state="en_curso"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(168, 85, 247, 0.2); }
+
+    /* Recursando (repitiendo la cursada) */
+    .subject-card[data-state="recursar"] {
+      background-color: #fff7ed; border: 2px solid #f97316; color: #7c2d12;
+      box-shadow: 0 10px 25px -5px rgba(249, 115, 22, 0.15);
+    }
+    .subject-card[data-state="recursar"] h3 { color: #7c2d12; }
+    .subject-card[data-state="recursar"] .subtitle { color: #c2410c; }
+    .subject-card[data-state="recursar"] .card-divider { border-color: #fed7aa; }
+    .subject-card[data-state="recursar"] .status-label { color: #ea580c; }
+    .subject-card[data-state="recursar"] .info-btn { background-color: #ffffff; color: #f97316; border: 1px solid #fed7aa;}
+    .subject-card[data-state="recursar"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.2); }
 
     /* Cursada aprobada · final pendiente */
     .subject-card[data-state="cursada"] {
@@ -284,6 +296,12 @@
     html.dark .subject-card[data-state="en_curso"] .card-divider { border-color: #6b21a8; }
     html.dark .subject-card[data-state="en_curso"] .status-label { color: #d8b4fe; }
     html.dark .subject-card[data-state="en_curso"] .info-btn { background-color: #3b0764; color: #d8b4fe; border-color: #6b21a8; }
+    html.dark .subject-card[data-state="recursar"] { background-color: #431407; border-color: #f97316; color: #ffedd5; box-shadow: none; }
+    html.dark .subject-card[data-state="recursar"] h3 { color: #ffedd5; }
+    html.dark .subject-card[data-state="recursar"] .subtitle { color: #fdba74; }
+    html.dark .subject-card[data-state="recursar"] .card-divider { border-color: #9a3412; }
+    html.dark .subject-card[data-state="recursar"] .status-label { color: #fdba74; }
+    html.dark .subject-card[data-state="recursar"] .info-btn { background-color: #7c2d12; color: #fdba74; border-color: #9a3412; }
     html.dark .subject-card[data-state="cursada"] { background-color: #042f2e; border-color: #14b8a6; color: #ccfbf1; box-shadow: none; }
     html.dark .subject-card[data-state="cursada"] h3 { color: #ccfbf1; }
     html.dark .subject-card[data-state="cursada"] .subtitle { color: #5eead4; }
@@ -305,9 +323,11 @@
     html.dark .subject-card[data-state="locked"]:hover { background-color: #1e293b; border-color: #64748b; }
 
     #app-header {
-      background: #0f172a radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
-      background-size: 16px 16px;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 60%) radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+      background-size: auto, 16px 16px;
     }
+    #app-title { font-weight: 800; }
+    @media (max-width: 639px) { #app-title { font-weight: 700; letter-spacing: -0.01em; } }
     #app-header.shrunk { padding-top: 0.6rem; padding-bottom: 0.6rem; }
     #app-header.shrunk #app-title { font-size: 1.1rem; }
     #app-header.shrunk .header-stat-label { display: none; }
@@ -411,6 +431,7 @@
           <select id="status-select" onchange="toggleGradeInput()" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none bg-slate-50">
             <option value="enabled">▶ Habilitada (Sin cursar)</option>
             <option value="en_curso">⏳ En Curso (Cursando actualmente)</option>
+            <option value="recursar">🔁 Recursando (repitiendo la cursada)</option>
             <option value="cursada">📝 Cursada aprobada (final pendiente)</option>
             <option value="approved">✅ Aprobada (final rendido)</option>
           </select>
@@ -570,11 +591,12 @@
         <div class="flex flex-col sm:flex-row gap-2">
           <select id="exam-subject" class="flex-1 min-w-0 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none"></select>
           <div class="flex gap-2">
-            <input type="date" id="exam-date" aria-label="Fecha de la mesa" class="min-w-0 flex-1 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            <input type="date" id="exam-date" aria-label="Fecha de la mesa" oninput="checkExamDatePast()" class="min-w-0 flex-1 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
             <input type="time" id="exam-time" aria-label="Hora de la mesa" class="min-w-0 w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
           <button onclick="addExam()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm">Guardar</button>
         </div>
+        <p id="exam-date-past-hint" class="hidden text-[11px] font-bold text-red-600 mt-2">⚠️ Esa fecha ya pasó.</p>
       </div>
       <div id="exam-list" class="p-4 space-y-3 overflow-y-auto bg-slate-100 flex-1"></div>
     </div>
@@ -783,12 +805,24 @@
           <button id="btn-undo" onclick="undoLast()" disabled class="shrink-0 text-xs bg-slate-50 text-slate-700 px-3 py-2 rounded-xl font-bold border border-slate-300 hover:bg-slate-200 transition flex items-center gap-1.5 shadow-sm" title="Deshacer el último cambio (Ctrl+Z)">
             <span>↶</span> <span class="hidden xl:inline">Deshacer</span>
           </button>
+          <button id="btn-legend" onclick="toggleLegend()" title="¿Qué significa cada color?" class="shrink-0 text-sm bg-slate-50 text-slate-700 w-9 h-9 rounded-xl border border-slate-300 hover:bg-slate-200 transition shadow-sm flex items-center justify-center">❔</button>
           <button id="btn-theme" onclick="toggleTheme()" class="shrink-0 text-sm bg-slate-50 text-slate-700 w-9 h-9 rounded-xl border border-slate-300 hover:bg-slate-200 transition shadow-sm flex items-center justify-center" title="Cambiar tema">🌙</button>
           <button onclick="confirmReset()" class="shrink-0 text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm" title="Liquidar Datos">
             <span>🔄</span> <span class="lg:hidden">Reset</span>
           </button>
         </div>
 
+      </div>
+    </div>
+
+    <div id="legend-panel" class="hidden bg-white/95 backdrop-blur-md border-b border-slate-200">
+      <div class="max-w-screen-2xl mx-auto px-4 py-3 flex flex-wrap gap-x-5 gap-y-2 text-[11px] font-bold text-slate-600">
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md border-2" style="background:#f8fafc;border-color:#cbd5e1;border-style:dashed"></span>Bloqueada</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md border-2" style="background:#fff;border-color:#2563eb"></span>Habilitada</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md border-2" style="background:#fdf4ff;border-color:#a855f7"></span>En curso</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md border-2" style="background:#fff7ed;border-color:#f97316"></span>Recursando</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md border-2" style="background:#f0fdfa;border-color:#14b8a6"></span>Cursada · final pendiente</span>
+        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-md border-2" style="background:#0f172a;border-color:#0f172a"></span>Aprobada</span>
       </div>
     </div>
 
@@ -1263,7 +1297,8 @@ const STATE_ICONS = {
   cursada: '<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4.5 3.5h8l3 3v10h-11z"/><path d="M12.5 3.5v3h3"/><path d="M7 11h6M7 14h4"/></svg>',
   en_curso: '<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5.5 3h9M5.5 17h9M7 3c0 4 3 4.5 3 7s-3 3-3 7M13 3c0 4-3 4.5-3 7s3 3 3 7"/></svg>',
   enabled: '<svg viewBox="0 0 20 20" width="15" height="15" fill="currentColor"><path d="M6 3.5l11 6.5-11 6.5z"/></svg>',
-  locked: '<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="9" width="12" height="8" rx="1.5"/><path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9"/></svg>'
+  locked: '<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="9" width="12" height="8" rx="1.5"/><path d="M6.5 9V6.5a3.5 3.5 0 0 1 7 0V9"/></svg>',
+  recursar: '<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M15 6a6 6 0 1 0 1.5 4"/><path d="M15 2v4h-4"/></svg>'
 };
 
 /* Limpia datos guardados/importados: descarta materias que ya no existen, estados raros y notas inválidas */
@@ -1778,6 +1813,11 @@ function updateAllCards() {
       iconEl.innerHTML = STATE_ICONS.en_curso;
       labelEl.innerHTML = 'En Curso';
     }
+    else if (uData && uData.status === 'recursar') {
+      card.dataset.state = 'recursar';
+      iconEl.innerHTML = STATE_ICONS.recursar;
+      labelEl.innerHTML = 'Recursando';
+    }
     else if (isSubjectEnabled(subject.id)) {
       card.dataset.state = 'enabled';
       iconEl.innerHTML = STATE_ICONS.enabled;
@@ -1818,7 +1858,11 @@ function applyFilterStyles() {
     
     let visible = true;
     
-    if (q && !normalizeText(subject.name).includes(q)) visible = false;
+    if (q) {
+      const name = normalizeText(subject.name);
+      const tokens = q.split(/\s+/).filter(Boolean);
+      if (!tokens.every(t => name.includes(t))) visible = false;
+    }
     
     if (state.termFilter !== 'all' && !termVisible(subjectTerm(subject), state.termFilter)) visible = false;
 
@@ -2146,7 +2190,10 @@ function openSimulador() {
   const modal = document.getElementById('simulador-modal');
   modal.classList.remove('hidden'); 
   const savedPace = safeGet('isfd100_ritmo');
-  if (savedPace) document.getElementById('grad-pace').value = savedPace;
+  if (savedPace) {
+    document.getElementById('grad-pace').value = savedPace;
+    document.getElementById('sim-qty').value = Math.min(10, savedPace);
+  }
   runGraduationProjection();
   setTimeout(() => {
     modal.children[0].classList.remove('scale-95');
@@ -2207,6 +2254,7 @@ function runSimulador() {
   let qty = parseInt(document.getElementById('sim-qty').value, 10);
   if (isNaN(qty)) qty = 3;
   qty = Math.min(10, Math.max(1, qty));
+  const pace = parseInt(document.getElementById('grad-pace').value, 10) || null;
 
   const enabled = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.userSubjects[s.id]);
   enabled.sort((a, b) => {
@@ -2238,6 +2286,9 @@ function runSimulador() {
     </div>`;
 
   let html = '';
+  if (pace && selected.length > pace) {
+    html += `<p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3 font-medium leading-relaxed">⚠️ Elegiste ver ${selected.length} materias, pero tu ritmo definido más abajo es de <b>${pace} por cuatrimestre</b>. Para que el plan sea realista, priorizá las primeras ${pace} (ya están ordenadas por Ruta Crítica) y dejá el resto para el cuatrimestre siguiente.</p>`;
+  }
   if (finales.length) {
     html += `<p class="text-[11px] text-slate-500 font-medium mb-3">📝 Finales que ya podés rendir (las correlativas ya están aprobadas):</p>`;
     html += finales.map(s => simCard(s, `Final pendiente · Año ${s.year}`)).join('');
@@ -2336,7 +2387,7 @@ function exportMap() {
    exportar horarios (imagen / calendario) · respaldo en archivo · modo oscuro · impresión/PDF
 ═════════════════════════════════════════════ */
 const SUBJECT_BY_ID = Object.fromEntries(SUBJECTS.map(s => [s.id, s]));
-const STATUS_LABEL = { enabled: 'Habilitada', en_curso: 'En curso', cursada: 'Cursada aprobada', approved: 'Aprobada' };
+const STATUS_LABEL = { enabled: 'Habilitada', en_curso: 'En curso', recursar: 'Recursando', cursada: 'Cursada aprobada', approved: 'Aprobada' };
 const TERM_LABEL = { A: 'Anual', '1': '1° cuat.', '2': '2° cuat.', B: '1° y 2° cuat.', '': 'Período sin definir' };
 const VIEW_LABEL = { all: 'Todo el año', '1': '1° cuatrimestre', '2': '2° cuatrimestre' };
 const CAMPO_HEX = { CFG: '#1e3a8a', CFE: '#059669', CPD: '#d97706' };
@@ -2466,6 +2517,9 @@ function toggleDensity() {
     document.getElementById('btn-density').textContent = compact ? '▦' : '☰';
     grid.style.opacity = '1';
   }, 130);
+}
+function toggleLegend() {
+  document.getElementById('legend-panel').classList.toggle('hidden');
 }
 function toggleTheme() {
   const dark = !document.documentElement.classList.contains('dark');
@@ -2764,6 +2818,11 @@ function renderExamsModal() {
   }
   document.getElementById('exam-list').innerHTML = html;
 }
+function checkExamDatePast() {
+  const v = document.getElementById('exam-date').value;
+  const hint = document.getElementById('exam-date-past-hint');
+  hint.classList.toggle('hidden', !(v && isValidISO(v) && daysUntil(v) < 0));
+}
 function addExam() {
   const id = document.getElementById('exam-subject').value;
   const date = document.getElementById('exam-date').value;
@@ -2771,6 +2830,7 @@ function addExam() {
   if (!id) { showAlert('⚠️ Atención', 'Elegí primero una materia con cursada aprobada.'); return; }
   if (time && !date) { showAlert('⚠️ Atención', 'Si cargás una hora, cargá también la fecha.'); return; }
   if (date && !isValidISO(date)) { showAlert('⚠️ Atención', 'La fecha no es válida.'); return; }
+  if (date && daysUntil(date) < 0 && !confirm('La fecha que cargaste ya pasó. ¿Igual querés guardarla?')) return;
   const prev = state.exams[id];
   pushUndo(`Mesa de ${SUBJECT_BY_ID[id].name}`);
   state.exams[id] = { date, time: date ? time : '', attempts: prev ? prev.attempts : 0 };
@@ -2778,6 +2838,7 @@ function addExam() {
   updateAllCards();
   document.getElementById('exam-date').value = '';
   document.getElementById('exam-time').value = '';
+  document.getElementById('exam-date-past-hint').classList.add('hidden');
 }
 function changeAttempts(id, delta) {
   const e = state.exams[id];
