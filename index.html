@@ -1492,24 +1492,7 @@ function init() {
     if (navigator.vibrate && e.target.closest('.sticky button')) navigator.vibrate(30);
   });
 
-  // Pull-to-refresh visual (arrastrar hacia abajo estando arriba de todo)
-  (function () {
-    const ind = document.getElementById('ptr-indicator');
-    let startY = null, fired = false;
-    document.addEventListener('touchstart', e => { if (window.scrollY === 0) { startY = e.touches[0].clientY; fired = false; } }, { passive: true });
-    document.addEventListener('touchmove', e => {
-      if (startY === null) return;
-      if (e.touches[0].clientY - startY > 60) { fired = true; ind.style.opacity = '1'; ind.textContent = '↻ Soltá para actualizar'; }
-    }, { passive: true });
-    document.addEventListener('touchend', () => {
-      if (fired) {
-        ind.textContent = '✓ Actualizado';
-        renderGrid(); updateAllCards(); updateProgress();
-        setTimeout(() => { ind.style.opacity = '0'; }, 900);
-      }
-      startY = null; fired = false;
-    }, { passive: true });
-  })();
+  // Pull-to-refresh desactivado: competía con el gesto de deslizar hacia abajo para cerrar ventanas.
 
   setTimeout(() => {
     const sp = document.getElementById('splash'); if (sp) { sp.style.opacity = '0'; setTimeout(() => sp.remove(), 400); }
@@ -2587,7 +2570,7 @@ function shareFile(blob, filename, mime) {
   try {
     const file = new File([blob], filename, { type: mime });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({ files: [file] }).catch(() => {});
+      navigator.share({ files: [file] }).catch(err => { if (err.name !== 'AbortError') downloadBlob(blob, filename); });
       return;
     }
   } catch (e) {}
