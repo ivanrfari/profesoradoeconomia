@@ -793,6 +793,7 @@
         </div>
       </div>
     </div>
+    <p id="eta-banner" class="hidden max-w-screen-2xl mx-auto px-1 mt-4 text-[11px] sm:text-xs text-slate-300 font-bold text-center sm:text-left"></p>
   </header>
 
   <!-- ══════════════════════════════════════════
@@ -1972,6 +1973,18 @@ function applyFilterStyles() {
   });
   document.getElementById('no-results').classList.toggle('hidden', anyVisible);
 }
+function updateEtaBanner(complete) {
+  const el = document.getElementById('eta-banner');
+  if (complete) { el.classList.add('hidden'); return; }
+  const { remainingCount, minWaves } = minGraduationWaves();
+  if (remainingCount === 0) { el.classList.add('hidden'); return; }
+  let pace = parseInt(safeGet('isfd100_ritmo'), 10);
+  if (!pace || pace < 1) pace = 3;
+  const periods = Math.max(minWaves, Math.ceil(remainingCount / pace));
+  const { year, period } = currentAcademicPeriod();
+  el.innerHTML = `🎓 A este ritmo, te recibirías alrededor del <b class="text-white">${addPeriods(year, period, periods)}</b> · <button onclick="openSimulador()" class="underline hover:text-white">ajustar</button>`;
+  el.classList.remove('hidden');
+}
 function updateProgress() {
   const total = SUBJECTS.length;
   const totalHs = state.totalHs || SUBJECTS.reduce((acc, s) => acc + s.hs, 0);
@@ -2011,6 +2024,7 @@ function updateProgress() {
   document.getElementById('hs-total').textContent = `/ ${totalHs} HS`;
   document.getElementById('promedio-label').textContent = promedio;
   document.getElementById('empty-state-hint').classList.toggle('hidden', Object.keys(state.userSubjects).length > 0);
+  updateEtaBanner(complete);
 
   // Confeti solo en el momento en que completás la carrera (no en cada carga); recién ahí se descarga la librería
   if (complete && wasComplete === false) {
