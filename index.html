@@ -1065,7 +1065,7 @@ window.addEventListener('scroll', () => {
   let startY = 0, startX = 0, swiping = false, card = null;
   document.addEventListener('touchstart', e => {
     const c = e.target.closest('.modal-backdrop > div');
-    if (!c) return;
+    if (!c || c.parentElement.id === 'simulador-modal') return;
     card = c; startY = e.touches[0].clientY; startX = e.touches[0].clientX; swiping = true;
   }, { passive: true });
   document.addEventListener('touchmove', e => {
