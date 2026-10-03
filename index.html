@@ -615,7 +615,7 @@
         <h3 class="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">🎓 Proyección de egreso</h3>
         <div class="flex items-center gap-2 mb-2">
           <input type="number" id="grad-pace" min="1" max="20" value="3" onchange="runGraduationProjection()" class="w-16 px-2 py-2 border-2 border-slate-200 rounded-xl text-center font-bold text-slate-700 font-mono focus:border-blue-500 outline-none">
-          <span class="text-xs text-slate-500 font-medium">materias por cuatrimestre</span>
+          <span class="text-xs text-slate-500 font-medium">materias en simultáneo (las anuales cuentan los 2 cuatrimestres)</span>
         </div>
         <div id="grad-result" class="text-xs text-slate-700 leading-relaxed"></div>
         <button onclick="renderTimeline()" class="w-full mt-3 px-3 py-2 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition">📊 Ver línea de tiempo por cuatrimestre</button>
@@ -1976,13 +1976,13 @@ function applyFilterStyles() {
 function updateEtaBanner(complete) {
   const el = document.getElementById('eta-banner');
   if (complete) { el.classList.add('hidden'); return; }
-  const { remainingCount, minWaves } = minGraduationWaves();
+  const { remainingCount } = minGraduationWaves();
   if (remainingCount === 0) { el.classList.add('hidden'); return; }
-  let pace = parseInt(safeGet('isfd100_ritmo'), 10);
-  if (!pace || pace < 1) pace = 3;
-  const periods = Math.max(minWaves, Math.ceil(remainingCount / pace));
+  let cap = parseInt(safeGet('isfd100_ritmo'), 10);
+  if (!cap || cap < 1) cap = 3;
+  const { periodsNeeded: periods } = computeCapacityPlan(cap);
   const { year, period } = currentAcademicPeriod();
-  el.innerHTML = `🎓 A este ritmo, te recibirías alrededor del <b class="text-white">${addPeriods(year, period, periods)}</b> · <button onclick="openSimulador()" class="underline hover:text-white">ajustar</button>`;
+  el.innerHTML = `🎓 A este ritmo (${pace}/cuatrimestre), te recibirías alrededor del <b class="text-white">${addPeriods(year, period, periods)}</b> · <button onclick="openSimulador()" class="underline hover:text-white">ajustar</button>`;
   el.classList.remove('hidden');
 }
 function updateProgress() {
@@ -2319,59 +2319,93 @@ function minGraduationWaves() {
   remainingIds.forEach(id => { max = Math.max(max, waveOf(id)); });
   return { remainingCount: remainingIds.size, minWaves: max };
 }
+/* Simula, cuatrimestre a cuatrimestre, qué podés cursar con un cupo de materias EN SIMULTÁNEO
+   (no "por cuatrimestre"): una anual ocupa el cupo durante los 2 cuatrimestres del año y recién
+   libera correlativas al terminar el segundo; una cuatrimestral ocupa 1 solo cuatrimestre. */
+function computeCapacityPlan(capacity) {
+  const { period: curPeriod } = currentAcademicPeriod();
+  const occupancy = {};
+  const finishPeriod = {};
+  const periodPlan = {};
+  SUBJECTS.forEach(s => {
+    const st = state.userSubjects[s.id]?.status;
+    if (st === 'en_curso' || st === 'recursar') {
+      occupancy[0] = (occupancy[0] || 0) + 1;
+      finishPeriod[s.id] = (s.regimen === 'Anual' && curPeriod === 1) ? 1 : 0;
+      if (finishPeriod[s.id] === 1) occupancy[1] = (occupancy[1] || 0) + 1;
+      (periodPlan[0] = periodPlan[0] || []).push(s);
+      if (finishPeriod[s.id] === 1) (periodPlan[1] = periodPlan[1] || []).push(s);
+    }
+  });
+  let pending = SUBJECTS.filter(s => !state.userSubjects[s.id]);
+  let p = 0, guard = 0;
+  while (pending.length && guard++ < 40) {
+    const available = capacity - (occupancy[p] || 0);
+    if (available > 0) {
+      const candidates = pending.filter(s => s.prereqs.every(pid => {
+        const st = state.userSubjects[pid]?.status;
+        return st === 'cursada' || st === 'approved' || (finishPeriod[pid] !== undefined && finishPeriod[pid] < p);
+      }));
+      candidates.sort((a, b) => (b.bottleneckCount - a.bottleneckCount) || (a.year - b.year));
+      const take = candidates.slice(0, available);
+      take.forEach(s => {
+        occupancy[p] = (occupancy[p] || 0) + 1;
+        (periodPlan[p] = periodPlan[p] || []).push(s);
+        if (s.regimen === 'Anual') {
+          finishPeriod[s.id] = p + 1;
+          occupancy[p + 1] = (occupancy[p + 1] || 0) + 1;
+          (periodPlan[p + 1] = periodPlan[p + 1] || []).push(s);
+        } else {
+          finishPeriod[s.id] = p;
+        }
+      });
+      pending = pending.filter(s => !take.includes(s));
+    }
+    p++;
+  }
+  const finishVals = Object.values(finishPeriod);
+  const periodsNeeded = finishVals.length ? Math.max(...finishVals) : 0;
+  return { periodPlan, periodsNeeded, unresolved: pending.length, lastPeriod: p - 1 };
+}
 function runGraduationProjection() {
   const out = document.getElementById('grad-result');
-  let pace = parseInt(document.getElementById('grad-pace').value, 10);
-  if (isNaN(pace) || pace < 1) pace = 1;
-  pace = Math.min(20, pace);
-  safeSet('isfd100_ritmo', String(pace));
+  let cap = parseInt(document.getElementById('grad-pace').value, 10);
+  if (isNaN(cap) || cap < 1) cap = 1;
+  cap = Math.min(20, cap);
+  safeSet('isfd100_ritmo', String(cap));
 
   const { remainingCount, minWaves } = minGraduationWaves();
   if (remainingCount === 0) { out.innerHTML = '🎉 ¡Ya tenés el final de todas las materias aprobado!'; return; }
 
-  const periods = Math.max(minWaves, Math.ceil(remainingCount / pace));
+  const { periodsNeeded, unresolved } = computeCapacityPlan(cap);
   const { year, period } = currentAcademicPeriod();
-  out.innerHTML = `Con ${pace} materia${pace === 1 ? '' : 's'} por cuatrimestre, terminarías el final de todo alrededor del <b>${addPeriods(year, period, periods)}</b> (unos ${periods} cuatrimestres más).` +
-    `<span class="block mt-2 text-[11px] text-slate-500 leading-snug">Te faltan ${remainingCount} finales. Por cómo se encadenan las correlativas, necesitás al menos ${minWaves} cuatrimestre${minWaves === 1 ? '' : 's'} sí o sí, sea cual sea tu ritmo. Es una estimación orientativa: no distingue anuales de cuatrimestrales ni tiene en cuenta cupos o superposición de horarios.</span>`;
+  out.innerHTML = `Llevando hasta ${cap} materia${cap === 1 ? '' : 's'} en simultáneo, terminarías el final de todo alrededor del <b>${addPeriods(year, period, periodsNeeded)}</b>.` +
+    `<span class="block mt-2 text-[11px] text-slate-500 leading-snug">Te faltan ${remainingCount} finales. Por cómo se encadenan las correlativas, necesitás al menos ${minWaves} cuatrimestre${minWaves === 1 ? '' : 's'} sí o sí, sea cual sea tu cupo. Una anual ocupa el cupo durante sus 2 cuatrimestres. Es orientativo: no tiene en cuenta superposición real de horarios.${unresolved ? ` (${unresolved} materia(s) no se pudieron ubicar todavía).` : ''}</span>`;
 }
 
 function renderTimeline() {
-  let pace = parseInt(document.getElementById('grad-pace').value, 10);
-  if (isNaN(pace) || pace < 1) pace = 1;
-  pace = Math.min(20, pace);
+  let cap = parseInt(document.getElementById('grad-pace').value, 10);
+  if (isNaN(cap) || cap < 1) cap = 1;
+  cap = Math.min(20, cap);
 
-  const now = SUBJECTS.filter(s => { const st = state.userSubjects[s.id]?.status; return st === 'en_curso' || st === 'recursar'; });
-  let pending = SUBJECTS.filter(s => !state.userSubjects[s.id]);
-  const done = new Set(); // ids que, en la simulación, ya quedan con la cursada hecha
-  const periods = [];
-  let guard = 0;
-  while (pending.length && guard++ < 30) {
-    const candidates = pending.filter(s => s.prereqs.every(p => {
-      const st = state.userSubjects[p]?.status;
-      return st === 'cursada' || st === 'approved' || done.has(p);
-    }));
-    if (!candidates.length) break;
-    candidates.sort((a, b) => (b.bottleneckCount - a.bottleneckCount) || (a.year - b.year));
-    const take = candidates.slice(0, pace);
-    periods.push(take);
-    take.forEach(s => done.add(s.id));
-    pending = pending.filter(s => !take.includes(s));
-  }
-
+  const { periodPlan, unresolved, lastPeriod } = computeCapacityPlan(cap);
   const { year, period } = currentAcademicPeriod();
-  const maxCount = Math.max(1, now.length, ...periods.map(p => p.length));
+  const maxCount = Math.max(1, ...Object.values(periodPlan).map(l => l.length));
   const row = (label, subjects, colorClass) => `
     <div class="bg-slate-50 border border-slate-200 rounded-xl p-2.5">
       <p class="text-[10px] font-black uppercase tracking-wide text-slate-500 mb-1.5">${label}</p>
       <div class="h-2.5 rounded-full bg-slate-200 overflow-hidden mb-1.5"><div class="h-full ${colorClass} rounded-full" style="width:${Math.max(8, subjects.length / maxCount * 100)}%"></div></div>
-      <div class="flex flex-wrap gap-1">${subjects.map(s => `<span class="text-[10px] font-bold bg-white border border-slate-200 rounded-md px-1.5 py-0.5">${s.name}</span>`).join('') || '<span class="text-[10px] text-slate-400">—</span>'}</div>
+      <div class="flex flex-wrap gap-1">${subjects.map(s => `<span class="text-[10px] font-bold bg-white border border-slate-200 rounded-md px-1.5 py-0.5">${s.name}${s.regimen === 'Anual' ? ' 📘' : ''}</span>`).join('') || '<span class="text-[10px] text-slate-400">—</span>'}</div>
     </div>`;
 
   let html = '';
-  if (now.length) html += row('Ahora', now, 'bg-purple-500');
-  periods.forEach((p, i) => { html += row(addPeriods(year, period, i + 1), p, 'bg-blue-500'); });
-  if (!now.length && !periods.length) html = '<p class="text-xs text-blue-600 font-bold text-center py-3">🎉 No te quedan materias por cursar.</p>';
-  else if (pending.length) html += `<p class="text-[10px] text-amber-600 font-medium px-1">⚠️ ${pending.length} materia(s) no se pudieron ubicar (correlativas no resueltas aún).</p>`;
+  for (let i = 0; i <= Math.max(0, lastPeriod); i++) {
+    const label = i === 0 ? 'Ahora' : addPeriods(year, period, i);
+    html += row(label, periodPlan[i] || [], i === 0 ? 'bg-purple-500' : 'bg-blue-500');
+  }
+  if (!Object.keys(periodPlan).length) html = '<p class="text-xs text-blue-600 font-bold text-center py-3">🎉 No te quedan materias por cursar.</p>';
+  else if (unresolved) html += `<p class="text-[10px] text-amber-600 font-medium px-1">⚠️ ${unresolved} materia(s) no se pudieron ubicar (correlativas no resueltas aún).</p>`;
+  html += `<p class="text-[9px] text-slate-400 px-1">📘 = materia anual (ocupa el cupo durante sus 2 cuatrimestres).</p>`;
   document.getElementById('timeline-result').innerHTML = html;
 }
 function closeSimulador(e) {
@@ -2421,7 +2455,7 @@ function runSimulador() {
 
   let html = '';
   if (pace && selected.length > pace) {
-    html += `<p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3 font-medium leading-relaxed">⚠️ Elegiste ver ${selected.length} materias, pero tu ritmo definido más abajo es de <b>${pace} por cuatrimestre</b>. Para que el plan sea realista, priorizá las primeras ${pace} (ya están ordenadas por Ruta Crítica) y dejá el resto para el cuatrimestre siguiente.</p>`;
+    html += `<p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3 font-medium leading-relaxed">⚠️ Elegiste ver ${selected.length} materias, pero tu cupo en simultáneo definido más abajo es de <b>${pace}</b>. Para que el plan sea realista, priorizá las primeras ${pace} (ya están ordenadas por Ruta Crítica) y dejá el resto para cuando se libere lugar.</p>`;
   }
   if (finales.length) {
     html += `<p class="text-[11px] text-slate-500 font-medium mb-3">📝 Finales que ya podés rendir (las correlativas ya están aprobadas):</p>`;
