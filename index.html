@@ -1486,14 +1486,17 @@ function init() {
   updateUndoButton();
   updateStudentUI();
 
-  let __hdrTicking = false;
+  let __hdrTicking = false, __hdrShrunk = false;
   window.addEventListener('scroll', () => {
     if (__hdrTicking) return;
     __hdrTicking = true;
     requestAnimationFrame(() => {
-      document.getElementById('app-header').classList.toggle('shrunk', window.scrollY > 60);
-      document.getElementById('app-header').style.backgroundPosition = `0px ${window.scrollY * -0.25}px`;
-      document.getElementById('progress-strip').classList.toggle('shrunk', window.scrollY > 60);
+      const y = window.scrollY;
+      if (!__hdrShrunk && y > 80) __hdrShrunk = true;
+      else if (__hdrShrunk && y < 40) __hdrShrunk = false;
+      document.getElementById('app-header').classList.toggle('shrunk', __hdrShrunk);
+      document.getElementById('app-header').style.backgroundPosition = `0px ${y * -0.25}px`;
+      document.getElementById('progress-strip').classList.toggle('shrunk', __hdrShrunk);
       __hdrTicking = false;
     });
   }, { passive: true });
