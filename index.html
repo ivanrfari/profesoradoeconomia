@@ -1982,7 +1982,7 @@ function updateEtaBanner(complete) {
   if (!cap || cap < 1) cap = 3;
   const { periodsNeeded: periods } = computeCapacityPlan(cap);
   const { year, period } = currentAcademicPeriod();
-  el.innerHTML = `🎓 A este ritmo (${pace}/cuatrimestre), te recibirías alrededor del <b class="text-white">${addPeriods(year, period, periods)}</b> · <button onclick="openSimulador()" class="underline hover:text-white">ajustar</button>`;
+  el.innerHTML = `🎓 A este ritmo, te recibirías alrededor del <b class="text-white">${addPeriods(year, period, periods)}</b> · <button onclick="openSimulador()" class="underline hover:text-white">ajustar</button>`;
   el.classList.remove('hidden');
 }
 function updateProgress() {
@@ -2312,8 +2312,9 @@ function minGraduationWaves() {
   const cache = {};
   function waveOf(id) {
     if (cache[id] !== undefined) return cache[id];
+    const span = SUBJECT_BY_ID[id].regimen === 'Anual' ? 2 : 1;
     const pend = SUBJECT_BY_ID[id].prereqs.filter(p => remainingIds.has(p));
-    return cache[id] = pend.length ? 1 + Math.max(...pend.map(waveOf)) : 1;
+    return cache[id] = pend.length ? span + Math.max(...pend.map(waveOf)) : span;
   }
   let max = 0;
   remainingIds.forEach(id => { max = Math.max(max, waveOf(id)); });
