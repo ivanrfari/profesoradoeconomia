@@ -177,6 +177,24 @@
 
     .modal-backdrop { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px); transition: background-color 0.25s ease; }
     html { scroll-behavior: smooth; }
+    .ico { display: inline-block; width: 1em; height: 1em; vertical-align: -0.15em; }
+    .chip-badge { display: inline-flex; align-items: center; gap: 3px; height: 18px; padding: 0 7px; border-radius: 0.5rem; font-size: 9.5px; font-weight: 800; letter-spacing: 0.03em; line-height: 1; white-space: nowrap; }
+    /* Jerarquía de botones: primario (acción principal), secundario (cancelar/volver), texto (link menor) */
+    .btn-primary { border-radius: 0.75rem; font-size: .875rem; font-weight: 700; color: #fff; background-color: #2563eb; box-shadow: 0 6px 16px -4px rgba(15,23,42,.14), 0 3px 6px -3px rgba(15,23,42,.08); transition-property: background-color, transform, box-shadow; transition-duration: 150ms; }
+    .btn-primary:hover { background-color: #1d4ed8; }
+    .btn-secondary { border-radius: 0.75rem; font-size: .875rem; font-weight: 700; color: #475569; background-color: #f1f5f9; transition: background-color 150ms; }
+    .btn-secondary:hover { background-color: #e2e8f0; }
+    .btn-text { font-weight: 700; color: #2563eb; text-decoration: underline; text-underline-offset: 2px; }
+    .btn-text:hover { color: #1d4ed8; }
+    html.dark .btn-secondary { color: #cbd5e1; background-color: #1e293b; }
+    html.dark .btn-secondary:hover { background-color: #334155; }
+    html.dark .btn-text { color: #60a5fa; }
+    html.dark .btn-text:hover { color: #93c5fd; }
+    /* Separadores neutros con degradé suave (no toca los bordes de color por estado) */
+    .border-t.border-slate-100, .border-t.border-slate-200 { border-top-width: 1px; border-image: linear-gradient(to right, transparent, #cbd5e1 15%, #cbd5e1 85%, transparent) 1; }
+    .border-b.border-slate-100, .border-b.border-slate-200 { border-bottom-width: 1px; border-image: linear-gradient(to right, transparent, #cbd5e1 15%, #cbd5e1 85%, transparent) 1; }
+    html.dark .border-t.border-slate-100, html.dark .border-t.border-slate-200 { border-image: linear-gradient(to right, transparent, #334155 15%, #334155 85%, transparent) 1; }
+    html.dark .border-b.border-slate-100, html.dark .border-b.border-slate-200 { border-image: linear-gradient(to right, transparent, #334155 15%, #334155 85%, transparent) 1; }
     * { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
     *::-webkit-scrollbar { width: 8px; height: 8px; }
     *::-webkit-scrollbar-track { background: transparent; }
@@ -517,8 +535,8 @@
       </div>
       
       <div class="flex gap-3 justify-end mt-6">
-        <button onclick="closeStatusModal()" class="px-5 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition flex-1">Cancelar</button>
-        <button onclick="saveSubjectStatus()" class="px-5 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition flex-1">Guardar</button>
+        <button onclick="closeStatusModal()" class="px-5 py-3 btn-secondary flex-1">Cancelar</button>
+        <button onclick="saveSubjectStatus()" class="px-5 py-3 btn-primary flex-1">Guardar</button>
       </div>
     </div>
   </div>
@@ -559,7 +577,7 @@
           </div>
         </div>
       </div>
-      <button onclick="closeSyncModal()" class="w-full mt-4 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cerrar</button>
+      <button onclick="closeSyncModal()" class="w-full mt-4 px-4 py-3 btn-secondary">Cerrar</button>
     </div>
   </div>
 
@@ -567,8 +585,8 @@
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
       <p id="generic-confirm-text" class="text-sm text-slate-700 leading-relaxed mb-5 font-medium"></p>
       <div class="flex gap-3 justify-end">
-        <button onclick="resolveConfirm(false)" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition flex-1">Cancelar</button>
-        <button id="generic-confirm-ok" onclick="resolveConfirm(true)" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition flex-1">Continuar</button>
+        <button onclick="resolveConfirm(false)" class="px-5 py-2.5 btn-secondary flex-1">Cancelar</button>
+        <button id="generic-confirm-ok" onclick="resolveConfirm(true)" class="px-5 py-2.5 btn-primary flex-1">Continuar</button>
       </div>
     </div>
   </div>
@@ -581,7 +599,7 @@
         <input type="checkbox" id="reset-backup-first" checked class="w-4 h-4"> Descargar un respaldo antes de borrar
       </label>
       <div class="flex gap-3 justify-end">
-        <button onclick="closeConfirmModal()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
+        <button onclick="closeConfirmModal()" class="px-5 py-2.5 btn-secondary">Cancelar</button>
         <button onclick="executeReset()" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition">Sí, reiniciar</button>
       </div>
     </div>
@@ -599,7 +617,7 @@
     <div class="bg-white rounded-3xl w-full max-w-5xl h-[90vh] sm:h-[85vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation()">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
         <div>
-          <h2 class="text-xl font-black flex items-center gap-2 tracking-tight"><span>📅</span> Planificador de Horarios</h2>
+          <h2 class="text-xl font-black flex items-center gap-2 tracking-tight"><span><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4.5" width="14" height="12" rx="1.5"/><path d="M3 8h14M7 2.5v3M13 2.5v3"/></svg></span> Planificador de Horarios</h2>
         </div>
         <button onclick="closeSchedule()" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
       </div>
@@ -642,7 +660,7 @@
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-200 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between gap-2">
         <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 tracking-tight">
-          <span class="text-blue-600">📈</span> Proyección de Cursada
+          <span class="text-blue-600"><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14l4.5-5 3 3L17 5"/><path d="M13 5h4v4"/></svg></span> Proyección de Cursada
         </h2>
         <button onclick="closeSimulador()" aria-label="Cerrar" class="shrink-0 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">✕</button>
       </div>
@@ -653,7 +671,7 @@
       </div>
       <div id="sim-results" class="mt-4 max-h-[45vh] overflow-y-auto pr-2 space-y-3"></div>
       <div class="mt-5 pt-4 border-t border-slate-200">
-        <h3 class="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2">🎓 Proyección de egreso</h3>
+        <h3 class="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-2"><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 7l8-3.5L18 7l-8 3.5L2 7Z"/><path d="M5.5 9v3.5c0 1 2 2 4.5 2s4.5-1 4.5-2V9"/></svg> Proyección de egreso</h3>
         <div class="flex items-center gap-2 mb-2">
           <input type="number" id="grad-pace" min="1" max="20" value="3" onchange="runGraduationProjection()" class="w-16 px-2 py-2 border-2 border-slate-200 rounded-xl text-center font-bold text-slate-700 font-mono focus:border-blue-500 outline-none">
           <span class="text-xs text-slate-500 font-medium">materias en simultáneo (las anuales cuentan los 2 cuatrimestres)</span>
@@ -668,7 +686,7 @@
   <div id="exams-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 hidden" onclick="closeExamsModal(event)">
     <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation()">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
-        <h2 class="text-xl font-black flex items-center gap-2 tracking-tight"><span>📝</span> Mesas de examen</h2>
+        <h2 class="text-xl font-black flex items-center gap-2 tracking-tight"><span><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4 16l1-3.5L13.5 4a1.5 1.5 0 0 1 2 2L7 14.5 4 16Z"/></svg></span> Mesas de examen</h2>
         <button onclick="closeExamsModal()" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
       </div>
       <div class="p-4 bg-slate-50 border-b border-slate-200 shrink-0">
@@ -715,8 +733,8 @@
         </label>
       </div>
       <div class="flex gap-3 mt-6">
-        <button onclick="closeCalModal()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
-        <button onclick="generateCalendar()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition">📅 Agregar a mi calendario</button>
+        <button onclick="closeCalModal()" class="flex-1 px-4 py-3 btn-secondary">Cancelar</button>
+        <button onclick="generateCalendar()" class="flex-1 px-4 py-3 btn-primary"><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4.5" width="14" height="12" rx="1.5"/><path d="M3 8h14M7 2.5v3M13 2.5v3"/></svg> Agregar a mi calendario</button>
       </div>
     </div>
   </div>
@@ -736,12 +754,12 @@
             <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="rp-horarios" checked class="w-4 h-4"> Horarios (del período que estés viendo)</label>
             <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="rp-mesas" checked class="w-4 h-4"> Mesas de examen</label>
           </div>
-          <button onclick="printReport()" class="w-full mt-4 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition">Abrir vista de impresión</button>
+          <button onclick="printReport()" class="w-full mt-4 px-4 py-2.5 btn-primary">Abrir vista de impresión</button>
           <button onclick="shareReportPDF()" class="w-full mt-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow-md transition">📱 Compartir PDF por WhatsApp</button>
           <p class="text-[11px] text-slate-500 mt-2 leading-snug">En el diálogo de impresión elegí <b>Guardar como PDF</b> como destino.</p>
         </div>
       </div>
-      <button onclick="closeReportModal()" class="w-full mt-4 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cerrar</button>
+      <button onclick="closeReportModal()" class="w-full mt-4 px-4 py-3 btn-secondary">Cerrar</button>
     </div>
   </div>
 
@@ -752,8 +770,8 @@
       <label for="student-input" class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Nombre y apellido</label>
       <input id="student-input" type="text" maxlength="60" autocomplete="name" placeholder="Ej: Juan Pérez" onkeydown="if(event.key==='Enter'){event.preventDefault();saveStudentName();}" class="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
       <div class="flex gap-3 mt-5">
-        <button onclick="closeNameModal()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
-        <button onclick="saveStudentName()" class="flex-1 px-4 py-3 rounded-xl text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md transition">Guardar</button>
+        <button onclick="closeNameModal()" class="flex-1 px-4 py-3 btn-secondary">Cancelar</button>
+        <button onclick="saveStudentName()" class="flex-1 px-4 py-3 btn-primary">Guardar</button>
       </div>
     </div>
   </div>
@@ -763,7 +781,7 @@
       <h2 class="text-lg font-black text-slate-900 mb-1">📱 Escaneá este código</h2>
       <p class="text-[11px] text-slate-500 mb-4">Abrí "Escanear un QR" en el otro dispositivo y apuntá la cámara acá.</p>
       <div id="qr-canvas-holder" class="flex items-center justify-center min-h-[220px]"></div>
-      <button onclick="closeQrShow()" class="w-full mt-4 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cerrar</button>
+      <button onclick="closeQrShow()" class="w-full mt-4 px-4 py-2.5 btn-secondary">Cerrar</button>
     </div>
   </div>
 
@@ -772,7 +790,7 @@
       <h2 class="text-lg font-black text-slate-900 mb-3">📷 Escanear código</h2>
       <video id="qr-video" muted autoplay playsinline class="w-full rounded-xl bg-slate-900 aspect-square object-cover"></video>
       <p id="qr-scan-status" class="text-[11px] text-slate-500 mt-3"></p>
-      <button onclick="closeQrScan()" class="w-full mt-3 px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition">Cancelar</button>
+      <button onclick="closeQrScan()" class="w-full mt-3 px-4 py-2.5 btn-secondary">Cancelar</button>
     </div>
   </div>
 
@@ -875,13 +893,13 @@
           </button>
           
           <button onclick="openSchedule()" class="shrink-0 text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm">
-            <span>📅</span> Horarios
+            <span><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4.5" width="14" height="12" rx="1.5"/><path d="M3 8h14M7 2.5v3M13 2.5v3"/></svg></span> Horarios
           </button>
           <button onclick="openExamsModal()" class="shrink-0 text-xs bg-teal-50 text-teal-700 px-3 py-2 rounded-xl font-bold border border-teal-400 transition flex items-center gap-1.5 shadow-sm">
-            <span>📝</span> Mesas
+            <span><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4 16l1-3.5L13.5 4a1.5 1.5 0 0 1 2 2L7 14.5 4 16Z"/></svg></span> Mesas
           </button>
           <button onclick="openSimulador()" class="shrink-0 text-xs bg-cyan-50 text-cyan-700 px-3 py-2 rounded-xl font-bold border border-cyan-200 hover:bg-cyan-100 transition flex items-center gap-1.5 shadow-sm">
-            <span>📈</span> Proyectar
+            <span><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14l4.5-5 3 3L17 5"/><path d="M13 5h4v4"/></svg></span> Proyectar
           </button>
           <button onclick="openSyncModal()" class="shrink-0 text-xs bg-amber-50 text-amber-700 px-3 py-2 rounded-xl font-bold border border-amber-200 hover:bg-amber-100 transition flex items-center gap-1.5 shadow-sm">
             <span>💾</span> Sincronizar
@@ -893,6 +911,7 @@
             <span>↶</span> <span class="hidden xl:inline">Deshacer</span>
           </button>
           <button id="btn-legend" onclick="toggleLegend()" title="¿Qué significa cada color?" class="shrink-0 text-sm bg-slate-50 text-slate-700 w-9 h-9 rounded-xl border border-slate-300 hover:bg-slate-200 transition shadow-sm flex items-center justify-center">❔</button>
+          <button id="btn-compact" onclick="toggleCompactView()" title="Vista lista compacta" class="shrink-0 text-base bg-slate-50 text-slate-700 w-9 h-9 rounded-xl border border-slate-300 hover:bg-slate-200 transition shadow-sm flex items-center justify-center"><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 5h12M4 10h12M4 15h12"/></svg></button>
           <button id="btn-theme" onclick="toggleTheme()" class="shrink-0 text-sm bg-slate-50 text-slate-700 w-9 h-9 rounded-xl border border-slate-300 hover:bg-slate-200 transition shadow-sm flex items-center justify-center" title="Cambiar tema">🌙</button>
           <button onclick="confirmReset()" class="shrink-0 text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-2 rounded-xl font-bold border border-red-100 transition flex items-center gap-1.5 shadow-sm" title="Liquidar Datos">
             <span>🔄</span> <span class="lg:hidden">Reset</span>
@@ -938,7 +957,7 @@
     </div>
     <div id="today-banner" onclick="openSchedule()" class="hidden cursor-pointer bg-emerald-50 border-b border-emerald-200">
       <div class="max-w-screen-2xl mx-auto px-4 py-2 flex items-center gap-2 text-xs font-bold text-emerald-700">
-        <span class="shrink-0">📚</span>
+        <span class="shrink-0"><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 4.5c2-1 4-1 6 0v11c-2-1-4-1-6 0v-11Z"/><path d="M15 4.5c-2-1-4-1-6 0v11c2-1 4-1 6 0v-11Z"/></svg></span>
         <span class="block h-4 overflow-hidden flex-1"><span id="today-banner-text" class="inline-block whitespace-nowrap"></span></span>
         <span class="shrink-0 text-emerald-400 text-xs">›</span>
       </div>
@@ -1717,13 +1736,13 @@ function createCard(subject) {
   
   const isBottleneck = subject.bottleneckCount >= 3;
   const bottleneckHtml = isBottleneck 
-    ? `<span class="bg-red-100 text-red-700 border border-red-200 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shadow-sm ml-2" title="Esta materia traba el cursado de otras ${subject.bottleneckCount} materias">🔥 Ruta Crítica</span>` 
+    ? `<span class="chip-badge bg-red-100 text-red-700 border border-red-200 uppercase shadow-sm ml-2" title="Esta materia traba el cursado de otras ${subject.bottleneckCount} materias"><svg class="ico" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1c1 3-3 4-3 7a3 3 0 0 0 6 0c1 1 1.5 2.5 1.5 3.5A4.5 4.5 0 0 1 10 16a4.5 4.5 0 0 1-4.5-4.5C5.5 7 10 5 10 1Z"/></svg> Ruta Crítica</span>` 
     : '';
 
   card.innerHTML = `
     <div class="flex justify-between items-start mb-3">
       <div class="flex items-center">
-        <span class="campo-badge ${CAMPO_COLORS[subject.campo].bg} px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-sm">${CAMPO_COLORS[subject.campo].icon} ${CAMPO_COLORS[subject.campo].label}</span>
+        <span class="chip-badge campo-badge ${CAMPO_COLORS[subject.campo].bg} uppercase text-white shadow-sm">${CAMPO_COLORS[subject.campo].icon} ${CAMPO_COLORS[subject.campo].label}</span>
         ${bottleneckHtml}
       </div>
       <span class="status-icon text-lg leading-none"></span>
@@ -2030,7 +2049,7 @@ function updateEtaBanner(complete) {
   if (!cap || cap < 1) cap = 3;
   const { periodsNeeded: periods } = computeCapacityPlan(cap);
   const { year, period } = currentAcademicPeriod();
-  el.innerHTML = `🎓 A este ritmo, te recibirías alrededor del <b class="text-white">${addPeriods(year, period, periods)}</b> · <button onclick="openSimulador()" class="underline hover:text-white">ajustar</button>`;
+  el.innerHTML = `<svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 7l8-3.5L18 7l-8 3.5L2 7Z"/><path d="M5.5 9v3.5c0 1 2 2 4.5 2s4.5-1 4.5-2V9"/></svg> A este ritmo, te recibirías alrededor del <b class="text-white">${addPeriods(year, period, periods)}</b> · <button onclick="openSimulador()" class="underline hover:text-white">ajustar</button>`;
   el.classList.remove('hidden');
 }
 function updateProgress() {
@@ -2495,7 +2514,7 @@ function runSimulador() {
       <div>
         <div class="flex items-center gap-1.5">
           <p class="text-sm font-black text-slate-800 leading-tight">${s.name}</p>
-          ${s.bottleneckCount >= 3 ? '<span title="Ruta Crítica">🔥</span>' : ''}
+          ${s.bottleneckCount >= 3 ? '<span title="Ruta Crítica"><svg class="ico" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1c1 3-3 4-3 7a3 3 0 0 0 6 0c1 1 1.5 2.5 1.5 3.5A4.5 4.5 0 0 1 10 16a4.5 4.5 0 0 1-4.5-4.5C5.5 7 10 5 10 1Z"/></svg></span>' : ''}
         </div>
         <p class="text-[11px] text-slate-500 mt-1 font-mono">${detail}</p>
       </div>
@@ -2507,7 +2526,7 @@ function runSimulador() {
     html += `<p class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2 mb-3 font-medium leading-relaxed">⚠️ Elegiste ver ${selected.length} materias, pero tu cupo en simultáneo definido más abajo es de <b>${pace}</b>. Para que el plan sea realista, priorizá las primeras ${pace} (ya están ordenadas por Ruta Crítica) y dejá el resto para cuando se libere lugar.</p>`;
   }
   if (finales.length) {
-    html += `<p class="text-[11px] text-slate-500 font-medium mb-3">📝 Finales que ya podés rendir (las correlativas ya están aprobadas):</p>`;
+    html += `<p class="text-[11px] text-slate-500 font-medium mb-3"><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4 16l1-3.5L13.5 4a1.5 1.5 0 0 1 2 2L7 14.5 4 16Z"/></svg> Finales que ya podés rendir (las correlativas ya están aprobadas):</p>`;
     html += finales.map(s => simCard(s, `Final pendiente · Año ${s.year}`)).join('');
   }
   if (selected.length) {
@@ -3023,7 +3042,7 @@ function renderExamsModal() {
           </div>
           ${n === null ? '' : examChip(n)}
         </div>
-        ${e.date ? `<a href="${googleCalUrl(s.name, e.date, e.time)}" target="_blank" rel="noopener" class="inline-block mt-2 text-[11px] font-bold text-blue-600 hover:underline">📅 Agregar a Google Calendar</a>` : ''}
+        ${e.date ? `<a href="${googleCalUrl(s.name, e.date, e.time)}" target="_blank" rel="noopener" class="inline-block mt-2 text-[11px] font-bold text-blue-600 hover:underline"><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4.5" width="14" height="12" rx="1.5"/><path d="M3 8h14M7 2.5v3M13 2.5v3"/></svg> Agregar a Google Calendar</a>` : ''}
         ${n !== null && n < 0 ? '<p class="text-[11px] text-red-600 font-bold mt-2">La fecha ya pasó: actualizala o sumá un intento.</p>' : ''}
         <div class="flex items-center justify-between mt-3 gap-2 flex-wrap">
           <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600">
@@ -3122,7 +3141,7 @@ function updateExamBanner() {
   if (!up.length) { el.classList.add('hidden'); return; }
   const f = up[0];
   document.getElementById('exam-banner-text').innerHTML =
-    `📅 <b>${relDaysLabel(f.days)}</b>: mesa de <b>${esc(f.s.name)}</b>${f.e.time ? ' · ' + f.e.time + ' hs' : ''}${up.length > 1 ? ` · y ${up.length - 1} más esta semana` : ''}`;
+    `<svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4.5" width="14" height="12" rx="1.5"/><path d="M3 8h14M7 2.5v3M13 2.5v3"/></svg> <b>${relDaysLabel(f.days)}</b>: mesa de <b>${esc(f.s.name)}</b>${f.e.time ? ' · ' + f.e.time + ' hs' : ''}${up.length > 1 ? ` · y ${up.length - 1} más esta semana` : ''}`;
   el.classList.remove('hidden');
 }
 
@@ -3138,7 +3157,7 @@ function renderCardExtras(subject) {
   const note = state.notes[subject.id];
   if (u?.status === 'cursada' && ex && ex.date) {
     const n = daysUntil(ex.date);
-    chips.push(`<span class="card-chip ${n < 0 ? 'danger' : n <= 7 ? 'warn' : ''}" title="Mesa de examen: ${esc(relDaysLabel(n))}">📅 ${esc(fmtDateShort(ex.date))}</span>`);
+    chips.push(`<span class="card-chip ${n < 0 ? 'danger' : n <= 7 ? 'warn' : ''}" title="Mesa de examen: ${esc(relDaysLabel(n))}"><svg class="ico" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4.5" width="14" height="12" rx="1.5"/><path d="M3 8h14M7 2.5v3M13 2.5v3"/></svg> ${esc(fmtDateShort(ex.date))}</span>`);
   }
   if (u?.status === 'cursada' && ex && ex.attempts > 0) {
     chips.push(`<span class="card-chip" title="Veces que rendiste el final">↻ ${ex.attempts}</span>`);
