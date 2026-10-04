@@ -387,10 +387,14 @@
     }
     #app-title { font-weight: 800; }
     @media (max-width: 639px) { #app-title { font-weight: 700; letter-spacing: -0.01em; } }
+    #app-header { transition: padding 0.25s ease; }
+    #app-title { transition: font-size 0.25s ease; }
     #app-header.shrunk { padding-top: 0.6rem; padding-bottom: 0.6rem; }
     #app-header.shrunk #app-title { font-size: 1.1rem; }
-    #app-header.shrunk .header-stat-label { display: none; }
-    #progress-strip.shrunk .progress-count-label { display: none; }
+    .header-stat-label, .progress-count-label { transition: opacity 0.2s ease; }
+    #app-header.shrunk .header-stat-label { opacity: 0; }
+    #progress-strip.shrunk .progress-count-label { opacity: 0; }
+    #progress-strip > div { transition: padding 0.25s ease; }
     #progress-strip.shrunk > div { padding-top: .35rem; padding-bottom: .35rem; }
 
     /* ══════════ MODO OSCURO "AMOLED": negro puro + más contraste ══════════ */
