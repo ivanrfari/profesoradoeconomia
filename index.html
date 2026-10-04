@@ -18,6 +18,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@800&family=Inter:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="icon" href="icon-192.png">
 
@@ -1551,10 +1552,14 @@ function init() {
   else if (shortcut === 'reporte') openReportModal();
   else if (shortcut === 'mesas') openExamsModal();
 
+  let __searchDebounce = null;
   document.getElementById('search-input').addEventListener('input', (e) => {
-    state.searchQuery = normalizeText(e.target.value.trim());
     document.getElementById('search-clear').classList.toggle('hidden', !e.target.value);
-    applyFilterStyles();
+    clearTimeout(__searchDebounce);
+    __searchDebounce = setTimeout(() => {
+      state.searchQuery = normalizeText(e.target.value.trim());
+      applyFilterStyles();
+    }, 150);
   });
 }
 
