@@ -388,9 +388,10 @@
     #app-title { font-weight: 800; }
     @media (max-width: 639px) { #app-title { font-weight: 700; letter-spacing: -0.01em; } }
     #app-header { transition: padding 0.25s ease; }
-    #app-title { transition: font-size 0.25s ease; }
+    #app-title { transition: transform 0.25s ease; transform-origin: center; will-change: transform; }
     #app-header.shrunk { padding-top: 0.6rem; padding-bottom: 0.6rem; }
-    #app-header.shrunk #app-title { font-size: 1.1rem; }
+    #app-header.shrunk #app-title { transform: scale(0.75); }
+    @media (min-width: 1024px) { #app-title { transform-origin: left center; } }
     .header-stat-label, .progress-count-label { transition: opacity 0.2s ease; }
     #app-header.shrunk .header-stat-label { opacity: 0; }
     #progress-strip.shrunk .progress-count-label { opacity: 0; }
