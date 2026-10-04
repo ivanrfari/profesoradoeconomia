@@ -91,7 +91,7 @@
     .subject-card[data-state="approved"] .card-divider { border-color: #334155; }
     .subject-card[data-state="approved"] .status-label { color: #38bdf8; }
     .subject-card[data-state="approved"] .info-btn { background-color: #1e293b; color: #94a3b8; border: 1px solid #334155;}
-    .subject-card[data-state="approved"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.4); }
+    .subject-card[data-state="approved"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.4), 0 0 0 3px rgba(15, 23, 42, 0.12); }
 
     /* En Curso */
     .subject-card[data-state="en_curso"] {
@@ -103,7 +103,7 @@
     .subject-card[data-state="en_curso"] .card-divider { border-color: #e9d5ff; }
     .subject-card[data-state="en_curso"] .status-label { color: #9333ea; }
     .subject-card[data-state="en_curso"] .info-btn { background-color: #ffffff; color: #a855f7; border: 1px solid #d8b4fe;}
-    .subject-card[data-state="en_curso"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(168, 85, 247, 0.2); }
+    .subject-card[data-state="en_curso"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(168, 85, 247, 0.2), 0 0 0 3px rgba(168, 85, 247, 0.18); border-color: #9333ea; }
 
     /* Recursando (repitiendo la cursada) */
     .subject-card[data-state="recursar"] {
@@ -115,7 +115,7 @@
     .subject-card[data-state="recursar"] .card-divider { border-color: #fed7aa; }
     .subject-card[data-state="recursar"] .status-label { color: #ea580c; }
     .subject-card[data-state="recursar"] .info-btn { background-color: #ffffff; color: #f97316; border: 1px solid #fed7aa;}
-    .subject-card[data-state="recursar"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.2); }
+    .subject-card[data-state="recursar"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(249, 115, 22, 0.2), 0 0 0 3px rgba(249, 115, 22, 0.18); border-color: #ea580c; }
 
     /* Cursada aprobada · final pendiente */
     .subject-card[data-state="cursada"] {
@@ -127,7 +127,7 @@
     .subject-card[data-state="cursada"] .card-divider { border-color: #99f6e4; }
     .subject-card[data-state="cursada"] .status-label { color: #0d9488; }
     .subject-card[data-state="cursada"] .info-btn { background-color: #ffffff; color: #0d9488; border: 1px solid #5eead4;}
-    .subject-card[data-state="cursada"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(20, 184, 166, 0.2); }
+    .subject-card[data-state="cursada"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(20, 184, 166, 0.2), 0 0 0 3px rgba(20, 184, 166, 0.18); border-color: #0d9488; }
 
     /* Habilitada */
     .subject-card[data-state="enabled"] {
@@ -139,7 +139,7 @@
     .subject-card[data-state="enabled"] .card-divider { border-color: #e2e8f0; }
     .subject-card[data-state="enabled"] .status-label { color: #2563eb; }
     .subject-card[data-state="enabled"] .info-btn { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;}
-    .subject-card[data-state="enabled"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.2); }
+    .subject-card[data-state="enabled"]:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -5px rgba(37, 99, 235, 0.2), 0 0 0 3px rgba(37, 99, 235, 0.18); border-color: #1d4ed8; }
 
     /* Bloqueada */
     .subject-card[data-state="locked"] {
@@ -1670,9 +1670,10 @@ function renderGrid() {
   const byYear = { 1: [], 2: [], 3: [], 4: [] };
   SUBJECTS.forEach(s => byYear[s.year].push(s));
 
+  const YEAR_TINT = { 1: 'bg-slate-50', 2: 'bg-blue-50/60', 3: 'bg-purple-50/60', 4: 'bg-teal-50/60' };
   [1, 2, 3, 4].forEach(yr => {
     const col = document.createElement('div');
-    col.className = 'year-col flex flex-col gap-5';
+    col.className = `year-col flex flex-col gap-5 ${YEAR_TINT[yr]} rounded-3xl p-3 -mx-3`;
     col.innerHTML = `
       <div class="relative border-b-[3px] border-slate-300 pb-2 mb-1 font-black text-xl text-slate-800 flex items-center justify-between">
         <span class="pointer-events-none select-none absolute top-1/2 -translate-y-1/2 left-0 text-5xl font-black text-slate-900/[.06] dark:text-white/[.05] leading-none">${yr}</span>
