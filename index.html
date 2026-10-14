@@ -268,6 +268,20 @@
     /* ── Pestañas del planificador ── */
     .sched-tab { font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 10px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; transition: all 0.15s; }
     .sched-tab:hover { background: #f1f5f9; }
+    .btn-primary { border-radius: .75rem; font-size: .875rem; font-weight: 700; color: #fff; background-color: #2563eb; box-shadow: 0 1px 3px rgba(15,23,42,.18); transition: background-color .15s; }
+    .btn-primary:hover { background-color: #1d4ed8; }
+    .btn-secondary { border-radius: .75rem; font-size: .875rem; font-weight: 700; color: #475569; background-color: #f1f5f9; transition: background-color .15s; }
+    .btn-secondary:hover { background-color: #e2e8f0; }
+    html.dark .btn-secondary { color: #cbd5e1; background-color: #1e293b; }
+    html.dark .btn-secondary:hover { background-color: #334155; }
+    .sched-gap { font-size: 10px; font-weight: 700; text-align: center; padding: 4px 6px; border-radius: 8px; }
+    .sched-gap.free { color: #64748b; background: rgba(100,116,139,.10); border: 1px dashed rgba(100,116,139,.35); }
+    .sched-gap.travel { color: #b45309; background: rgba(245,158,11,.14); border: 1px solid rgba(245,158,11,.4); }
+    html.dark .sched-gap.free { color: #94a3b8; }
+    html.dark .sched-gap.travel { color: #fbbf24; }
+    .card-chip.sched { background: rgba(37,99,235,.14); color: #1d4ed8; }
+    html.dark .card-chip.sched { color: #93c5fd; }
+    html.dark .text-violet-600, html.dark .text-violet-700 { color: #c4b5fd; }
     .sched-tab.active { background: #2563eb; border-color: #2563eb; color: #ffffff; }
 
     button:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -596,44 +610,124 @@
   </div>
 
   <div id="schedule-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 hidden" onclick="closeSchedule(event)">
-    <div class="bg-white rounded-3xl w-full max-w-5xl h-[90vh] sm:h-[85vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation()">
-      <div class="bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
-        <div>
-          <h2 class="text-xl font-black flex items-center gap-2 tracking-tight"><span>📅</span> Planificador de Horarios</h2>
+    <div class="bg-white rounded-3xl w-full max-w-5xl h-[90vh] sm:h-[85vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation(); closePlanMenu()">
+      <div class="bg-slate-900 text-white px-4 py-3 sm:p-5 shrink-0">
+        <div class="flex justify-between items-center gap-2">
+          <h2 class="text-lg sm:text-xl font-black flex items-center gap-2 tracking-tight"><span>📅</span> Planificador de Horarios</h2>
+          <div class="flex items-center gap-1.5 sm:gap-2">
+            <button onclick="schedToEnCurso()" title="Pasar a En curso las materias habilitadas de este plan" class="text-xs bg-amber-400 text-slate-900 font-bold px-2.5 py-1.5 rounded-xl hover:bg-amber-300 transition">⚡ <span class="hidden sm:inline">Pasar a "En Curso"</span><span class="sm:hidden">En curso</span></button>
+            <button onclick="openSchedShare()" class="text-xs bg-white/15 hover:bg-white/25 text-white font-bold px-2.5 py-1.5 rounded-xl transition">🤝 <span class="hidden sm:inline">Compartir</span></button>
+            <button onclick="closeSchedule()" aria-label="Cerrar" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
+          </div>
         </div>
-        <button onclick="closeSchedule()" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
+        <div class="flex items-center gap-2 flex-wrap mt-3">
+          <div id="sched-plans" class="flex gap-1.5 flex-wrap"></div>
+          <div class="relative">
+            <button onclick="togglePlanMenu(event)" class="sched-tab">⚙️ Plan...</button>
+            <div id="sched-plan-menu" class="hidden absolute left-0 top-full mt-1 z-30 w-60 bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 overflow-hidden"></div>
+          </div>
+        </div>
       </div>
       <div id="sched-tabs" class="px-4 pt-3 pb-1 bg-slate-50 flex items-center gap-2 flex-wrap shrink-0">
         <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-1">Ver:</span>
         <button class="sched-tab active" data-view="all" onclick="setScheduleView('all')">Todo el año</button>
         <button class="sched-tab" data-view="1" onclick="setScheduleView('1')">1° cuatrimestre</button>
         <button class="sched-tab" data-view="2" onclick="setScheduleView('2')">2° cuatrimestre</button>
+        <div id="sched-modes" class="flex gap-1.5 sm:ml-3">
+          <button class="sched-tab" data-mode="columns" onclick="setSchedMode('columns')" title="Columnas de Lunes a Sábado">🗓️ Columnas</button>
+          <button class="sched-tab" data-mode="agenda" onclick="setSchedMode('agenda')" title="Agenda por día (celular)">📱 Agenda</button>
+          <button class="sched-tab" data-mode="timeline" onclick="setSchedMode('timeline')" title="Cronograma proporcional">⏱️ Cronograma</button>
+        </div>
         <div class="ml-auto flex gap-2">
           <button onclick="exportScheduleImage()" class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition shadow-sm">🖼️ Imagen</button>
           <button onclick="openCalModal()" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition shadow-sm">📆 Calendario</button>
         </div>
       </div>
-      <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row gap-3 shrink-0">
-        <select id="sched-subject" class="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none truncate"></select>
-        <div class="flex flex-wrap gap-3 items-center">
-          <select id="sched-day" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none">
-            <option value="Lunes">Lunes</option>
-            <option value="Martes">Martes</option>
-            <option value="Miércoles">Miércoles</option>
-            <option value="Jueves">Jueves</option>
-            <option value="Viernes">Viernes</option>
-            <option value="Sábado">Sábado</option>
-          </select>
-          <div class="flex items-center gap-1.5 flex-1 sm:flex-none">
-            <input type="time" id="sched-start" aria-label="Hora de inicio" class="min-w-0 flex-1 sm:w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
-            <span class="text-xs font-bold text-slate-400">a</span>
-            <input type="time" id="sched-end" aria-label="Hora de fin" class="min-w-0 flex-1 sm:w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+      <div id="sched-stats-bar" class="px-4 py-2 bg-slate-50 flex flex-wrap gap-2 text-[11px] shrink-0"></div>
+      <div class="bg-slate-50 border-b border-slate-200 shrink-0 max-h-[45%] overflow-y-auto" data-scroll-body>
+        <button id="sched-form-toggle" onclick="toggleSchedForm()" class="sm:hidden w-full text-left px-4 py-2.5 text-xs font-black uppercase tracking-wide text-blue-700 flex items-center justify-between">➕ Agregar horario <span id="sched-form-caret">▾</span></button>
+        <div id="sched-form" class="hidden sm:block px-4 pb-4 pt-2 sm:pt-3 space-y-3">
+          <div class="flex flex-col sm:flex-row gap-3">
+            <select id="sched-subject" class="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none truncate"></select>
+            <label class="flex items-center gap-2 text-xs font-bold text-violet-700 cursor-pointer shrink-0"><input type="checkbox" id="sched-sim" onchange="buildScheduleOptions()" class="w-4 h-4 accent-violet-600"> 🔮 Simular</label>
           </div>
-          <button onclick="addScheduleItem()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl font-bold text-sm transition shadow-sm">Agregar</button>
+          <div class="flex flex-wrap gap-3 items-center">
+            <select id="sched-day" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none">
+              <option value="Lunes">Lunes</option><option value="Martes">Martes</option><option value="Miércoles">Miércoles</option><option value="Jueves">Jueves</option><option value="Viernes">Viernes</option><option value="Sábado">Sábado</option>
+            </select>
+            <div class="flex items-center gap-1.5 flex-1 sm:flex-none">
+              <input type="time" id="sched-start" aria-label="Hora de inicio" class="min-w-0 flex-1 sm:w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+              <span class="text-xs font-bold text-slate-400">a</span>
+              <input type="time" id="sched-end" aria-label="Hora de fin" class="min-w-0 flex-1 sm:w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+          </div>
+          <div id="sched-quick" class="flex flex-wrap gap-1.5"></div>
+          <div class="flex flex-wrap gap-3 items-center">
+            <select id="sched-mod" aria-label="Modalidad" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none"><option value="pres">🏫 Presencial</option><option value="virt">💻 Virtual</option><option value="contra">🎒 Contraturno / Práctica</option></select>
+            <select id="sched-reg" aria-label="Régimen de cursada" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none"><option value="">Régimen...</option><option value="promo">✨ Promocional</option><option value="final">📝 Con Final</option><option value="libre">🆓 Libre</option></select>
+            <input type="text" id="sched-aula" maxlength="40" placeholder="Aula (ej: Aula 12)" aria-label="Aula física" class="min-w-0 flex-1 sm:w-40 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            <label class="flex items-center gap-2 text-xs font-bold text-amber-700 cursor-pointer"><input type="checkbox" id="sched-forced" class="w-4 h-4 accent-amber-500"> 🤝 Superposición acordada</label>
+            <button onclick="addScheduleItem()" class="btn-primary w-full sm:w-auto px-4 py-2">Agregar</button>
+          </div>
         </div>
       </div>
-      <div class="flex-1 overflow-x-auto p-4 bg-slate-100">
-        <div class="flex gap-4 min-w-max h-full" id="schedule-grid"></div>
+      <div class="flex-1 overflow-auto p-4 bg-slate-100" data-scroll-body><div id="schedule-grid"></div></div>
+    </div>
+  </div>
+
+  <div id="sched-item-modal" class="modal-backdrop fixed inset-0 z-[65] flex items-center justify-center p-3 hidden" onclick="closeSchedItem(event)">
+    <div class="bg-white rounded-3xl max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <div class="p-5 pb-3 flex items-start justify-between gap-3 shrink-0">
+        <div><p class="text-[10px] font-black uppercase tracking-widest text-blue-600">Editar bloque horario</p><h2 id="schedi-title" class="text-lg font-black text-slate-900 leading-tight mt-0.5"></h2></div>
+        <button onclick="closeSchedItem()" aria-label="Cerrar" class="shrink-0 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">✕</button>
+      </div>
+      <div class="px-5 pb-3 space-y-3 overflow-y-auto" data-scroll-body>
+        <div class="grid grid-cols-3 gap-2">
+          <select id="schedi-day" aria-label="Día" class="col-span-3 sm:col-span-1 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium outline-none"><option>Lunes</option><option>Martes</option><option>Miércoles</option><option>Jueves</option><option>Viernes</option><option>Sábado</option></select>
+          <input type="time" id="schedi-start" aria-label="Inicio" class="min-w-0 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium outline-none">
+          <input type="time" id="schedi-end" aria-label="Fin" class="min-w-0 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium outline-none">
+        </div>
+        <div id="schedi-quick" class="flex flex-wrap gap-1.5"></div>
+        <div class="grid grid-cols-2 gap-2">
+          <select id="schedi-mod" aria-label="Modalidad" class="px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium outline-none"><option value="pres">🏫 Presencial</option><option value="virt">💻 Virtual</option><option value="contra">🎒 Contraturno</option></select>
+          <select id="schedi-reg" aria-label="Régimen" class="px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium outline-none"><option value="">Régimen...</option><option value="promo">✨ Promocional</option><option value="final">📝 Con Final</option><option value="libre">🆓 Libre</option></select>
+        </div>
+        <input type="text" id="schedi-aula" maxlength="40" placeholder="Aula física (ej: Aula 12)" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium outline-none">
+        <label class="flex items-center gap-2 text-xs font-bold text-amber-700 cursor-pointer"><input type="checkbox" id="schedi-forced" class="w-4 h-4 accent-amber-500"> 🤝 Superposición acordada / tolerada</label>
+        <div class="pt-2 border-t border-slate-200 space-y-2">
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Datos de la materia (se guardan en sus notas)</p>
+          <input type="text" id="schedi-teacher" maxlength="80" placeholder="👤 Docente" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium outline-none">
+          <input type="text" id="schedi-room" maxlength="40" placeholder="🏫 Código de Classroom" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium outline-none">
+          <div id="schedi-term-wrap"><select id="schedi-term" aria-label="Cuatrimestre" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium outline-none"><option value="">Cuatrimestre: sin definir</option><option value="1">1° cuatrimestre</option><option value="2">2° cuatrimestre</option><option value="B">1° y 2° cuatrimestre</option></select></div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="schedItemInfo()" class="btn-secondary px-3 py-2.5 text-xs">ℹ️ Ver Ficha y Notas</button>
+          <button onclick="schedItemStatus()" class="btn-secondary px-3 py-2.5 text-xs">📊 Cambiar Estado</button>
+        </div>
+      </div>
+      <div class="p-5 pt-3 flex gap-2 shrink-0 border-t border-slate-200">
+        <button onclick="schedItemRemove()" class="px-3 py-2.5 rounded-xl text-sm font-bold text-red-600 bg-red-50 hover:bg-red-100 transition">🗑️ Quitar</button>
+        <button onclick="closeSchedItem()" class="btn-secondary flex-1 px-3 py-2.5">Cancelar</button>
+        <button onclick="saveSchedItem()" class="btn-primary flex-1 px-3 py-2.5">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="sched-share-modal" class="modal-backdrop fixed inset-0 z-[65] flex items-center justify-center p-3 hidden" onclick="closeSchedShare(event)">
+    <div class="bg-white rounded-3xl max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
+      <div class="p-5 pb-2 flex items-start justify-between gap-3 shrink-0">
+        <div><h2 class="text-lg font-black text-slate-900">🤝 Compartir Horario</h2><p id="sched-share-title" class="text-xs text-slate-500 font-bold mt-0.5"></p></div>
+        <button onclick="closeSchedShare()" aria-label="Cerrar" class="shrink-0 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">✕</button>
+      </div>
+      <div class="px-5 pb-5 space-y-3 overflow-y-auto" data-scroll-body>
+        <p class="text-xs text-slate-500 leading-relaxed">Comparte <b>solo</b> los horarios del plan activo y los cuatrimestres: quien lo importe no pierde sus notas ni sus materias aprobadas.</p>
+        <textarea id="sched-share-code" readonly rows="3" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-[11px] font-mono outline-none resize-none"></textarea>
+        <div class="grid grid-cols-2 gap-2"><button onclick="copySchedShare()" class="btn-secondary px-3 py-2.5 text-xs">📋 Copiar código</button><button onclick="shareSchedWhatsApp()" class="btn-primary px-3 py-2.5 text-xs">💬 WhatsApp</button></div>
+        <div class="pt-3 border-t border-slate-200 space-y-2">
+          <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Importar el horario de un compañero</p>
+          <textarea id="sched-share-import" rows="3" placeholder="Pegá acá el código (sched1|...)" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-[11px] font-mono outline-none resize-none"></textarea>
+          <button onclick="importSchedShare()" class="btn-primary w-full px-3 py-2.5">Importar al plan activo</button>
+        </div>
       </div>
     </div>
   </div>
@@ -709,6 +803,12 @@
             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Última semana</label>
             <input type="date" id="cal-end" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
           </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Recordatorio de cada clase</label>
+          <select id="cal-alarm" class="w-full px-3 py-2.5 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="0">Sin alarma</option><option value="15" selected>15 minutos antes</option><option value="30">30 minutos antes</option><option value="60">1 hora antes</option>
+          </select>
         </div>
         <label class="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
           <input type="checkbox" id="cal-exams" checked class="w-4 h-4"> Incluir mesas de examen (con aviso el día anterior)
@@ -993,7 +1093,7 @@
   <!-- ══════════════════════════════════════════
        MODAL DE INFORMACIÓN MATERIA
   ══════════════════════════════════════════ -->
-  <div id="modal-backdrop" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 hidden" onclick="closeModal(event)">
+  <div id="modal-backdrop" class="modal-backdrop fixed inset-0 z-[75] flex items-center justify-center p-3 sm:p-4 hidden" onclick="closeModal(event)">
     <div id="modal-box" class="bg-white w-full max-w-lg shadow-2xl rounded-3xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
       
       <div id="modal-header" class="p-5 sm:p-6 text-white bg-slate-900 border-b border-slate-700 relative overflow-hidden shrink-0">
@@ -1096,7 +1196,8 @@ const __modalCloseFns = {
   'cal-modal': () => closeCalModal(), 'report-modal': () => closeReportModal(),
   'name-modal': () => closeNameModal(), 'qr-show-modal': () => closeQrShow(),
   'qr-scan-modal': () => closeQrScan(), 'modal-backdrop': () => closeModal(),
-  'generic-confirm-modal': () => resolveConfirm(false)
+  'generic-confirm-modal': () => resolveConfirm(false),
+  'sched-item-modal': () => closeSchedItem(), 'sched-share-modal': () => closeSchedShare()
 };
 window.addEventListener('scroll', () => {
   document.getElementById('btn-top').classList.toggle('hidden', window.scrollY < 500);
@@ -1107,6 +1208,8 @@ window.addEventListener('scroll', () => {
   document.addEventListener('touchstart', e => {
     const c = e.target.closest('.modal-backdrop > div');
     if (!c || c.parentElement.id === 'simulador-modal') return;
+    const sb = e.target.closest('[data-scroll-body]');
+    if (sb && sb.scrollHeight > sb.clientHeight + 2) return;
     card = c; startY = e.touches[0].clientY; startX = e.touches[0].clientX; swiping = true;
   }, { passive: true });
   document.addEventListener('touchmove', e => {
@@ -1413,13 +1516,22 @@ const state = {
   userSubjects: {},
   searchQuery: '',
   totalHs: 0,
-  schedule: emptySchedule(),
+  schedulePlans: { A: emptySchedule(), B: emptySchedule(), C: emptySchedule() },
+  activePlan: 'A',
+  schedMode: 'columns',
+  schedDay: '',
   student: '',
   exams: {},
   notes: {},
   scheduleView: 'all',
   termFilter: 'all'
 };
+/* state.schedule siempre apunta al plan activo (compatibilidad con todo el código existente) */
+Object.defineProperty(state, 'schedule', {
+  enumerable: true,
+  get() { return this.schedulePlans[this.activePlan]; },
+  set(v) { this.schedulePlans[this.activePlan] = v; }
+});
 
 const CAMPO_COLORS = {
   CFG: { bg: 'bg-[#1e3a8a]', label: 'CFG', icon: '📘', title: 'Formación General' },
@@ -1442,10 +1554,11 @@ function sanitizeUserSubjects(raw) {
   Object.keys(raw).forEach(id => {
     if (!SUBJECTS.some(s => s.id === id)) return;
     const v = raw[id];
-    if (!v || !['approved', 'cursada', 'en_curso'].includes(v.status)) return;
+    if (!v || !['approved', 'cursada', 'en_curso', 'recursar'].includes(v.status)) return;
     let g = (v.status !== 'approved' || v.grade === null || v.grade === undefined || v.grade === '') ? null : Number(v.grade);
     if (g !== null && (isNaN(g) || g < NOTA_MINIMA || g > 10)) g = null;
     out[id] = { status: v.status, grade: g };
+    if (v.equivalencia === true) out[id].equivalencia = true;
   });
   return out;
 }
@@ -1457,10 +1570,21 @@ function sanitizeSchedule(raw) {
     if (!Array.isArray(raw[day])) return;
     raw[day].forEach(item => {
       if (item && SUBJECTS.some(s => s.id === item.id)) {
-        out[day].push({ id: item.id, time: String(item.time || 'Sin horario definido').slice(0, 40) });
+        const e = { id: item.id, time: String(item.time || 'Sin horario definido').slice(0, 40) };
+        if (MODS[item.mod]) e.mod = item.mod;
+        if (REGS[item.reg]) e.reg = item.reg;
+        const aula = String(item.aula || '').trim().slice(0, 40);
+        if (aula) e.aula = aula;
+        if (item.forced === true) e.forced = true;
+        out[day].push(e);
       }
     });
   });
+  return out;
+}
+function sanitizePlans(raw) {
+  const out = {};
+  PLANS.forEach(p => { out[p] = sanitizeSchedule(raw && typeof raw === 'object' ? raw[p] : null); });
   return out;
 }
 
@@ -1477,8 +1601,16 @@ function init() {
   const savedV2 = loadJSON('isfd100_data_v2');
   if (savedV2) state.userSubjects = sanitizeUserSubjects(savedV2);
 
-  const savedSchedule = loadJSON('isfd100_horarios');
-  if (savedSchedule) state.schedule = sanitizeSchedule(savedSchedule);
+  const savedPlans = loadJSON('isfd100_horarios_planes');
+  if (savedPlans && typeof savedPlans === 'object') state.schedulePlans = sanitizePlans(savedPlans);
+  else {
+    const savedSchedule = loadJSON('isfd100_horarios');
+    if (savedSchedule) state.schedulePlans.A = sanitizeSchedule(savedSchedule);
+  }
+  const savedPlan = safeGet('isfd100_plan_activo');
+  if (PLANS.includes(savedPlan)) state.activePlan = savedPlan;
+  const savedMode = safeGet('isfd100_sched_mode');
+  state.schedMode = ['columns', 'agenda', 'timeline'].includes(savedMode) ? savedMode : (window.innerWidth < 640 ? 'agenda' : 'columns');
 
   const savedExams = loadJSON('isfd100_mesas');
   if (savedExams) state.exams = sanitizeExams(savedExams);
@@ -1566,6 +1698,8 @@ function init() {
 function saveState() {
   safeSet('isfd100_data_v2', JSON.stringify(state.userSubjects));
   safeSet('isfd100_horarios', JSON.stringify(state.schedule));
+  safeSet('isfd100_horarios_planes', JSON.stringify(state.schedulePlans));
+  safeSet('isfd100_plan_activo', state.activePlan);
   safeSet('isfd100_mesas', JSON.stringify(state.exams));
   safeSet('isfd100_notas', JSON.stringify(state.notes));
   safeSet('isfd100_alumno', state.student || '');
@@ -2259,7 +2393,7 @@ function executeReset() {
   closeConfirmModal();
   pushUndo('Reinicio de datos');
   state.userSubjects = {};
-  state.schedule = emptySchedule();
+  state.schedulePlans = { A: emptySchedule(), B: emptySchedule(), C: emptySchedule() };
   state.exams = {};
   state.notes = {};
   saveState();
@@ -2291,9 +2425,14 @@ function openSchedule() {
   const modal = document.getElementById('schedule-modal');
   modal.classList.remove('hidden');
 
+  state.schedDay = todayDayName() || DAYS[0];
+  $id('sched-quick').innerHTML = quickChipsHTML('sched');
+  $id('schedi-quick').innerHTML = quickChipsHTML('schedi');
   updateSchedTabs();
   buildScheduleOptions();
   renderScheduleGrid();
+  clearInterval(__schedRadarTimer);
+  __schedRadarTimer = setInterval(() => { const r = $id('sched-radar'); if (r) r.innerHTML = radarHTML(__schedEntriesToday); }, 30000);
 
   setTimeout(() => {
     modal.children[0].classList.remove('scale-95');
@@ -2304,6 +2443,8 @@ function openSchedule() {
 
 function closeSchedule(e) {
   if (e && e.target !== document.getElementById('schedule-modal') && e.type === 'click') return;
+  clearInterval(__schedRadarTimer);
+  closePlanMenu();
   const modal = document.getElementById('schedule-modal');
   modal.children[0].classList.remove('scale-100');
   modal.children[0].classList.add('scale-95');
@@ -2771,7 +2912,7 @@ const undoStack = [];
 let toastTimer = null;
 
 function snapshotData() {
-  return JSON.stringify({ u: state.userSubjects, s: state.schedule, e: state.exams, n: state.notes, a: state.student });
+  return JSON.stringify({ u: state.userSubjects, s: state.schedule, p: state.schedulePlans, ap: state.activePlan, e: state.exams, n: state.notes, a: state.student });
 }
 function pushUndo(label) {
   undoStack.push({ label, data: snapshotData() });
@@ -2784,7 +2925,7 @@ function undoLast() {
   if (!entry) { showToast('No hay nada para deshacer', false); return; }
   const d = JSON.parse(entry.data);
   state.userSubjects = sanitizeUserSubjects(d.u);
-  state.schedule = sanitizeSchedule(d.s);
+  if (d.p) { state.schedulePlans = sanitizePlans(d.p); if (PLANS.includes(d.ap)) state.activePlan = d.ap; } else state.schedule = sanitizeSchedule(d.s);
   state.exams = sanitizeExams(d.e);
   state.notes = sanitizeNotes(d.n);
   state.student = sanitizeStudent(d.a);
@@ -3143,6 +3284,12 @@ function renderCardExtras(subject) {
   if (u?.status === 'cursada' && ex && ex.attempts > 0) {
     chips.push(`<span class="card-chip" title="Veces que rendiste el final">↻ ${ex.attempts}</span>`);
   }
+  const stt = u?.status;
+  if (stt === 'en_curso' || stt === 'recursar' || (!u && isSubjectEnabled(subject.id))) {
+    const blocks = [];
+    DAYS.forEach(d => (state.schedule[d] || []).forEach(it => { if (it.id === subject.id && parseTimeRange(it.time)) blocks.push(`${DAY_ABBR[d]} ${esc(it.time)}`); }));
+    if (blocks.length) chips.push(`<span class="card-chip sched" title="Horario del Plan ${state.activePlan}">🕒 ${blocks.slice(0, 2).join(' · ')}${blocks.length > 2 ? ' +' + (blocks.length - 2) : ''}</span>`);
+  }
   if (note && (note.text || note.teacher || note.room)) {
     chips.push('<span class="card-chip" title="Tenés notas en esta materia">🗒️ Notas</span>');
   }
@@ -3153,29 +3300,125 @@ function renderCardExtras(subject) {
 }
 
 /* ── Horarios: armado, conflictos y vistas por período ── */
-function setScheduleView(v) {
-  state.scheduleView = v;
+/* ── Horarios: planes A/B/C, 3 vistas, estadísticas, edición rápida y compartir ── */
+const PLANS = ['A', 'B', 'C'];
+const MODS = { pres: { ico: '🏫', label: 'Presencial' }, virt: { ico: '💻', label: 'Virtual' }, contra: { ico: '🎒', label: 'Contraturno / Práctica' } };
+const REGS = { promo: { ico: '✨', label: 'Promocional' }, final: { ico: '📝', label: 'Con Final' }, libre: { ico: '🆓', label: 'Libre' } };
+const DAY_ABBR = { 'Lunes': 'Lun', 'Martes': 'Mar', 'Miércoles': 'Mié', 'Jueves': 'Jue', 'Viernes': 'Vie', 'Sábado': 'Sáb' };
+const QUICK_PRES = [['18:00', '20:00'], ['20:00', '22:00'], ['18:00', '22:00'], ['18:30', '20:30'], ['20:30', '22:30']];
+const QUICK_CONTRA = [['08:00', '12:00'], ['13:00', '17:00']];
+const $id = id => document.getElementById(id);
+const fmtMin = m => { const h = Math.floor(m / 60), mm = m % 60; return h ? (mm ? `${h}h ${mm}m` : `${h}h`) : `${mm}m`; };
+const hhmm = m => `${pad2(Math.floor(m / 60))}:${pad2(m % 60)}`;
+const shortMod = m => (MODS[m] || MODS.pres).label.split(' ')[0];
+function todayDayName() { const d = new Date().getDay(); return d === 0 ? null : DAYS[d - 1]; }
+let __schedEntriesToday = [], __schedRadarTimer = null;
+
+/* Planes */
+function planCount(p) { return DAYS.reduce((a, d) => a + (state.schedulePlans[p]?.[d]?.length || 0), 0); }
+function renderPlanPills() {
+  $id('sched-plans').innerHTML = PLANS.map(p =>
+    `<button class="sched-tab ${p === state.activePlan ? 'active' : ''}" onclick="setActivePlan('${p}')">Plan ${p} (${planCount(p)})</button>`).join('');
+}
+function setActivePlan(p) {
+  if (!PLANS.includes(p)) return;
+  state.activePlan = p;
+  safeSet('isfd100_plan_activo', p);
+  safeSet('isfd100_horarios', JSON.stringify(state.schedule));
+  closePlanMenu();
+  refreshScheduleUI();
+}
+function closePlanMenu() { const m = $id('sched-plan-menu'); if (m) m.classList.add('hidden'); }
+function togglePlanMenu(e) {
+  if (e) e.stopPropagation();
+  const m = $id('sched-plan-menu');
+  if (!m.classList.contains('hidden')) { m.classList.add('hidden'); return; }
+  const item = 'block w-full text-left px-3 py-2.5 text-xs font-bold hover:bg-slate-100 transition';
+  m.innerHTML = PLANS.filter(p => p !== state.activePlan).map(p => `<button onclick="copyPlanTo('${p}')" class="${item}">📋 Copiar este plan en Plan ${p}</button>`).join('')
+    + `<button onclick="clearActivePlan()" class="${item} text-red-600 border-t border-slate-200">🗑️ Vaciar Plan ${state.activePlan}</button>`;
+  m.classList.remove('hidden');
+}
+async function copyPlanTo(p) {
+  closePlanMenu();
+  const from = state.activePlan;
+  if (!planCount(from)) { showToast(`El Plan ${from} está vacío`, false); return; }
+  if (planCount(p) && !(await showConfirm(`El Plan ${p} ya tiene ${planCount(p)} bloque(s). ¿Reemplazarlo con una copia del Plan ${from}?`, 'Reemplazar'))) return;
+  pushUndo(`Plan ${from} copiado en Plan ${p}`);
+  state.schedulePlans[p] = sanitizeSchedule(JSON.parse(JSON.stringify(state.schedule)));
+  saveState();
+  refreshScheduleUI();
+}
+async function clearActivePlan() {
+  closePlanMenu();
+  const n = planCount(state.activePlan);
+  if (!n) { showToast(`El Plan ${state.activePlan} ya está vacío`, false); return; }
+  if (!(await showConfirm(`¿Vaciar el Plan ${state.activePlan}? Se van a quitar ${n} bloque(s) horario(s).`, 'Vaciar'))) return;
+  pushUndo(`Plan ${state.activePlan} vaciado`);
+  state.schedule = emptySchedule();
+  saveState();
+  refreshScheduleUI();
+}
+async function schedToEnCurso() {
+  const ids = new Set();
+  DAYS.forEach(d => (state.schedule[d] || []).forEach(it => ids.add(it.id)));
+  const list = [...ids].map(id => SUBJECT_BY_ID[id]).filter(s => s && isSubjectEnabled(s.id) && !state.userSubjects[s.id]);
+  if (!list.length) { showAlert('ℹ️ Nada para pasar', `En el Plan ${state.activePlan} no hay materias habilitadas y sin estado asignado.`); return; }
+  if (!(await showConfirm(`Se van a pasar a <b>En curso</b> ${list.length} materia(s) del Plan ${state.activePlan}:<br><br>${list.map(s => '• ' + esc(s.name)).join('<br>')}`, 'Pasar a En curso'))) return;
+  pushUndo(`${list.length} materia(s) → En curso`);
+  list.forEach(s => { state.userSubjects[s.id] = { status: 'en_curso', grade: null }; });
+  saveState();
+  refreshAll();
+  refreshScheduleUI();
+}
+
+/* Pestañas, modo y formulario */
+function setScheduleView(v) { state.scheduleView = v; updateSchedTabs(); buildScheduleOptions(); renderScheduleGrid(); }
+function setSchedMode(m) {
+  if (!['columns', 'agenda', 'timeline'].includes(m)) m = 'columns';
+  state.schedMode = m;
+  safeSet('isfd100_sched_mode', m);
   updateSchedTabs();
-  buildScheduleOptions();
   renderScheduleGrid();
 }
+function setSchedDay(d) { state.schedDay = d; renderScheduleGrid(); }
 function updateSchedTabs() {
-  document.querySelectorAll('#sched-tabs .sched-tab').forEach(b => b.classList.toggle('active', b.dataset.view === state.scheduleView));
+  document.querySelectorAll('#sched-tabs [data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === state.scheduleView));
+  document.querySelectorAll('#sched-modes [data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === state.schedMode));
+}
+function toggleSchedForm() {
+  const f = $id('sched-form');
+  f.classList.toggle('hidden');
+  $id('sched-form-caret').textContent = f.classList.contains('hidden') ? '▾' : '▴';
+}
+function quickChipsHTML(prefix) {
+  const chip = (s, e, mod) => `<button type="button" onclick="setQuickTime('${prefix}','${s}','${e}'${mod ? `,'${mod}'` : ''})" class="text-[11px] font-bold px-2 py-1 rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-blue-50 hover:border-blue-300 transition">${s}–${e}</button>`;
+  return QUICK_PRES.map(([s, e]) => chip(s, e)).join('') + '<span class="text-[10px] text-slate-400 font-bold self-center px-1">🎒</span>' + QUICK_CONTRA.map(([s, e]) => chip(s, e, 'contra')).join('');
+}
+function setQuickTime(prefix, s, e, mod) {
+  $id(prefix + '-start').value = s;
+  $id(prefix + '-end').value = e;
+  if (mod) $id(prefix + '-mod').value = mod;
 }
 function buildScheduleOptions() {
-  const sel = document.getElementById('sched-subject');
+  const sel = $id('sched-subject');
   const prev = sel.value;
   const view = state.scheduleView;
+  const sim = $id('sched-sim') && $id('sched-sim').checked;
   const fits = s => termVisible(subjectTerm(s), view);
   const byYear = (a, b) => a.year - b.year;
   const opt = s => `<option value="${s.id}">${s.bottleneckCount >= 3 ? '🔥 ' : ''}${s.name} (Año ${s.year})</option>`;
-  const enCurso = SUBJECTS.filter(s => state.userSubjects[s.id]?.status === 'en_curso' && fits(s)).sort(byYear);
+  const optLocked = s => `<option value="${s.id}">${s.name} (Año ${s.year}) — faltan ${s.prereqs.filter(p => !prereqCursadaOk(p)).length} correlativa(s)</option>`;
+  const enCurso = SUBJECTS.filter(s => ['en_curso', 'recursar'].includes(state.userSubjects[s.id]?.status) && fits(s)).sort(byYear);
   const habilitadas = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.userSubjects[s.id] && fits(s)).sort(byYear);
+  const locked = sim ? SUBJECTS.filter(s => !isSubjectEnabled(s.id) && !state.userSubjects[s.id] && fits(s)).sort(byYear) : [];
   sel.innerHTML = '<option value="" disabled selected>Seleccioná una materia...</option>'
     + (enCurso.length ? `<optgroup label="⏳ En curso">${enCurso.map(opt).join('')}</optgroup>` : '')
-    + (habilitadas.length ? `<optgroup label="▶ Habilitadas">${habilitadas.map(opt).join('')}</optgroup>` : '');
+    + (habilitadas.length ? `<optgroup label="▶ Habilitadas">${habilitadas.map(opt).join('')}</optgroup>` : '')
+    + (locked.length ? `<optgroup label="🔮 Bloqueadas (Modo Simulación)">${locked.map(optLocked).join('')}</optgroup>` : '');
   if (prev && sel.querySelector(`option[value="${prev}"]`)) sel.value = prev;
 }
+
+/* Modelo: bloques, superposiciones exactas y huecos */
 function findConflicts(day, time, term, skipIndex = -1) {
   const r = parseTimeRange(time);
   if (!r) return [];
@@ -3199,10 +3442,23 @@ function collectScheduleItems(view) {
     const note = state.notes[item.id] || {};
     out.push({
       day, index, item, subject, term, time: item.time, range: parseTimeRange(item.time),
-      room: note.room || '', teacher: note.teacher || '',
-      conflict: findConflicts(day, item.time, term, index).length > 0
+      room: note.room || '', teacher: note.teacher || '', aula: item.aula || '',
+      mod: MODS[item.mod] ? item.mod : 'pres', reg: REGS[item.reg] ? item.reg : '', forced: !!item.forced,
+      overlaps: [], conflict: false, tolerated: false
     });
   }));
+  out.forEach(a => {
+    if (!a.range) return;
+    out.forEach(b => {
+      if (a === b || a.day !== b.day || !b.range || !termsOverlap(a.term, b.term)) return;
+      const mins = Math.min(a.range.end, b.range.end) - Math.max(a.range.start, b.range.start);
+      if (mins > 0) a.overlaps.push({ other: b, mins });
+    });
+    if (a.overlaps.length) {
+      a.tolerated = a.forced || a.overlaps.every(o => o.other.forced);
+      a.conflict = !a.tolerated;
+    }
+  });
   return out;
 }
 function sortScheduleItems(a, b) {
@@ -3213,50 +3469,234 @@ function sortScheduleItems(a, b) {
   if (b.range) return 1;
   return 0;
 }
+function gapInfo(a, b) {
+  if (!a.range || !b.range || !termsOverlap(a.term, b.term)) return null;
+  const gap = b.range.start - a.range.end;
+  if (gap < 0) return null;
+  if (a.mod !== b.mod && gap < 45) return { kind: 'travel', gap, a, b };
+  if (gap >= 15) return { kind: 'free', gap, a, b };
+  return null;
+}
+function dayWithGaps(entries) {
+  const out = [];
+  let prev = null;
+  entries.forEach(it => {
+    if (it.range && prev) { const g = gapInfo(prev, it); if (g) out.push({ gap: g }); }
+    out.push({ it });
+    if (it.range && (!prev || it.range.end > prev.range.end)) prev = it;
+  });
+  return out;
+}
+function gapHTML(g) {
+  if (g.kind === 'travel') return `<div class="sched-gap travel">🚌 Traslado ajustado: ${g.gap}m entre ${shortMod(g.a.mod)}/${shortMod(g.b.mod)}</div>`;
+  return `<div class="sched-gap free">☕ Hora puente / libre: ${fmtMin(g.gap)} (${hhmm(g.a.range.end)} a ${hhmm(g.b.range.start)})</div>`;
+}
+
+/* Estadísticas en vivo */
+function renderSchedStats(items) {
+  let mins = 0, pairs = 0, travel = 0;
+  const perDay = {}, subs = new Map();
+  items.forEach(it => {
+    const dur = it.range ? it.range.end - it.range.start : 0;
+    mins += dur; perDay[it.day] = (perDay[it.day] || 0) + dur; subs.set(it.subject.id, it.subject);
+    it.overlaps.forEach(o => { if (!(it.forced || o.other.forced)) pairs += 0.5; });
+  });
+  DAYS.forEach(d => dayWithGaps(items.filter(i => i.day === d)).forEach(x => { if (x.gap && x.gap.kind === 'travel') travel++; }));
+  let light;
+  if (pairs > 0) light = ['🔴', 'Con choques horarios', 'bg-red-50 text-red-700 border-red-200'];
+  else if (!mins) light = ['⚪', 'Sin carga', 'bg-slate-100 text-slate-600 border-slate-200'];
+  else if (mins <= 600) light = ['🟢', 'Carga liviana', 'bg-emerald-50 text-emerald-700 border-emerald-200'];
+  else if (mins <= 1080) light = ['🔵', 'Carga equilibrada', 'bg-blue-50 text-blue-700 border-blue-200'];
+  else light = ['🟠', 'Carga intensa', 'bg-amber-50 text-amber-700 border-amber-200'];
+  const list = [...subs.values()];
+  const anual = list.filter(s => s.regimen === 'Anual').length;
+  const crit = list.filter(s => s.bottleneckCount >= 3).length;
+  const busiest = Object.entries(perDay).sort((a, b) => b[1] - a[1])[0];
+  const alerts = Math.round(pairs) + travel;
+  const pill = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-lg border font-bold';
+  $id('sched-stats-bar').innerHTML =
+    `<span class="${pill} ${light[2]}">${light[0]} ${light[1]}</span>`
+    + `<span class="${pill} bg-white text-slate-700 border-slate-200">⏱️ ${mins ? fmtMin(mins) : '0h'} / semana</span>`
+    + `<span class="${pill} bg-white text-slate-700 border-slate-200">📚 ${list.length} materia${list.length === 1 ? '' : 's'}${list.length ? ` · ${anual} anual${anual === 1 ? '' : 'es'} · ${list.length - anual} cuat. · 🔥 ${crit} crítica${crit === 1 ? '' : 's'}` : ''}</span>`
+    + (busiest && busiest[1] ? `<span class="${pill} bg-white text-slate-700 border-slate-200">📆 Más cargado: ${busiest[0]} (${fmtMin(busiest[1])})</span>` : '')
+    + `<span class="${pill} ${alerts ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-white text-slate-500 border-slate-200'}">⚠️ ${alerts} alerta${alerts === 1 ? '' : 's'}</span>`;
+}
+
+/* Tarjetas y vistas */
+function schedMeta(it) {
+  const bits = [`${MODS[it.mod].ico} ${shortMod(it.mod)}`];
+  if (it.reg) bits.push(`${REGS[it.reg].ico} ${REGS[it.reg].label}`);
+  return bits.join(' · ');
+}
+function schedFlags(it) {
+  let h = '';
+  if (it.conflict) { const o = it.overlaps.find(x => !(it.forced || x.other.forced)) || it.overlaps[0]; h += `<p class="text-[10px] text-red-600 font-black mt-1">⚠ Se superpone ${o.mins}m con ${esc(o.other.subject.name)}</p>`; }
+  else if (it.tolerated) h += `<p class="text-[10px] text-amber-700 font-black mt-1">🤝 Cruce acordado · ${it.overlaps[0].mins}m</p>`;
+  const s = it.subject;
+  if (!isSubjectEnabled(s.id) && !state.userSubjects[s.id]) {
+    const falta = s.prereqs.filter(p => !prereqCursadaOk(p)).map(p => esc(SUBJECT_BY_ID[p]?.name || p)).join(', ');
+    h += `<p class="text-[10px] text-violet-600 font-bold mt-1">🔮 Simulada (falta final de: ${falta})</p>`;
+  }
+  return h;
+}
+function schedCardHTML(it) {
+  const s = it.subject, view = state.scheduleView;
+  const approved = state.userSubjects[s.id]?.status === 'approved';
+  const col = it.conflict ? 'border-red-500' : it.tolerated ? 'border-amber-500' : s.campo === 'CFG' ? 'border-blue-500' : s.campo === 'CFE' ? 'border-emerald-500' : 'border-amber-500';
+  const bg = it.conflict ? 'bg-red-50' : it.tolerated ? 'bg-amber-50' : 'bg-slate-50';
+  const termChip = (view === 'all' && (it.term === '1' || it.term === '2' || it.term === 'B'))
+    ? `<span class="inline-block mt-1 text-[9px] font-black uppercase tracking-wide bg-slate-100 text-slate-600 border border-slate-200 px-1.5 py-0.5 rounded">${TERM_LABEL[it.term]}</span>` : '';
+  return `
+    <div onclick="openSchedItem('${it.day}', ${it.index})" role="button" tabindex="0" class="${bg} ${approved ? 'opacity-60' : ''} p-3 rounded-lg border-l-4 ${col} border-y border-r border-slate-200 shadow-sm relative group cursor-pointer hover:shadow-md transition">
+      <p class="text-[11px] font-bold text-slate-800 leading-tight pr-7">${esc(s.name)}</p>
+      <p class="text-[10px] text-blue-600 font-mono mt-1 font-bold">${esc(it.time)}</p>
+      <p class="text-[10px] text-slate-500 font-medium mt-0.5">${schedMeta(it)}</p>
+      ${it.aula ? `<p class="text-[10px] text-slate-500 font-medium">📍 ${esc(it.aula)}</p>` : ''}
+      ${it.room ? `<p class="text-[10px] text-slate-500 font-medium">🏫 Classroom: ${esc(it.room)}</p>` : ''}
+      ${it.teacher ? `<p class="text-[10px] text-slate-500 font-medium">👤 ${esc(it.teacher)}</p>` : ''}
+      ${termChip}${schedFlags(it)}
+      ${approved ? '<p class="text-[10px] text-slate-500 font-bold mt-1">✓ Ya aprobada</p>' : ''}
+      <button onclick="event.stopPropagation(); removeScheduleItem('${it.day}', ${it.index})" aria-label="Quitar" class="absolute top-1.5 right-1.5 w-6 h-6 bg-red-100 text-red-600 rounded-md opacity-100 sm:opacity-0 group-hover:opacity-100 focus:opacity-100 transition flex items-center justify-center text-xs">✕</button>
+    </div>`;
+}
+function dayMins(entries) { return entries.reduce((a, i) => a + (i.range ? i.range.end - i.range.start : 0), 0); }
+function renderColumnsView(model) {
+  const today = todayDayName();
+  return '<div class="flex gap-4 min-w-max">' + DAYS.map(day => {
+    const entries = model.byDay[day], mins = dayMins(entries), isToday = day === today;
+    const body = entries.length ? dayWithGaps(entries).map(x => x.gap ? gapHTML(x.gap) : schedCardHTML(x.it)).join('') : '<p class="text-xs text-slate-400 text-center mt-4 italic">Día libre</p>';
+    return `<div class="bg-white border ${isToday ? 'border-blue-500 ring-2 ring-blue-200' : 'border-slate-200'} rounded-xl flex flex-col min-w-[210px] w-[210px] shadow-sm self-start">
+      <h4 class="font-black text-slate-800 bg-slate-100 p-3 rounded-t-xl border-b border-slate-200 flex items-center gap-2">${day}${isToday ? '<span class="text-[9px] bg-blue-600 text-white px-1.5 py-0.5 rounded-md">HOY</span>' : ''}<span class="ml-auto text-[10px] font-bold text-slate-500">${mins ? '⏱️ ' + fmtMin(mins) : ''}</span></h4>
+      <div class="p-3 flex flex-col gap-3 min-h-[150px]">${body}</div></div>`;
+  }).join('') + '</div>';
+}
+function radarHTML(entries) {
+  const now = new Date(), nm = now.getHours() * 60 + now.getMinutes();
+  const cur = entries.find(i => i.range && i.range.start <= nm && nm < i.range.end);
+  const box = 'rounded-xl px-3 py-2.5 text-xs font-bold border';
+  if (cur) return `<div class="${box} bg-red-50 text-red-700 border-red-200"><span class="animate-pulse">🔴</span> En clase ahora: ${esc(cur.subject.name)} · quedan ${fmtMin(cur.range.end - nm)} (hasta las ${hhmm(cur.range.end)})</div>`;
+  const next = entries.filter(i => i.range && i.range.start > nm).sort((a, b) => a.range.start - b.range.start)[0];
+  if (next) return `<div class="${box} bg-blue-50 text-blue-700 border-blue-200">⏭️ Próxima clase: ${esc(next.subject.name)} a las ${hhmm(next.range.start)} (en ${fmtMin(next.range.start - nm)})</div>`;
+  if (entries.some(i => i.range)) return `<div class="${box} bg-emerald-50 text-emerald-700 border-emerald-200">✅ Ya terminaron las clases de hoy</div>`;
+  return `<div class="${box} bg-slate-100 text-slate-600 border-slate-200">☀️ Hoy no tenés clases cargadas</div>`;
+}
+function renderAgendaView(model) {
+  const today = todayDayName();
+  if (!DAYS.includes(state.schedDay)) state.schedDay = today || DAYS[0];
+  const tabs = DAYS.map(d => {
+    const e = model.byDay[d], m = dayMins(e);
+    return `<button onclick="setSchedDay('${d}')" class="sched-tab ${d === state.schedDay ? 'active' : ''} flex-1 min-w-[48px] !px-1 text-center"><span class="block">${DAY_ABBR[d]}${d === today ? ' •' : ''}</span><span class="block text-[9px] font-bold opacity-80">${e.length} · ${m ? fmtMin(m) : '0h'}</span></button>`;
+  }).join('');
+  const entries = model.byDay[state.schedDay] || [];
+  const isToday = state.schedDay === today;
+  __schedEntriesToday = isToday ? entries : [];
+  const body = entries.length ? dayWithGaps(entries).map(x => x.gap ? gapHTML(x.gap) : schedCardHTML(x.it)).join('') : '<p class="text-xs text-slate-400 text-center py-8 italic">Día libre</p>';
+  return `<div class="max-w-xl mx-auto flex flex-col gap-3"><div class="flex gap-1.5">${tabs}</div>${isToday ? `<div id="sched-radar">${radarHTML(entries)}</div>` : ''}<div class="flex flex-col gap-3">${body}</div></div>`;
+}
+function layoutLanes(entries) {
+  const sorted = entries.filter(i => i.range).sort((a, b) => a.range.start - b.range.start || a.range.end - b.range.end);
+  const res = [];
+  let cluster = [], clusterEnd = -1;
+  const flush = () => {
+    if (!cluster.length) return;
+    const lanes = [];
+    cluster.forEach(it => {
+      let li = lanes.findIndex(e => e <= it.range.start);
+      if (li < 0) { li = lanes.length; lanes.push(0); }
+      lanes[li] = it.range.end; it._lane = li;
+    });
+    cluster.forEach(it => { it._lanes = lanes.length; res.push(it); });
+    cluster = [];
+  };
+  sorted.forEach(it => {
+    if (cluster.length && it.range.start >= clusterEnd) { flush(); clusterEnd = -1; }
+    cluster.push(it); clusterEnd = Math.max(clusterEnd, it.range.end);
+  });
+  flush();
+  return res;
+}
+function renderTimelineView(model) {
+  const ranged = model.items.filter(i => i.range), noTime = model.items.filter(i => !i.range);
+  const today = todayDayName(), PPM = 1.1;
+  let t0 = 8 * 60, t1 = 22 * 60 + 30;
+  if (ranged.length) {
+    t0 = Math.max(8 * 60, Math.floor(Math.min(...ranged.map(i => i.range.start)) / 60) * 60);
+    t1 = Math.min(22 * 60 + 30, Math.ceil(Math.max(...ranged.map(i => i.range.end)) / 30) * 30);
+    if (t1 <= t0) t1 = Math.min(22 * 60 + 30, t0 + 120);
+  }
+  const H = Math.round((t1 - t0) * PPM);
+  let lines = '', labels = '';
+  for (let h = Math.ceil(t0 / 60); h * 60 <= t1; h++) {
+    const y = Math.round((h * 60 - t0) * PPM);
+    lines += `<div class="absolute left-0 right-0 border-t border-slate-200/80" style="top:${y}px"></div>`;
+    labels += `<div class="absolute right-1 text-[10px] font-bold text-slate-400 -translate-y-1/2" style="top:${y}px">${pad2(h)}:00</div>`;
+  }
+  const cols = DAYS.map(day => {
+    const entries = model.byDay[day], isToday = day === today;
+    const blocks = layoutLanes(entries).map(it => {
+      const top = Math.round((Math.max(it.range.start, t0) - t0) * PPM);
+      const h = Math.max(20, Math.round((Math.min(it.range.end, t1) - Math.max(it.range.start, t0)) * PPM) - 2);
+      const col = it.conflict ? 'border-red-500 bg-red-50' : it.tolerated ? 'border-amber-500 bg-amber-50' : it.subject.campo === 'CFG' ? 'border-blue-500 bg-blue-50' : it.subject.campo === 'CFE' ? 'border-emerald-500 bg-emerald-50' : 'border-amber-500 bg-amber-50';
+      return `<div class="absolute p-px" style="top:${top}px;height:${h + 2}px;left:${it._lane * 100 / it._lanes}%;width:${100 / it._lanes}%">
+        <div onclick="openSchedItem('${it.day}', ${it.index})" role="button" tabindex="0" title="${esc(it.subject.name)} · ${esc(it.time)}" class="h-full w-full overflow-hidden rounded-md border-l-4 ${col} border-y border-r border-slate-200 p-1 cursor-pointer hover:shadow-md transition text-[10px] leading-tight">
+          <p class="font-bold text-slate-800 truncate">${esc(it.subject.name)}</p>
+          <p class="font-mono font-bold text-blue-600">${it.range ? hhmm(it.range.start) + '–' + hhmm(it.range.end) : ''}</p>
+          ${it.aula ? `<p class="text-slate-500 truncate">📍 ${esc(it.aula)}</p>` : ''}${it.conflict ? '<p class="text-red-600 font-black">⚠ ' + it.overlaps[0].mins + 'm</p>' : it.tolerated ? '<p class="text-amber-700 font-black">🤝 ' + it.overlaps[0].mins + 'm</p>' : ''}
+        </div></div>`;
+    }).join('');
+    return `<div class="w-[150px] shrink-0 ${isToday ? 'bg-blue-50/40' : ''}">
+      <div class="h-9 flex items-center justify-center gap-1 text-xs font-black text-slate-800 bg-slate-100 border-b border-slate-200 ${isToday ? 'text-blue-700' : ''}">${DAY_ABBR[day]}${isToday ? '<span class="text-[9px] bg-blue-600 text-white px-1 rounded">HOY</span>' : ''}</div>
+      <div class="relative border-l border-slate-200" style="height:${H}px">${lines}${blocks}</div></div>`;
+  }).join('');
+  const extra = noTime.length ? `<div class="mt-4"><p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Sin horario definido</p><div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl">${noTime.map(schedCardHTML).join('')}</div></div>` : '';
+  return `<div class="bg-white border border-slate-200 rounded-xl overflow-hidden w-max"><div class="flex"><div class="w-12 shrink-0"><div class="h-9"></div><div class="relative" style="height:${H}px">${labels}</div></div>${cols}</div></div>${extra}`;
+}
+function buildSchedModel(view) {
+  const items = collectScheduleItems(view).sort(sortScheduleItems);
+  const byDay = {};
+  DAYS.forEach(d => { byDay[d] = items.filter(i => i.day === d); });
+  return { items, byDay };
+}
+function renderScheduleGrid() {
+  const model = buildSchedModel(state.scheduleView);
+  renderPlanPills();
+  renderSchedStats(model.items);
+  $id('schedule-grid').innerHTML = state.schedMode === 'agenda' ? renderAgendaView(model) : state.schedMode === 'timeline' ? renderTimelineView(model) : renderColumnsView(model);
+}
+function refreshScheduleUI() {
+  updateSchedTabs();
+  buildScheduleOptions();
+  renderScheduleGrid();
+  SUBJECTS.forEach(renderCardExtras);
+  renderTodayBanner();
+}
+
+/* Alta / baja de bloques */
 function addScheduleItem() {
-  const subId = document.getElementById('sched-subject').value;
-  const day = document.getElementById('sched-day').value;
-  const start = document.getElementById('sched-start').value;
-  const end = document.getElementById('sched-end').value;
-
-  if (!subId) { showAlert('⚠️ Atención', "Por favor, seleccioná una materia primero."); return; }
-  if ((start && !end) || (!start && end)) {
-    showAlert('⚠️ Atención', "Completá la hora de inicio y la de fin (o dejá las dos vacías).");
-    return;
-  }
-  if (start && end && end <= start) {
-    showAlert('⚠️ Atención', "La hora de fin tiene que ser posterior a la de inicio.");
-    return;
-  }
-
+  const subId = $id('sched-subject').value;
+  const day = $id('sched-day').value;
+  const start = $id('sched-start').value;
+  const end = $id('sched-end').value;
+  if (!subId) { showAlert('⚠️ Atención', 'Por favor, seleccioná una materia primero.'); return; }
+  if ((start && !end) || (!start && end)) { showAlert('⚠️ Atención', 'Completá la hora de inicio y la de fin (o dejá las dos vacías).'); return; }
+  if (start && end && end <= start) { showAlert('⚠️ Atención', 'La hora de fin tiene que ser posterior a la de inicio.'); return; }
   const subject = SUBJECT_BY_ID[subId];
   const time = (start && end) ? `${start} a ${end}` : 'Sin horario definido';
-
   if (!state.schedule[day]) state.schedule[day] = [];
-  if (state.schedule[day].some(it => it.id === subId && it.time === time)) {
-    showAlert('⚠️ Atención', "Esa materia ya está cargada ese día y en ese horario.");
-    return;
-  }
-
-  // Si estás mirando un cuatrimestre y la materia no tenía período, queda asignada a ese
+  if (state.schedule[day].some(it => it.id === subId && it.time === time)) { showAlert('⚠️ Atención', 'Esa materia ya está cargada ese día y en ese horario.'); return; }
   const view = state.scheduleView;
   const assign = (subject.regimen !== 'Anual' && !subjectTerm(subject) && (view === '1' || view === '2')) ? view : null;
-
   pushUndo(`Horario: ${subject.name} (${day})`);
   if (assign) setNote(subId, { term: assign });
-  const term = subjectTerm(subject);
-  const conflicts = findConflicts(day, time, term);
-  state.schedule[day].push({ id: subId, time });
-
+  const forced = $id('sched-forced').checked;
+  const conflicts = findConflicts(day, time, subjectTerm(subject));
+  state.schedule[day].push({ id: subId, time, mod: $id('sched-mod').value, reg: $id('sched-reg').value, aula: $id('sched-aula').value.trim().slice(0, 40), forced });
   saveState();
-  renderScheduleGrid();
-  renderCardExtras(subject);
-  document.getElementById('sched-start').value = '';
-  document.getElementById('sched-end').value = '';
-
-  if (conflicts.length) {
+  refreshScheduleUI();
+  $id('sched-start').value = ''; $id('sched-end').value = '';
+  if (conflicts.length && !forced) {
     const names = conflicts.map(c => `<b>${esc(SUBJECT_BY_ID[c.id]?.name || c.id)}</b> (${esc(c.time)})`).join('<br>');
-    showAlert('⚠️ Superposición', `Ese horario se pisa con:<br><br>${names}`);
+    showAlert('⚠️ Superposición', `Ese horario se pisa con:<br><br>${names}<br><br><span class="text-xs">Si lo vas a cursar igual, tocá el bloque y marcá "🤝 Superposición acordada".</span>`);
   }
 }
 function removeScheduleItem(day, index) {
@@ -3265,49 +3705,112 @@ function removeScheduleItem(day, index) {
   pushUndo(`Horario quitado: ${SUBJECT_BY_ID[it.id]?.name || it.id}`);
   state.schedule[day].splice(index, 1);
   saveState();
-  renderScheduleGrid();
+  closeBox('sched-item-modal');
+  refreshScheduleUI();
 }
-function renderScheduleGrid() {
-  const grid = document.getElementById('schedule-grid');
-  const view = state.scheduleView;
-  const items = collectScheduleItems(view).sort(sortScheduleItems);
-  let html = '';
 
-  DAYS.forEach(day => {
-    const entries = items.filter(i => i.day === day);
-    html += `
-      <div class="bg-white border border-slate-200 rounded-xl flex flex-col min-w-[200px] w-[200px] shadow-sm">
-        <h4 class="font-black text-slate-800 bg-slate-100 p-3 rounded-t-xl border-b border-slate-200">${day}</h4>
-        <div class="p-3 flex flex-col gap-3 min-h-[150px]">
-    `;
-    if (entries.length === 0) {
-      html += `<p class="text-xs text-slate-400 text-center mt-4 italic">Día libre</p>`;
-    } else {
-      entries.forEach(it => {
-        const subject = it.subject;
-        const approved = state.userSubjects[subject.id]?.status === 'approved';
-        const borderCol = it.conflict ? 'border-red-500'
-          : subject.campo === 'CFG' ? 'border-blue-500'
-          : subject.campo === 'CFE' ? 'border-emerald-500' : 'border-amber-500';
-        const termChip = (view === 'all' && (it.term === '1' || it.term === '2' || it.term === 'B'))
-          ? `<span class="inline-block mt-1 text-[9px] font-black uppercase tracking-wide bg-slate-100 text-slate-600 border border-slate-200 px-1.5 py-0.5 rounded">${TERM_LABEL[it.term]}</span>` : '';
-        html += `
-          <div class="${it.conflict ? 'bg-red-50' : 'bg-slate-50'} ${approved ? 'opacity-60' : ''} p-3 rounded-lg border-l-4 ${borderCol} border-y border-r border-slate-200 shadow-sm relative group">
-            <p class="text-[11px] font-bold text-slate-800 leading-tight pr-7">${subject.name}</p>
-            <p class="text-[10px] text-blue-600 font-mono mt-1 font-bold">${esc(it.time)}</p>
-            ${it.room ? `<p class="text-[10px] text-slate-500 font-medium mt-1">🏫 Classroom: ${esc(it.room)}</p>` : ''}
-            ${it.teacher ? `<p class="text-[10px] text-slate-500 font-medium">👤 ${esc(it.teacher)}</p>` : ''}
-            ${termChip}
-            ${it.conflict ? '<p class="text-[10px] text-red-600 font-black mt-1">⚠ Se superpone</p>' : ''}
-            ${approved ? '<p class="text-[10px] text-slate-500 font-bold mt-1">✓ Ya aprobada</p>' : ''}
-            <button onclick="removeScheduleItem('${day}', ${it.index})" aria-label="Quitar" class="absolute top-1.5 right-1.5 w-6 h-6 bg-red-100 text-red-600 rounded-md opacity-100 sm:opacity-0 group-hover:opacity-100 focus:opacity-100 transition flex items-center justify-center text-xs font-black shadow-sm">✕</button>
-          </div>
-        `;
-      });
-    }
-    html += `</div></div>`;
-  });
-  grid.innerHTML = html;
+/* Edición rápida */
+let schedEdit = null;
+function openSchedItem(day, index) {
+  const it = state.schedule[day]?.[index];
+  const s = it && SUBJECT_BY_ID[it.id];
+  if (!s) return;
+  schedEdit = { day, index };
+  const note = getNote(it.id), r = parseTimeRange(it.time);
+  $id('schedi-title').textContent = s.name;
+  $id('schedi-day').value = day;
+  $id('schedi-start').value = r ? hhmm(r.start) : '';
+  $id('schedi-end').value = r ? hhmm(r.end) : '';
+  $id('schedi-mod').value = MODS[it.mod] ? it.mod : 'pres';
+  $id('schedi-reg').value = REGS[it.reg] ? it.reg : '';
+  $id('schedi-aula').value = it.aula || '';
+  $id('schedi-forced').checked = !!it.forced;
+  $id('schedi-teacher').value = note.teacher || '';
+  $id('schedi-room').value = note.room || '';
+  $id('schedi-term-wrap').classList.toggle('hidden', s.regimen === 'Anual');
+  $id('schedi-term').value = note.term || '';
+  openBox('sched-item-modal');
+}
+function closeSchedItem(e) { closeBox('sched-item-modal', e); }
+function saveSchedItem() {
+  if (!schedEdit) return;
+  const old = state.schedule[schedEdit.day]?.[schedEdit.index];
+  if (!old) { closeSchedItem(); return; }
+  const s = SUBJECT_BY_ID[old.id];
+  const day = $id('schedi-day').value, start = $id('schedi-start').value, end = $id('schedi-end').value;
+  if ((start && !end) || (!start && end)) { showAlert('⚠️ Atención', 'Completá la hora de inicio y la de fin (o dejá las dos vacías).'); return; }
+  if (start && end && end <= start) { showAlert('⚠️ Atención', 'La hora de fin tiene que ser posterior a la de inicio.'); return; }
+  const time = (start && end) ? `${start} a ${end}` : 'Sin horario definido';
+  if (state.schedule[day].some((it, i) => it.id === old.id && it.time === time && !(day === schedEdit.day && i === schedEdit.index))) { showAlert('⚠️ Atención', 'Esa materia ya está cargada ese día y en ese horario.'); return; }
+  pushUndo(`Horario editado: ${s.name}`);
+  const next = { id: old.id, time, mod: $id('schedi-mod').value, reg: $id('schedi-reg').value, aula: $id('schedi-aula').value.trim().slice(0, 40), forced: $id('schedi-forced').checked };
+  if (day === schedEdit.day) state.schedule[day][schedEdit.index] = next;
+  else { state.schedule[schedEdit.day].splice(schedEdit.index, 1); state.schedule[day].push(next); }
+  const patch = { teacher: $id('schedi-teacher').value.trim().slice(0, 80), room: $id('schedi-room').value.trim().slice(0, 40) };
+  if (s.regimen !== 'Anual') patch.term = $id('schedi-term').value;
+  setNote(old.id, patch);
+  saveState();
+  closeSchedItem();
+  refreshScheduleUI();
+  if (currentInfoId === old.id && isOpen('modal-backdrop')) fillNotesSection(old.id);
+}
+function schedItemRemove() { if (schedEdit) removeScheduleItem(schedEdit.day, schedEdit.index); }
+function schedItemInfo() {
+  const it = schedEdit && state.schedule[schedEdit.day]?.[schedEdit.index];
+  if (!it) return;
+  closeSchedItem();
+  openModal({ stopPropagation() {} }, it.id);
+}
+function schedItemStatus() {
+  const it = schedEdit && state.schedule[schedEdit.day]?.[schedEdit.index];
+  if (!it) return;
+  closeSchedItem();
+  openStatusModal(it.id);
+}
+
+/* Compartir solo el horario del plan activo */
+function buildSchedShareCode() {
+  const terms = {};
+  DAYS.forEach(d => (state.schedule[d] || []).forEach(it => { const t = state.notes[it.id]?.term; if (t) terms[it.id] = t; }));
+  return 'sched1|' + btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, plan: state.activePlan, s: state.schedule, t: terms }))));
+}
+function openSchedShare() {
+  $id('sched-share-title').textContent = `Plan ${state.activePlan} · ${planCount(state.activePlan)} bloque(s)`;
+  $id('sched-share-code').value = planCount(state.activePlan) ? buildSchedShareCode() : '';
+  $id('sched-share-import').value = '';
+  openBox('sched-share-modal');
+}
+function closeSchedShare(e) { closeBox('sched-share-modal', e); }
+function copySchedShare() {
+  const ta = $id('sched-share-code');
+  if (!ta.value) { showToast('No hay horarios para compartir en este plan', false); return; }
+  const ok = () => showToast('Código copiado', false);
+  if (navigator.clipboard) navigator.clipboard.writeText(ta.value).then(ok, () => { ta.select(); document.execCommand('copy'); ok(); });
+  else { ta.select(); document.execCommand('copy'); ok(); }
+}
+function shareSchedWhatsApp() {
+  const code = $id('sched-share-code').value;
+  if (!code) { showToast('No hay horarios para compartir en este plan', false); return; }
+  const msg = `Mis horarios (Plan ${state.activePlan}) del Planificador ISFD N°100:\n\n${code}\n\nPara cargarlos: Horarios → 🤝 Compartir → pegar el código en "Importar".`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
+}
+async function importSchedShare() {
+  const raw = $id('sched-share-import').value.trim().replace(/\s+/g, '');
+  let data = null;
+  try { if (raw.startsWith('sched1|')) data = JSON.parse(decodeURIComponent(escape(atob(raw.slice(7))))); } catch (e) { data = null; }
+  if (!data || typeof data !== 'object') { showAlert('⚠️ Código inválido', 'El código no es de un horario compartido (tiene que empezar con <b>sched1|</b>).'); return; }
+  const sched = sanitizeSchedule(data.s);
+  const total = DAYS.reduce((a, d) => a + sched[d].length, 0);
+  if (!total) { showAlert('⚠️ Atención', 'El código no contiene bloques horarios.'); return; }
+  if (planCount(state.activePlan) && !(await showConfirm(`Esto reemplaza los ${planCount(state.activePlan)} bloque(s) del Plan ${state.activePlan} por ${total} del código. Tus notas y materias aprobadas no se tocan. ¿Continuar?`, 'Importar'))) return;
+  pushUndo('Horario importado');
+  state.schedule = sched;
+  const t = data.t && typeof data.t === 'object' ? data.t : {};
+  Object.keys(t).forEach(id => { if (SUBJECT_BY_ID[id] && SUBJECT_BY_ID[id].regimen !== 'Anual' && ['1', '2', 'B'].includes(t[id])) setNote(id, { term: t[id] }); });
+  saveState();
+  closeSchedShare();
+  refreshScheduleUI();
+  showToast(`Horario cargado en el Plan ${state.activePlan}`, false);
 }
 
 /* ── Exportar horarios como imagen ── */
@@ -3358,10 +3861,12 @@ function drawScheduleCanvas(view) {
       const nameLines = wrapText(measure, it.subject.name, colW - px * 2 - 8, 3);
       measure.font = `12px ${FONT}`;
       const extra = [];
+      extra.push(fitText(measure, `${MODS[it.mod].label}${it.reg ? ' · ' + REGS[it.reg].label : ''}`, colW - px * 2 - 8));
+      if (it.aula) extra.push(fitText(measure, `Aula: ${it.aula}`, colW - px * 2 - 8));
       if (it.room) extra.push(fitText(measure, `Classroom: ${it.room}`, colW - px * 2 - 8));
       if (it.teacher) extra.push(fitText(measure, `Docente: ${it.teacher}`, colW - px * 2 - 8));
       const termText = (view === 'all' && (it.term === '1' || it.term === '2' || it.term === 'B')) ? TERM_LABEL[it.term] : '';
-      const h = py * 2 + nameLines.length * 17 + 20 + extra.length * 16 + (termText ? 16 : 0) + (it.conflict ? 16 : 0);
+      const h = py * 2 + nameLines.length * 17 + 20 + extra.length * 16 + (termText ? 16 : 0) + (it.conflict || it.tolerated ? 16 : 0);
       return { it, nameLines, extra, termText, h };
     });
     return { day: d, cards };
@@ -3393,11 +3898,11 @@ function drawScheduleCanvas(view) {
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = '#ffffff';
   ctx.font = `900 26px ${FONT}`;
-  ctx.fillText('Horarios de cursada', pad, 44);
+  ctx.fillText(`Horarios de cursada · Plan ${state.activePlan}`, pad, 44);
   ctx.fillStyle = '#94a3b8';
   ctx.font = `600 13px ${FONT}`;
   const fecha = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
-  ctx.fillText(`${VIEW_LABEL[view]} · Profesorado en Economía · ISFD N°100`, pad, 68);
+  ctx.fillText(`${VIEW_LABEL[view]} · Profesorado en Economía · ISFD N°100 · ${fmtMin(items.reduce((a, i) => a + (i.range ? i.range.end - i.range.start : 0), 0))} semanales`, pad, 68);
   ctx.fillText((state.student ? `Alumno/a: ${fitText(ctx, state.student, 420)} · ` : '') + `Emitido el ${fecha}`, pad, 88);
 
   layout.forEach((col, ci) => {
@@ -3421,13 +3926,13 @@ function drawScheduleCanvas(view) {
       ctx.fillStyle = 'rgba(15,23,42,0.06)';
       roundRect(ctx, x, y + 2, colW, k.h, 10);
       ctx.fill();
-      ctx.fillStyle = k.it.conflict ? '#fef2f2' : '#ffffff';
+      ctx.fillStyle = k.it.conflict ? '#fef2f2' : k.it.tolerated ? '#fffbeb' : '#ffffff';
       roundRect(ctx, x, y, colW, k.h, 10);
       ctx.fill();
       ctx.strokeStyle = '#e2e8f0';
       ctx.lineWidth = 1;
       ctx.stroke();
-      ctx.fillStyle = k.it.conflict ? '#ef4444' : (CAMPO_HEX[k.it.subject.campo] || '#475569');
+      ctx.fillStyle = k.it.conflict ? '#ef4444' : k.it.tolerated ? '#f59e0b' : (CAMPO_HEX[k.it.subject.campo] || '#475569');
       roundRect(ctx, x, y, 7, k.h, 3);
       ctx.fill();
 
@@ -3443,7 +3948,8 @@ function drawScheduleCanvas(view) {
       ctx.font = `12px ${FONT}`;
       k.extra.forEach(l => { ctx.fillText(l, x + px + 6, ty); ty += 16; });
       if (k.termText) { ctx.fillStyle = '#475569'; ctx.fillText(k.termText, x + px + 6, ty); ty += 16; }
-      if (k.it.conflict) { ctx.fillStyle = '#dc2626'; ctx.font = `bold 12px ${FONT}`; ctx.fillText('¡Se superpone con otra materia!', x + px + 6, ty); }
+      if (k.it.conflict) { ctx.fillStyle = '#dc2626'; ctx.font = `bold 12px ${FONT}`; ctx.fillText(`¡Se superpone ${k.it.overlaps[0].mins}m con otra!`, x + px + 6, ty); }
+      else if (k.it.tolerated) { ctx.fillStyle = '#b45309'; ctx.font = `bold 12px ${FONT}`; ctx.fillText(`Cruce acordado · ${k.it.overlaps[0].mins}m`, x + px + 6, ty); }
       y += k.h + cardGap;
     });
   });
@@ -3473,7 +3979,7 @@ function icsFold(line) {
 }
 function icsStamp(ms) { return new Date(ms).toISOString().slice(0, 19).replace(/[-:]/g, ''); }   // hora "flotante": los campos UTC se usan como reloj local
 function buildICS(opts) {
-  const { view, startISO, endISO, includeExams } = opts;
+  const { view, startISO, endISO, includeExams, alarm = 0 } = opts;
   const TZ = 'America/Argentina/Buenos_Aires';
   const lines = [];
   const add = l => lines.push(icsFold(l));
@@ -3510,17 +4016,29 @@ function buildICS(opts) {
     if (first > endISO) { skippedRange++; return; }
     const hm = m => `${pad2(Math.floor(m / 60))}${pad2(m % 60)}00`;
     const d0 = first.replace(/-/g, '');
-    const desc = [];
+    const desc = [`Plan ${state.activePlan}`];
     if (it.teacher) desc.push(`Docente: ${it.teacher}`);
-        add('BEGIN:VEVENT');
+    if (it.aula) desc.push(`Aula: ${it.aula}`);
+    if (it.room) desc.push(`Classroom: ${it.room}`);
+    desc.push(`Modalidad: ${MODS[it.mod].label}`);
+    if (it.reg) desc.push(`Régimen: ${REGS[it.reg].label}`);
+    const loc = [it.aula, it.room ? 'Classroom ' + it.room : ''].filter(Boolean).join(' · ');
+    add('BEGIN:VEVENT');
     add(`UID:${nextUid()}`);
     add(`DTSTAMP:${now}`);
     add(`DTSTART;TZID=${TZ}:${d0}T${hm(it.range.start)}`);
     add(`DTEND;TZID=${TZ}:${d0}T${hm(it.range.end)}`);
     add(`RRULE:FREQ=WEEKLY;UNTIL=${until}`);
     add(`SUMMARY:${icsEscape(it.subject.name)}`);
-    if (it.room) add(`LOCATION:${icsEscape(it.room)}`);
-    if (desc.length) add(`DESCRIPTION:${icsEscape(desc.join('\n'))}`);
+    if (loc) add(`LOCATION:${icsEscape(loc)}`);
+    add(`DESCRIPTION:${icsEscape(desc.join('\n'))}`);
+    if (alarm > 0) {
+      add('BEGIN:VALARM');
+      add('ACTION:DISPLAY');
+      add(`DESCRIPTION:${icsEscape('Clase: ' + it.subject.name)}`);
+      add(`TRIGGER:-PT${alarm}M`);
+      add('END:VALARM');
+    }
     add('END:VEVENT');
     events++;
   });
@@ -3572,7 +4090,8 @@ function generateCalendar() {
   const includeExams = document.getElementById('cal-exams').checked;
   if (!isValidISO(startISO) || !isValidISO(endISO)) { showAlert('⚠️ Atención', 'Completá las fechas de inicio y de fin del período.'); return; }
   if (endISO < startISO) { showAlert('⚠️ Atención', 'La fecha final tiene que ser posterior a la inicial.'); return; }
-  const r = buildICS({ view, startISO, endISO, includeExams });
+  const alarm = parseInt(document.getElementById('cal-alarm').value, 10) || 0;
+  const r = buildICS({ view, startISO, endISO, includeExams, alarm });
   if (r.events + r.examCount === 0) {
     showAlert('⚠️ Atención', 'No hay nada para exportar: cargá horarios con hora de inicio y fin' + (includeExams ? ' o mesas con fecha' : '') + '.');
     return;
@@ -3591,7 +4110,7 @@ function generateCalendar() {
 function downloadBackup() {
   const payload = {
     app: BACKUP_APP, version: 1, exportedAt: new Date().toISOString(),
-    data: { student: state.student, userSubjects: state.userSubjects, schedule: state.schedule, exams: state.exams, notes: state.notes }
+    data: { student: state.student, userSubjects: state.userSubjects, schedule: state.schedule, schedulePlans: state.schedulePlans, activePlan: state.activePlan, exams: state.exams, notes: state.notes }
   };
   const slug = fileSlug(state.student);
   downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }), `Respaldo-ISFD100-${slug ? slug + '-' : ''}${todayISO()}.json`);
@@ -3618,7 +4137,8 @@ async function applyBackup(obj) {
     || DAYS.some(day => (state.schedule[day] || []).length > 0);
   if (hasData && !(await showConfirm('Esto reemplaza todo lo que tenés cargado (progreso, horarios, mesas y notas) por el contenido del respaldo. ¿Continuar?'))) return;
   pushUndo('Respaldo cargado');
-  state.userSubjects = next.u; state.schedule = next.s; state.exams = next.e; state.notes = next.n;
+  state.userSubjects = next.u; state.exams = next.e; state.notes = next.n;
+  if (d.schedulePlans) { state.schedulePlans = sanitizePlans(d.schedulePlans); if (PLANS.includes(d.activePlan)) state.activePlan = d.activePlan; } else state.schedule = next.s;
   state.student = nextStudent;
   saveState();
   refreshAll();
@@ -3675,12 +4195,12 @@ function buildPrintReport(opts) {
   if (opts.horarios) {
     const view = state.scheduleView;
     const items = collectScheduleItems(view).sort(sortScheduleItems);
-    h += `<h2>Horarios de cursada <span class="muted">(${esc(VIEW_LABEL[view])})</span></h2>`;
+    h += `<h2>Horarios de cursada <span class="muted">(${esc(VIEW_LABEL[view])} · Plan ${state.activePlan} · ${fmtMin(items.reduce((a, i) => a + (i.range ? i.range.end - i.range.start : 0), 0))} semanales)</span></h2>`;
     if (!items.length) h += '<p class="muted">No hay horarios cargados en este período.</p>';
     else {
-      h += '<table><tr><th>Día</th><th>Horario</th><th>Materia</th><th>Período</th><th>Classroom</th><th>Docente</th></tr>';
+      h += '<table><tr><th>Día</th><th>Horario</th><th>Materia</th><th>Período</th><th>Aula</th><th>Modalidad</th><th>Régimen</th><th>Classroom</th><th>Docente</th></tr>';
       items.forEach(it => {
-        h += `<tr><td>${esc(it.day)}</td><td>${esc(it.time)}${it.conflict ? ' ⚠' : ''}</td><td>${esc(it.subject.name)}</td><td>${esc(TERM_LABEL[it.term])}</td><td>${esc(it.room)}</td><td>${esc(it.teacher)}</td></tr>`;
+        h += `<tr><td>${esc(it.day)}</td><td>${esc(it.time)}${it.conflict ? ' ⚠' : it.tolerated ? ' 🤝' : ''}</td><td>${esc(it.subject.name)}</td><td>${esc(TERM_LABEL[it.term])}</td><td>${esc(it.aula)}</td><td>${esc(MODS[it.mod].label)}</td><td>${esc(it.reg ? REGS[it.reg].label : '')}</td><td>${esc(it.room)}</td><td>${esc(it.teacher)}</td></tr>`;
       });
       h += '</table>';
     }
