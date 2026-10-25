@@ -421,7 +421,8 @@
 
     /* ── Rediseño: tarjetas limpias, fondo liso, nav inferior ── */
     body, html.dark body { background-image: none !important; }
-    #app-header { background-image: none !important; }
+    #app-header { background: #0f172a !important; }
+    html.dark #app-header { background: #020617 !important; }
     .subject-card { background: #fff !important; border: 1px solid #e2e8f0 !important; border-left-width: 5px !important; box-shadow: 0 1px 2px rgba(15,23,42,.05) !important; }
     .subject-card h3 { color: #0f172a !important; }
     .subject-card .subtitle { color: #64748b !important; }
@@ -443,8 +444,8 @@
     #bottom-nav { display: none; }
     @media (max-width: 639px) {
       .nav-dup { display: none !important; }
-      body { padding-bottom: calc(58px + env(safe-area-inset-bottom)); }
-      #bottom-nav { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-top: 1px solid #e2e8f0; padding-bottom: env(safe-area-inset-bottom); }
+      body { padding-bottom: calc(74px + env(safe-area-inset-bottom)); }
+      #bottom-nav { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-top: 1px solid #e2e8f0; padding-bottom: calc(env(safe-area-inset-bottom) + 14px); }
       #bottom-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 6px; font-size: 10px; font-weight: 700; color: #475569; }
       #bottom-nav button span { font-size: 18px; line-height: 1; }
       html.dark #bottom-nav { background: rgba(2,6,23,.96); border-color: #1e293b; }
