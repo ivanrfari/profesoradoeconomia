@@ -444,6 +444,7 @@
     #progress-strip, #toolbar-row { max-height: 90px; transition: max-height .25s ease, opacity .2s ease, padding .25s ease; }
     body.toolbar-collapsed #progress-strip, body.toolbar-collapsed #toolbar-row { max-height: 0 !important; opacity: 0; padding-top: 0 !important; padding-bottom: 0 !important; overflow: hidden; border-width: 0; pointer-events: none; }
     @media (max-width: 639px) { #btn-top { bottom: calc(92px + env(safe-area-inset-bottom)) !important; } }
+    body.toolbar-collapsed #toolbar-wrap { gap: 0 !important; padding-top: .4rem !important; padding-bottom: .4rem !important; }
     #bottom-nav { display: none; }
     @media (max-width: 639px) {
       .nav-dup { display: none !important; }
@@ -979,7 +980,7 @@
   ══════════════════════════════════════════ -->
   <div class="sticky top-0 z-20 flex flex-col shadow-sm">
     <div class="bg-white/95 backdrop-blur-md border-b border-slate-200">
-      <div class="max-w-screen-2xl mx-auto px-4 py-3 flex flex-col lg:flex-row gap-3 items-center justify-between">
+      <div id="toolbar-wrap" class="max-w-screen-2xl mx-auto px-4 py-3 flex flex-col lg:flex-row gap-3 items-center justify-between transition-[padding,gap] duration-200">
         
         <div class="flex w-full lg:w-auto flex-1 gap-3">
           <div class="relative flex-1">
