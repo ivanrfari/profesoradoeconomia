@@ -268,6 +268,15 @@
     /* ── Pestañas del planificador ── */
     .sched-tab { font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 10px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; transition: all 0.15s; }
     .sched-tab:hover { background: #f1f5f9; }
+    .sched-seg { background: #e2e8f0; }
+    .sched-seg button { padding: 6px 10px; border-radius: .6rem; font-size: 11px; font-weight: 700; color: #475569; white-space: nowrap; transition: background-color .15s, color .15s; }
+    .sched-seg button:hover { background: rgba(255,255,255,.65); }
+    .sched-seg button.active { background: #2563eb; color: #fff; box-shadow: 0 1px 3px rgba(15,23,42,.25); }
+    @media (min-width: 640px) { .sched-seg button { padding: 6px 14px; font-size: 12px; } }
+    html.dark .sched-seg { background: #1e293b; }
+    html.dark .sched-seg button { color: #cbd5e1; }
+    html.dark .sched-seg button:hover { background: rgba(255,255,255,.08); }
+    html.dark .sched-seg button.active { background: #2563eb; color: #fff; }
     .btn-primary { border-radius: .75rem; font-size: .875rem; font-weight: 700; color: #fff; background-color: #2563eb; box-shadow: 0 1px 3px rgba(15,23,42,.18); transition: background-color .15s; }
     .btn-primary:hover { background-color: #1d4ed8; }
     .btn-secondary { border-radius: .75rem; font-size: .875rem; font-weight: 700; color: #475569; background-color: #f1f5f9; transition: background-color .15s; }
@@ -626,14 +635,16 @@
           <button onclick="closeSchedule()" aria-label="Cerrar" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
         </div>
       </div>
-      <div id="sched-tabs" class="px-4 pt-3 pb-1 bg-slate-50 flex items-center gap-2 flex-wrap shrink-0">
-        <button class="sched-tab active" data-view="all" onclick="setScheduleView('all')">Todo el año</button>
-        <button class="sched-tab" data-view="1" onclick="setScheduleView('1')">1° cuat.</button>
-        <button class="sched-tab" data-view="2" onclick="setScheduleView('2')">2° cuat.</button>
-        <div id="sched-modes" class="flex gap-1 ml-auto">
-          <button class="sched-tab" data-mode="columns" onclick="setSchedMode('columns')" title="Columnas de Lunes a Sábado" aria-label="Vista en columnas">🗓️</button>
-          <button class="sched-tab" data-mode="agenda" onclick="setSchedMode('agenda')" title="Agenda por día" aria-label="Vista agenda">📱</button>
-          <button class="sched-tab" data-mode="timeline" onclick="setSchedMode('timeline')" title="Cronograma por horas" aria-label="Vista cronograma">⏱️</button>
+      <div id="sched-tabs" class="px-4 pt-3 pb-2 bg-slate-50 flex flex-col sm:flex-row sm:items-center gap-2 shrink-0">
+        <div class="flex gap-1.5 flex-wrap">
+          <button class="sched-tab active" data-view="all" onclick="setScheduleView('all')">Todo el año</button>
+          <button class="sched-tab" data-view="1" onclick="setScheduleView('1')">1° cuat.</button>
+          <button class="sched-tab" data-view="2" onclick="setScheduleView('2')">2° cuat.</button>
+        </div>
+        <div id="sched-modes" class="sched-seg grid grid-cols-3 gap-1 p-1 rounded-xl w-full sm:w-auto sm:ml-auto" role="group" aria-label="Forma de visualización">
+          <button data-mode="columns" onclick="setSchedMode('columns')" title="Columnas de Lunes a Sábado">🗓️ Columnas</button>
+          <button data-mode="agenda" onclick="setSchedMode('agenda')" title="Un día por vez, ideal para el celular">📱 Agenda</button>
+          <button data-mode="timeline" onclick="setSchedMode('timeline')" title="Cronograma proporcional por horas">⏱️ Cronograma</button>
         </div>
       </div>
       <div class="px-4 py-2 bg-slate-50 shrink-0">
