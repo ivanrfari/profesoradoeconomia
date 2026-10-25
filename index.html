@@ -890,14 +890,14 @@
   <!-- ══════════════════════════════════════════
        HEADER PRINCIPAL DASHBOARD
   ══════════════════════════════════════════ -->
-  <header id="app-header" class="text-white py-4 px-4 sm:px-6 shadow-xl relative z-30 transition-[padding] duration-300">
+  <header id="app-header" class="text-white py-2.5 px-4 sm:px-6 shadow-xl relative z-30 transition-[padding] duration-300">
     <div class="max-w-screen-2xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
       
       <div class="flex items-center justify-center lg:justify-start gap-4 w-full lg:w-auto">
         <img src="icon-192.png" alt="" class="w-11 h-11 rounded-xl shadow-md hidden sm:block shrink-0">
         <div class="flex-1 text-center lg:text-left">
-          <h1 id="app-title" class="text-[10px] sm:text-[11px] uppercase tracking-widest text-slate-300 font-bold">Planificador Curricular · DGCyE · ISFD N°100 · Economía</h1>
-          <button id="btn-student" onclick="openNameModal()" class="mt-2 inline-flex max-w-full items-center gap-2 text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3.5 py-1.5 rounded-full transition" title="Cambiar el nombre del alumno de este perfil">
+          <h1 id="app-title" class="text-[10px] sm:text-[11px] uppercase tracking-widest text-slate-300 font-bold">Planificador Curricular · ISFD N°100 · Economía</h1>
+          <button id="btn-student" onclick="openNameModal()" class="mt-1.5 inline-flex max-w-full items-center gap-2 text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3 py-1 rounded-full transition" title="Cambiar el nombre del alumno de este perfil">
             <span id="student-avatar" class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[9px] font-black shrink-0">👤</span>
             <span id="student-label" class="truncate">Agregar nombre del alumno</span>
             <span class="text-slate-400 shrink-0">✎</span>
@@ -905,11 +905,11 @@
         </div>
       </div>
       
-      <div class="flex justify-between sm:justify-end items-center gap-4 sm:gap-8 bg-slate-800/50 rounded-2xl px-5 py-4 border border-slate-700 w-full lg:w-auto">
+      <div class="flex justify-between sm:justify-end items-center gap-3 sm:gap-6 bg-slate-800/50 rounded-2xl px-4 py-2 border border-slate-700 w-full lg:w-auto">
         <div class="text-center sm:text-right flex flex-col flex-1 sm:flex-none">
           <p class="header-stat-label text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Promedio</p>
           <div class="flex items-baseline gap-1 justify-center sm:justify-end">
-            <span class="text-2xl sm:text-4xl font-black text-white font-mono tracking-tighter" id="promedio-label">-</span>
+            <span class="text-xl sm:text-3xl font-black text-white font-mono tracking-tighter" id="promedio-label">-</span>
           </div>
         </div>
 
@@ -918,7 +918,7 @@
         <div class="text-center sm:text-right flex flex-col flex-1 sm:flex-none">
           <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1" title="Horas con final aprobado sobre el total de horas del plan">Avance Global</p>
           <div class="flex items-baseline gap-1 justify-center sm:justify-end">
-            <span class="text-2xl sm:text-4xl font-black text-white font-mono tracking-tighter" id="pct-label">0</span>
+            <span class="text-xl sm:text-3xl font-black text-white font-mono tracking-tighter" id="pct-label">0</span>
             <span class="text-sm sm:text-lg font-bold text-blue-400">%</span>
           </div>
           <p class="text-[9px] text-slate-400 font-bold mt-0.5" id="pct-caption"></p>
@@ -929,7 +929,7 @@
         <div class="text-center sm:text-right flex flex-col flex-1 sm:flex-none">
           <p class="text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Carga Horaria</p>
           <div class="flex items-baseline gap-1 justify-center sm:justify-end">
-            <span class="text-2xl sm:text-4xl font-black text-white font-mono tracking-tighter" id="hs-count">0</span>
+            <span class="text-xl sm:text-3xl font-black text-white font-mono tracking-tighter" id="hs-count">0</span>
             <span id="hs-total" class="text-[10px] sm:text-xs font-bold text-slate-400">HS</span>
           </div>
         </div>
@@ -947,9 +947,9 @@
         
         <div class="flex w-full lg:w-auto flex-1 gap-3">
           <div class="relative flex-1">
-            <span class="absolute left-2.5 top-1.5 text-slate-400 text-sm">🔍</span>
-            <input type="text" id="search-input" placeholder="Buscar materia..." class="w-full pl-8 pr-7 py-1.5 text-sm rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-800 transition-all font-medium">
-            <button type="button" onclick="const i=document.getElementById('search-input'); i.value=''; i.dispatchEvent(new Event('input')); i.focus();" class="hidden absolute right-1.5 top-1 w-5 h-5 rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-600 text-sm" aria-label="Borrar búsqueda" id="search-clear">✕</button>
+            <span class="absolute left-2.5 top-1 text-slate-400 text-sm">🔍</span>
+            <input type="text" id="search-input" placeholder="Buscar materia..." class="w-full pl-8 pr-7 py-1 text-[13px] rounded-xl border border-slate-300 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-slate-800 transition-all font-medium">
+            <button type="button" onclick="const i=document.getElementById('search-input'); i.value=''; i.dispatchEvent(new Event('input')); i.focus();" class="hidden absolute right-1.5 top-0.5 w-5 h-5 rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-600 text-sm" aria-label="Borrar búsqueda" id="search-clear">✕</button>
           </div>
         </div>
 
