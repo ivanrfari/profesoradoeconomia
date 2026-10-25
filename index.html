@@ -610,64 +610,62 @@
   </div>
 
   <div id="schedule-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 hidden" onclick="closeSchedule(event)">
-    <div class="bg-white rounded-3xl w-full max-w-5xl h-[90vh] sm:h-[85vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation(); closePlanMenu()">
-      <div class="bg-slate-900 text-white px-4 py-3 sm:p-5 shrink-0">
-        <div class="flex justify-between items-center gap-2">
-          <h2 class="text-lg sm:text-xl font-black flex items-center gap-2 tracking-tight"><span>📅</span> Planificador de Horarios</h2>
-          <div class="flex items-center gap-1.5 sm:gap-2">
-            <button onclick="schedToEnCurso()" title="Pasar a En curso las materias habilitadas de este plan" class="text-xs bg-amber-400 text-slate-900 font-bold px-2.5 py-1.5 rounded-xl hover:bg-amber-300 transition">⚡ <span class="hidden sm:inline">Pasar a "En Curso"</span><span class="sm:hidden">En curso</span></button>
-            <button onclick="openSchedShare()" class="text-xs bg-white/15 hover:bg-white/25 text-white font-bold px-2.5 py-1.5 rounded-xl transition">🤝 <span class="hidden sm:inline">Compartir</span></button>
-            <button onclick="closeSchedule()" aria-label="Cerrar" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 flex-wrap mt-3">
-          <div id="sched-plans" class="flex gap-1.5 flex-wrap"></div>
+    <div class="bg-white rounded-3xl w-full max-w-5xl h-[90vh] sm:h-[85vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation(); closeSchedMenu()">
+      <div class="bg-slate-900 text-white px-4 py-3 sm:px-5 sm:py-4 shrink-0 flex justify-between items-center gap-2">
+        <h2 class="text-lg sm:text-xl font-black flex items-center gap-2 tracking-tight"><span>📅</span> Horarios</h2>
+        <div class="flex items-center gap-2">
           <div class="relative">
-            <button onclick="togglePlanMenu(event)" class="sched-tab">⚙️ Plan...</button>
-            <div id="sched-plan-menu" class="hidden absolute left-0 top-full mt-1 z-30 w-60 bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 overflow-hidden"></div>
+            <button onclick="toggleSchedMenu(event)" aria-label="Más opciones" class="bg-white/20 hover:bg-white/30 text-white h-8 px-3 rounded-full flex items-center justify-center text-sm font-black transition">⋯</button>
+            <div id="sched-menu" class="hidden absolute right-0 top-full mt-2 z-30 w-64 bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 overflow-hidden">
+              <button onclick="closeSchedMenu(); exportScheduleImage()" class="block w-full text-left px-3 py-2.5 text-xs font-bold hover:bg-slate-100 transition">🖼️ Guardar como imagen</button>
+              <button onclick="closeSchedMenu(); openCalModal()" class="block w-full text-left px-3 py-2.5 text-xs font-bold hover:bg-slate-100 transition">📆 Agregar al calendario</button>
+              <button onclick="closeSchedMenu(); openSchedShare()" class="block w-full text-left px-3 py-2.5 text-xs font-bold hover:bg-slate-100 transition">🤝 Compartir horario</button>
+              <button onclick="closeSchedMenu(); schedToEnCurso()" class="block w-full text-left px-3 py-2.5 text-xs font-bold hover:bg-slate-100 transition">⚡ Pasar materias a "En curso"</button>
+            </div>
           </div>
+          <button onclick="closeSchedule()" aria-label="Cerrar" class="bg-white/20 hover:bg-white/30 text-white w-8 h-8 rounded-full flex items-center justify-center transition">✕</button>
         </div>
       </div>
       <div id="sched-tabs" class="px-4 pt-3 pb-1 bg-slate-50 flex items-center gap-2 flex-wrap shrink-0">
-        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 mr-1">Ver:</span>
         <button class="sched-tab active" data-view="all" onclick="setScheduleView('all')">Todo el año</button>
-        <button class="sched-tab" data-view="1" onclick="setScheduleView('1')">1° cuatrimestre</button>
-        <button class="sched-tab" data-view="2" onclick="setScheduleView('2')">2° cuatrimestre</button>
-        <div id="sched-modes" class="flex gap-1.5 sm:ml-3">
-          <button class="sched-tab" data-mode="columns" onclick="setSchedMode('columns')" title="Columnas de Lunes a Sábado">🗓️ Columnas</button>
-          <button class="sched-tab" data-mode="agenda" onclick="setSchedMode('agenda')" title="Agenda por día (celular)">📱 Agenda</button>
-          <button class="sched-tab" data-mode="timeline" onclick="setSchedMode('timeline')" title="Cronograma proporcional">⏱️ Cronograma</button>
-        </div>
-        <div class="ml-auto flex gap-2">
-          <button onclick="exportScheduleImage()" class="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition shadow-sm">🖼️ Imagen</button>
-          <button onclick="openCalModal()" class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1.5 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition shadow-sm">📆 Calendario</button>
+        <button class="sched-tab" data-view="1" onclick="setScheduleView('1')">1° cuat.</button>
+        <button class="sched-tab" data-view="2" onclick="setScheduleView('2')">2° cuat.</button>
+        <div id="sched-modes" class="flex gap-1 ml-auto">
+          <button class="sched-tab" data-mode="columns" onclick="setSchedMode('columns')" title="Columnas de Lunes a Sábado" aria-label="Vista en columnas">🗓️</button>
+          <button class="sched-tab" data-mode="agenda" onclick="setSchedMode('agenda')" title="Agenda por día" aria-label="Vista agenda">📱</button>
+          <button class="sched-tab" data-mode="timeline" onclick="setSchedMode('timeline')" title="Cronograma por horas" aria-label="Vista cronograma">⏱️</button>
         </div>
       </div>
-      <div id="sched-stats-bar" class="px-4 py-2 bg-slate-50 flex flex-wrap gap-2 text-[11px] shrink-0"></div>
-      <div class="bg-slate-50 border-b border-slate-200 shrink-0 max-h-[45%] overflow-y-auto" data-scroll-body>
+      <div class="px-4 py-2 bg-slate-50 shrink-0">
+        <div id="sched-stats-bar" class="flex flex-wrap gap-2 text-[11px]"></div>
+        <p id="sched-stats-detail" class="text-[10px] text-slate-400 font-medium mt-1.5"></p>
+      </div>
+      <div class="bg-slate-50 border-b border-slate-200 shrink-0 max-h-[50%] overflow-y-auto" data-scroll-body>
         <button id="sched-form-toggle" onclick="toggleSchedForm()" class="sm:hidden w-full text-left px-4 py-2.5 text-xs font-black uppercase tracking-wide text-blue-700 flex items-center justify-between">➕ Agregar horario <span id="sched-form-caret">▾</span></button>
         <div id="sched-form" class="hidden sm:block px-4 pb-4 pt-2 sm:pt-3 space-y-3">
-          <div class="flex flex-col sm:flex-row gap-3">
-            <select id="sched-subject" class="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none truncate"></select>
-            <label class="flex items-center gap-2 text-xs font-bold text-violet-700 cursor-pointer shrink-0"><input type="checkbox" id="sched-sim" onchange="buildScheduleOptions()" class="w-4 h-4 accent-violet-600"> 🔮 Simular</label>
-          </div>
-          <div class="flex flex-wrap gap-3 items-center">
-            <select id="sched-day" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none">
+          <select id="sched-subject" aria-label="Materia" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none truncate"></select>
+          <div class="flex flex-wrap gap-2 items-center">
+            <select id="sched-day" aria-label="Día" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
               <option value="Lunes">Lunes</option><option value="Martes">Martes</option><option value="Miércoles">Miércoles</option><option value="Jueves">Jueves</option><option value="Viernes">Viernes</option><option value="Sábado">Sábado</option>
             </select>
-            <div class="flex items-center gap-1.5 flex-1 sm:flex-none">
-              <input type="time" id="sched-start" aria-label="Hora de inicio" class="min-w-0 flex-1 sm:w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
-              <span class="text-xs font-bold text-slate-400">a</span>
-              <input type="time" id="sched-end" aria-label="Hora de fin" class="min-w-0 flex-1 sm:w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
-            </div>
+            <input type="time" id="sched-start" aria-label="Hora de inicio" class="min-w-0 flex-1 sm:flex-none sm:w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            <span class="text-xs font-bold text-slate-400">a</span>
+            <input type="time" id="sched-end" aria-label="Hora de fin" class="min-w-0 flex-1 sm:flex-none sm:w-28 px-2 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            <button onclick="addScheduleItem()" class="btn-primary w-full sm:w-auto sm:ml-auto px-5 py-2">Agregar</button>
           </div>
           <div id="sched-quick" class="flex flex-wrap gap-1.5"></div>
-          <div class="flex flex-wrap gap-3 items-center">
-            <select id="sched-mod" aria-label="Modalidad" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none"><option value="pres">🏫 Presencial</option><option value="virt">💻 Virtual</option><option value="contra">🎒 Contraturno / Práctica</option></select>
-            <select id="sched-reg" aria-label="Régimen de cursada" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none"><option value="">Régimen...</option><option value="promo">✨ Promocional</option><option value="final">📝 Con Final</option><option value="libre">🆓 Libre</option></select>
-            <input type="text" id="sched-aula" maxlength="40" placeholder="Aula (ej: Aula 12)" aria-label="Aula física" class="min-w-0 flex-1 sm:w-40 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
-            <label class="flex items-center gap-2 text-xs font-bold text-amber-700 cursor-pointer"><input type="checkbox" id="sched-forced" class="w-4 h-4 accent-amber-500"> 🤝 Superposición acordada</label>
-            <button onclick="addScheduleItem()" class="btn-primary w-full sm:w-auto px-4 py-2">Agregar</button>
+          <button type="button" onclick="toggleSchedMore()" class="text-[11px] font-bold text-slate-500 hover:text-slate-700 transition">Más opciones <span id="sched-more-caret">▾</span></button>
+          <div id="sched-more" class="hidden space-y-3">
+            <div class="flex flex-wrap gap-2 items-center">
+              <select id="sched-mod" aria-label="Modalidad" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none"><option value="pres">🏫 Presencial</option><option value="virt">💻 Virtual</option><option value="contra">🎒 Contraturno / Práctica</option></select>
+              <select id="sched-reg" aria-label="Régimen de cursada" class="px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none flex-1 sm:flex-none"><option value="">Régimen...</option><option value="promo">✨ Promocional</option><option value="final">📝 Con Final</option><option value="libre">🆓 Libre</option></select>
+              <input type="text" id="sched-aula" maxlength="40" placeholder="Aula (ej: Aula 12)" aria-label="Aula física" class="min-w-0 flex-1 sm:w-40 px-3 py-2 rounded-xl border border-slate-300 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+            </div>
+            <div id="sched-quick-contra" class="flex flex-wrap gap-1.5"></div>
+            <div class="flex flex-wrap gap-4">
+              <label class="flex items-center gap-2 text-xs font-bold text-amber-700 cursor-pointer"><input type="checkbox" id="sched-forced" class="w-4 h-4 accent-amber-500"> 🤝 Superposición acordada</label>
+              <label class="flex items-center gap-2 text-xs font-bold text-violet-700 cursor-pointer"><input type="checkbox" id="sched-sim" onchange="buildScheduleOptions()" class="w-4 h-4 accent-violet-600"> 🔮 Simular materias bloqueadas</label>
+            </div>
           </div>
         </div>
       </div>
@@ -720,13 +718,13 @@
         <button onclick="closeSchedShare()" aria-label="Cerrar" class="shrink-0 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">✕</button>
       </div>
       <div class="px-5 pb-5 space-y-3 overflow-y-auto" data-scroll-body>
-        <p class="text-xs text-slate-500 leading-relaxed">Comparte <b>solo</b> los horarios del plan activo y los cuatrimestres: quien lo importe no pierde sus notas ni sus materias aprobadas.</p>
+        <p class="text-xs text-slate-500 leading-relaxed">Comparte <b>solo</b> tus horarios y los cuatrimestres: quien lo importe no pierde sus notas ni sus materias aprobadas.</p>
         <textarea id="sched-share-code" readonly rows="3" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-[11px] font-mono outline-none resize-none"></textarea>
         <div class="grid grid-cols-2 gap-2"><button onclick="copySchedShare()" class="btn-secondary px-3 py-2.5 text-xs">📋 Copiar código</button><button onclick="shareSchedWhatsApp()" class="btn-primary px-3 py-2.5 text-xs">💬 WhatsApp</button></div>
         <div class="pt-3 border-t border-slate-200 space-y-2">
           <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Importar el horario de un compañero</p>
           <textarea id="sched-share-import" rows="3" placeholder="Pegá acá el código (sched1|...)" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-[11px] font-mono outline-none resize-none"></textarea>
-          <button onclick="importSchedShare()" class="btn-primary w-full px-3 py-2.5">Importar al plan activo</button>
+          <button onclick="importSchedShare()" class="btn-primary w-full px-3 py-2.5">Importar horario</button>
         </div>
       </div>
     </div>
@@ -1608,7 +1606,6 @@ function init() {
     if (savedSchedule) state.schedulePlans.A = sanitizeSchedule(savedSchedule);
   }
   const savedPlan = safeGet('isfd100_plan_activo');
-  if (PLANS.includes(savedPlan)) state.activePlan = savedPlan;
   const savedMode = safeGet('isfd100_sched_mode');
   state.schedMode = ['columns', 'agenda', 'timeline'].includes(savedMode) ? savedMode : (window.innerWidth < 640 ? 'agenda' : 'columns');
 
@@ -2426,7 +2423,8 @@ function openSchedule() {
   modal.classList.remove('hidden');
 
   state.schedDay = todayDayName() || DAYS[0];
-  $id('sched-quick').innerHTML = quickChipsHTML('sched');
+  $id('sched-quick').innerHTML = quickChipsHTML('sched', 'pres');
+  $id('sched-quick-contra').innerHTML = quickChipsHTML('sched', 'contra');
   $id('schedi-quick').innerHTML = quickChipsHTML('schedi');
   updateSchedTabs();
   buildScheduleOptions();
@@ -2444,7 +2442,7 @@ function openSchedule() {
 function closeSchedule(e) {
   if (e && e.target !== document.getElementById('schedule-modal') && e.type === 'click') return;
   clearInterval(__schedRadarTimer);
-  closePlanMenu();
+  closeSchedMenu();
   const modal = document.getElementById('schedule-modal');
   modal.children[0].classList.remove('scale-100');
   modal.children[0].classList.add('scale-95');
@@ -2925,7 +2923,7 @@ function undoLast() {
   if (!entry) { showToast('No hay nada para deshacer', false); return; }
   const d = JSON.parse(entry.data);
   state.userSubjects = sanitizeUserSubjects(d.u);
-  if (d.p) { state.schedulePlans = sanitizePlans(d.p); if (PLANS.includes(d.ap)) state.activePlan = d.ap; } else state.schedule = sanitizeSchedule(d.s);
+  if (d.p) { state.schedulePlans = sanitizePlans(d.p); } else state.schedule = sanitizeSchedule(d.s);
   state.exams = sanitizeExams(d.e);
   state.notes = sanitizeNotes(d.n);
   state.student = sanitizeStudent(d.a);
@@ -3288,7 +3286,7 @@ function renderCardExtras(subject) {
   if (stt === 'en_curso' || stt === 'recursar' || (!u && isSubjectEnabled(subject.id))) {
     const blocks = [];
     DAYS.forEach(d => (state.schedule[d] || []).forEach(it => { if (it.id === subject.id && parseTimeRange(it.time)) blocks.push(`${DAY_ABBR[d]} ${esc(it.time)}`); }));
-    if (blocks.length) chips.push(`<span class="card-chip sched" title="Horario del Plan ${state.activePlan}">🕒 ${blocks.slice(0, 2).join(' · ')}${blocks.length > 2 ? ' +' + (blocks.length - 2) : ''}</span>`);
+    if (blocks.length) chips.push(`<span class="card-chip sched" title="Horario cargado">🕒 ${blocks.slice(0, 2).join(' · ')}${blocks.length > 2 ? ' +' + (blocks.length - 2) : ''}</span>`);
   }
   if (note && (note.text || note.teacher || note.room)) {
     chips.push('<span class="card-chip" title="Tenés notas en esta materia">🗒️ Notas</span>');
@@ -3314,56 +3312,25 @@ const shortMod = m => (MODS[m] || MODS.pres).label.split(' ')[0];
 function todayDayName() { const d = new Date().getDay(); return d === 0 ? null : DAYS[d - 1]; }
 let __schedEntriesToday = [], __schedRadarTimer = null;
 
-/* Planes */
+/* Planes (internos): la app usa un único horario, siempre el plan A */
 function planCount(p) { return DAYS.reduce((a, d) => a + (state.schedulePlans[p]?.[d]?.length || 0), 0); }
-function renderPlanPills() {
-  $id('sched-plans').innerHTML = PLANS.map(p =>
-    `<button class="sched-tab ${p === state.activePlan ? 'active' : ''}" onclick="setActivePlan('${p}')">Plan ${p} (${planCount(p)})</button>`).join('');
-}
-function setActivePlan(p) {
-  if (!PLANS.includes(p)) return;
-  state.activePlan = p;
-  safeSet('isfd100_plan_activo', p);
-  safeSet('isfd100_horarios', JSON.stringify(state.schedule));
-  closePlanMenu();
-  refreshScheduleUI();
-}
-function closePlanMenu() { const m = $id('sched-plan-menu'); if (m) m.classList.add('hidden'); }
-function togglePlanMenu(e) {
+function closeSchedMenu() { const m = $id('sched-menu'); if (m) m.classList.add('hidden'); }
+function toggleSchedMenu(e) {
   if (e) e.stopPropagation();
-  const m = $id('sched-plan-menu');
-  if (!m.classList.contains('hidden')) { m.classList.add('hidden'); return; }
-  const item = 'block w-full text-left px-3 py-2.5 text-xs font-bold hover:bg-slate-100 transition';
-  m.innerHTML = PLANS.filter(p => p !== state.activePlan).map(p => `<button onclick="copyPlanTo('${p}')" class="${item}">📋 Copiar este plan en Plan ${p}</button>`).join('')
-    + `<button onclick="clearActivePlan()" class="${item} text-red-600 border-t border-slate-200">🗑️ Vaciar Plan ${state.activePlan}</button>`;
-  m.classList.remove('hidden');
+  const m = $id('sched-menu');
+  m.classList.toggle('hidden');
 }
-async function copyPlanTo(p) {
-  closePlanMenu();
-  const from = state.activePlan;
-  if (!planCount(from)) { showToast(`El Plan ${from} está vacío`, false); return; }
-  if (planCount(p) && !(await showConfirm(`El Plan ${p} ya tiene ${planCount(p)} bloque(s). ¿Reemplazarlo con una copia del Plan ${from}?`, 'Reemplazar'))) return;
-  pushUndo(`Plan ${from} copiado en Plan ${p}`);
-  state.schedulePlans[p] = sanitizeSchedule(JSON.parse(JSON.stringify(state.schedule)));
-  saveState();
-  refreshScheduleUI();
-}
-async function clearActivePlan() {
-  closePlanMenu();
-  const n = planCount(state.activePlan);
-  if (!n) { showToast(`El Plan ${state.activePlan} ya está vacío`, false); return; }
-  if (!(await showConfirm(`¿Vaciar el Plan ${state.activePlan}? Se van a quitar ${n} bloque(s) horario(s).`, 'Vaciar'))) return;
-  pushUndo(`Plan ${state.activePlan} vaciado`);
-  state.schedule = emptySchedule();
-  saveState();
-  refreshScheduleUI();
+function toggleSchedMore() {
+  const m = $id('sched-more');
+  m.classList.toggle('hidden');
+  $id('sched-more-caret').textContent = m.classList.contains('hidden') ? '▾' : '▴';
 }
 async function schedToEnCurso() {
   const ids = new Set();
   DAYS.forEach(d => (state.schedule[d] || []).forEach(it => ids.add(it.id)));
   const list = [...ids].map(id => SUBJECT_BY_ID[id]).filter(s => s && isSubjectEnabled(s.id) && !state.userSubjects[s.id]);
-  if (!list.length) { showAlert('ℹ️ Nada para pasar', `En el Plan ${state.activePlan} no hay materias habilitadas y sin estado asignado.`); return; }
-  if (!(await showConfirm(`Se van a pasar a <b>En curso</b> ${list.length} materia(s) del Plan ${state.activePlan}:<br><br>${list.map(s => '• ' + esc(s.name)).join('<br>')}`, 'Pasar a En curso'))) return;
+  if (!list.length) { showAlert('ℹ️ Nada para pasar', 'En tu horario no hay materias habilitadas y sin estado asignado.'); return; }
+  if (!(await showConfirm(`Se van a pasar a <b>En curso</b> ${list.length} materia(s) de tu horario:<br><br>${list.map(s => '• ' + esc(s.name)).join('<br>')}`, 'Pasar a En curso'))) return;
   pushUndo(`${list.length} materia(s) → En curso`);
   list.forEach(s => { state.userSubjects[s.id] = { status: 'en_curso', grade: null }; });
   saveState();
@@ -3390,9 +3357,13 @@ function toggleSchedForm() {
   f.classList.toggle('hidden');
   $id('sched-form-caret').textContent = f.classList.contains('hidden') ? '▾' : '▴';
 }
-function quickChipsHTML(prefix) {
+function quickChipsHTML(prefix, kind = 'all') {
   const chip = (s, e, mod) => `<button type="button" onclick="setQuickTime('${prefix}','${s}','${e}'${mod ? `,'${mod}'` : ''})" class="text-[11px] font-bold px-2 py-1 rounded-lg border border-slate-300 bg-white text-slate-600 hover:bg-blue-50 hover:border-blue-300 transition">${s}–${e}</button>`;
-  return QUICK_PRES.map(([s, e]) => chip(s, e)).join('') + '<span class="text-[10px] text-slate-400 font-bold self-center px-1">🎒</span>' + QUICK_CONTRA.map(([s, e]) => chip(s, e, 'contra')).join('');
+  const pres = QUICK_PRES.map(([s, e]) => chip(s, e)).join('');
+  const contra = QUICK_CONTRA.map(([s, e]) => chip(s, e, 'contra')).join('');
+  if (kind === 'pres') return pres;
+  if (kind === 'contra') return '<span class="text-[10px] text-slate-400 font-bold self-center px-1">🎒 Contraturno</span>' + contra;
+  return pres + '<span class="text-[10px] text-slate-400 font-bold self-center px-1">🎒</span>' + contra;
 }
 function setQuickTime(prefix, s, e, mod) {
   $id(prefix + '-start').value = s;
@@ -3517,9 +3488,10 @@ function renderSchedStats(items) {
   $id('sched-stats-bar').innerHTML =
     `<span class="${pill} ${light[2]}">${light[0]} ${light[1]}</span>`
     + `<span class="${pill} bg-white text-slate-700 border-slate-200">⏱️ ${mins ? fmtMin(mins) : '0h'} / semana</span>`
-    + `<span class="${pill} bg-white text-slate-700 border-slate-200">📚 ${list.length} materia${list.length === 1 ? '' : 's'}${list.length ? ` · ${anual} anual${anual === 1 ? '' : 'es'} · ${list.length - anual} cuat. · 🔥 ${crit} crítica${crit === 1 ? '' : 's'}` : ''}</span>`
-    + (busiest && busiest[1] ? `<span class="${pill} bg-white text-slate-700 border-slate-200">📆 Más cargado: ${busiest[0]} (${fmtMin(busiest[1])})</span>` : '')
-    + `<span class="${pill} ${alerts ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-white text-slate-500 border-slate-200'}">⚠️ ${alerts} alerta${alerts === 1 ? '' : 's'}</span>`;
+    + (alerts ? `<span class="${pill} bg-amber-50 text-amber-700 border-amber-200">⚠️ ${alerts} alerta${alerts === 1 ? '' : 's'}</span>` : '');
+  $id('sched-stats-detail').textContent = list.length
+    ? `${list.length} materia${list.length === 1 ? '' : 's'} · ${anual} anual${anual === 1 ? '' : 'es'} · ${list.length - anual} cuatrimestral${list.length - anual === 1 ? '' : 'es'} · ${crit} ruta crítica${busiest && busiest[1] ? ' · Más cargado: ' + busiest[0] + ' (' + fmtMin(busiest[1]) + ')' : ''}`
+    : '';
 }
 
 /* Tarjetas y vistas */
@@ -3659,7 +3631,6 @@ function buildSchedModel(view) {
 }
 function renderScheduleGrid() {
   const model = buildSchedModel(state.scheduleView);
-  renderPlanPills();
   renderSchedStats(model.items);
   $id('schedule-grid').innerHTML = state.schedMode === 'agenda' ? renderAgendaView(model) : state.schedMode === 'timeline' ? renderTimelineView(model) : renderColumnsView(model);
 }
@@ -3775,7 +3746,7 @@ function buildSchedShareCode() {
   return 'sched1|' + btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, plan: state.activePlan, s: state.schedule, t: terms }))));
 }
 function openSchedShare() {
-  $id('sched-share-title').textContent = `Plan ${state.activePlan} · ${planCount(state.activePlan)} bloque(s)`;
+  $id('sched-share-title').textContent = `${planCount(state.activePlan)} bloque(s) horario(s)`;
   $id('sched-share-code').value = planCount(state.activePlan) ? buildSchedShareCode() : '';
   $id('sched-share-import').value = '';
   openBox('sched-share-modal');
@@ -3791,7 +3762,7 @@ function copySchedShare() {
 function shareSchedWhatsApp() {
   const code = $id('sched-share-code').value;
   if (!code) { showToast('No hay horarios para compartir en este plan', false); return; }
-  const msg = `Mis horarios (Plan ${state.activePlan}) del Planificador ISFD N°100:\n\n${code}\n\nPara cargarlos: Horarios → 🤝 Compartir → pegar el código en "Importar".`;
+  const msg = `Mis horarios del Planificador ISFD N°100:\n\n${code}\n\nPara cargarlos: Horarios → 🤝 Compartir → pegar el código en "Importar".`;
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
 }
 async function importSchedShare() {
@@ -3802,7 +3773,7 @@ async function importSchedShare() {
   const sched = sanitizeSchedule(data.s);
   const total = DAYS.reduce((a, d) => a + sched[d].length, 0);
   if (!total) { showAlert('⚠️ Atención', 'El código no contiene bloques horarios.'); return; }
-  if (planCount(state.activePlan) && !(await showConfirm(`Esto reemplaza los ${planCount(state.activePlan)} bloque(s) del Plan ${state.activePlan} por ${total} del código. Tus notas y materias aprobadas no se tocan. ¿Continuar?`, 'Importar'))) return;
+  if (planCount(state.activePlan) && !(await showConfirm(`Esto reemplaza los ${planCount(state.activePlan)} bloque(s) actuales por ${total} del código. Tus notas y materias aprobadas no se tocan. ¿Continuar?`, 'Importar'))) return;
   pushUndo('Horario importado');
   state.schedule = sched;
   const t = data.t && typeof data.t === 'object' ? data.t : {};
@@ -3810,7 +3781,7 @@ async function importSchedShare() {
   saveState();
   closeSchedShare();
   refreshScheduleUI();
-  showToast(`Horario cargado en el Plan ${state.activePlan}`, false);
+  showToast('Horario cargado', false);
 }
 
 /* ── Exportar horarios como imagen ── */
@@ -3898,7 +3869,7 @@ function drawScheduleCanvas(view) {
   ctx.textBaseline = 'alphabetic';
   ctx.fillStyle = '#ffffff';
   ctx.font = `900 26px ${FONT}`;
-  ctx.fillText(`Horarios de cursada · Plan ${state.activePlan}`, pad, 44);
+  ctx.fillText('Horarios de cursada', pad, 44);
   ctx.fillStyle = '#94a3b8';
   ctx.font = `600 13px ${FONT}`;
   const fecha = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -4016,7 +3987,7 @@ function buildICS(opts) {
     if (first > endISO) { skippedRange++; return; }
     const hm = m => `${pad2(Math.floor(m / 60))}${pad2(m % 60)}00`;
     const d0 = first.replace(/-/g, '');
-    const desc = [`Plan ${state.activePlan}`];
+    const desc = [];
     if (it.teacher) desc.push(`Docente: ${it.teacher}`);
     if (it.aula) desc.push(`Aula: ${it.aula}`);
     if (it.room) desc.push(`Classroom: ${it.room}`);
@@ -4138,7 +4109,7 @@ async function applyBackup(obj) {
   if (hasData && !(await showConfirm('Esto reemplaza todo lo que tenés cargado (progreso, horarios, mesas y notas) por el contenido del respaldo. ¿Continuar?'))) return;
   pushUndo('Respaldo cargado');
   state.userSubjects = next.u; state.exams = next.e; state.notes = next.n;
-  if (d.schedulePlans) { state.schedulePlans = sanitizePlans(d.schedulePlans); if (PLANS.includes(d.activePlan)) state.activePlan = d.activePlan; } else state.schedule = next.s;
+  if (d.schedulePlans) { state.schedulePlans = sanitizePlans(d.schedulePlans); } else state.schedule = next.s;
   state.student = nextStudent;
   saveState();
   refreshAll();
@@ -4195,7 +4166,7 @@ function buildPrintReport(opts) {
   if (opts.horarios) {
     const view = state.scheduleView;
     const items = collectScheduleItems(view).sort(sortScheduleItems);
-    h += `<h2>Horarios de cursada <span class="muted">(${esc(VIEW_LABEL[view])} · Plan ${state.activePlan} · ${fmtMin(items.reduce((a, i) => a + (i.range ? i.range.end - i.range.start : 0), 0))} semanales)</span></h2>`;
+    h += `<h2>Horarios de cursada <span class="muted">(${esc(VIEW_LABEL[view])} · ${fmtMin(items.reduce((a, i) => a + (i.range ? i.range.end - i.range.start : 0), 0))} semanales)</span></h2>`;
     if (!items.length) h += '<p class="muted">No hay horarios cargados en este período.</p>';
     else {
       h += '<table><tr><th>Día</th><th>Horario</th><th>Materia</th><th>Período</th><th>Aula</th><th>Modalidad</th><th>Régimen</th><th>Classroom</th><th>Docente</th></tr>';
