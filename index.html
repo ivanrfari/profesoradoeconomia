@@ -2276,8 +2276,14 @@ async function copySyncCode() {
   setTimeout(() => btn.innerText = 'Copiar', 2000);
 }
 
+// Permite pegar el mensaje completo de WhatsApp: busca adentro el código de sincronización.
+function extractSyncCode(text) {
+  const cands = (text.match(/[A-Za-z0-9+\/]{16,}={0,2}/g) || []).sort((a, b) => b.length - a.length);
+  for (const c of cands) { try { decodeShortCode(c); return c; } catch (e) {} }
+  return text;
+}
 async function importSyncCode() {
-  const val = document.getElementById('sync-import-code').value.trim();
+  const val = extractSyncCode(document.getElementById('sync-import-code').value.trim());
   if (!val) return;
 
   let data;
@@ -3764,7 +3770,8 @@ function shareSchedWhatsApp() {
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank', 'noopener');
 }
 async function importSchedShare() {
-  const raw = $id('sched-share-import').value.trim().replace(/\s+/g, '');
+  const txt = $id('sched-share-import').value.trim();
+  const raw = (txt.match(/sched1\|[A-Za-z0-9+\/=]+/) || [txt.replace(/\s+/g, '')])[0];
   let data = null;
   try { if (raw.startsWith('sched1|')) data = JSON.parse(decodeURIComponent(escape(atob(raw.slice(7))))); } catch (e) { data = null; }
   if (!data || typeof data !== 'object') { showAlert('⚠️ Código inválido', 'El código no es de un horario compartido (tiene que empezar con <b>sched1|</b>).'); return; }
