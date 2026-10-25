@@ -409,13 +409,8 @@
       background-image: linear-gradient(135deg, #1e293b 0%, #0f172a 60%), radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
       background-size: auto, 16px 16px;
     }
-    #app-title { font-weight: 800; }
-    @media (max-width: 639px) { #app-title { font-weight: 700; letter-spacing: -0.01em; } }
     #app-header { transition: padding 0.25s ease; }
-    #app-title { transition: transform 0.25s ease; transform-origin: center; will-change: transform; }
     #app-header.shrunk { padding-top: 0.6rem; padding-bottom: 0.6rem; }
-    #app-header.shrunk #app-title { transform: scale(0.75); }
-    @media (min-width: 1024px) { #app-title { transform-origin: left center; } }
     .header-stat-label, .progress-count-label { transition: opacity 0.2s ease; }
     #app-header.shrunk .header-stat-label { opacity: 0; }
     #progress-strip.shrunk .progress-count-label { opacity: 0; }
@@ -895,17 +890,14 @@
   <!-- ══════════════════════════════════════════
        HEADER PRINCIPAL DASHBOARD
   ══════════════════════════════════════════ -->
-  <header id="app-header" class="text-white py-6 px-4 sm:px-6 shadow-xl relative z-30 transition-[padding] duration-300">
-    <div class="max-w-screen-2xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
+  <header id="app-header" class="text-white py-4 px-4 sm:px-6 shadow-xl relative z-30 transition-[padding] duration-300">
+    <div class="max-w-screen-2xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-4">
       
       <div class="flex items-center justify-center lg:justify-start gap-4 w-full lg:w-auto">
         <img src="icon-192.png" alt="" class="w-11 h-11 rounded-xl shadow-md hidden sm:block shrink-0">
         <div class="flex-1 text-center lg:text-left">
-          <p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-1">DGCyE · ISFD N°100 · ECONOMÍA</p>
-          <h1 id="app-title" class="text-2xl sm:text-3xl font-black mt-0.5 tracking-tight text-white" style="font-family:'Sora',sans-serif">
-            Planificador Curricular
-          </h1>
-          <button id="btn-student" onclick="openNameModal()" class="mt-3 inline-flex max-w-full items-center gap-2 text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3.5 py-1.5 rounded-full transition" title="Cambiar el nombre del alumno de este perfil">
+          <h1 id="app-title" class="text-[10px] sm:text-[11px] uppercase tracking-widest text-slate-300 font-bold">Planificador Curricular · DGCyE · ISFD N°100 · Economía</h1>
+          <button id="btn-student" onclick="openNameModal()" class="mt-2 inline-flex max-w-full items-center gap-2 text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/20 text-white px-3.5 py-1.5 rounded-full transition" title="Cambiar el nombre del alumno de este perfil">
             <span id="student-avatar" class="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[9px] font-black shrink-0">👤</span>
             <span id="student-label" class="truncate">Agregar nombre del alumno</span>
             <span class="text-slate-400 shrink-0">✎</span>
