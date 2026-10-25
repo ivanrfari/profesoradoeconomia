@@ -418,6 +418,38 @@
     #progress-strip.shrunk > div { padding-top: .35rem; padding-bottom: .35rem; }
 
     /* ══════════ MODO OSCURO "AMOLED": negro puro + más contraste ══════════ */
+
+    /* ── Rediseño: tarjetas limpias, fondo liso, nav inferior ── */
+    body, html.dark body { background-image: none !important; }
+    #app-header { background-image: none !important; }
+    .subject-card { background: #fff !important; border: 1px solid #e2e8f0 !important; border-left-width: 5px !important; box-shadow: 0 1px 2px rgba(15,23,42,.05) !important; }
+    .subject-card h3 { color: #0f172a !important; }
+    .subject-card .subtitle { color: #64748b !important; }
+    .subject-card .card-divider { border-color: #f1f5f9 !important; }
+    .subject-card .info-btn { background: transparent !important; border: 1px solid #e2e8f0 !important; box-shadow: none !important; color: #475569 !important; }
+    .subject-card[data-state="approved"] { border-left-color: #0284c7 !important; }
+    .subject-card[data-state="approved"] .status-label { color: #0284c7 !important; }
+    .subject-card[data-state="en_curso"] { border-left-color: #9333ea !important; }
+    .subject-card[data-state="recursar"] { border-left-color: #ea580c !important; }
+    .subject-card[data-state="cursada"] { border-left-color: #0d9488 !important; }
+    .subject-card[data-state="enabled"] { border-left-color: #2563eb !important; }
+    .subject-card[data-state="locked"] { border-left-color: #cbd5e1 !important; opacity: .8; }
+    html.dark .subject-card { background: #0f172a !important; border-color: #1e293b !important; }
+    html.dark .subject-card h3 { color: #e2e8f0 !important; }
+    html.dark .subject-card .subtitle { color: #94a3b8 !important; }
+    html.dark .subject-card .card-divider { border-color: #1e293b !important; }
+    html.dark .subject-card .info-btn { border-color: #334155 !important; color: #cbd5e1 !important; }
+    html.dark .subject-card[data-state="approved"] .status-label { color: #38bdf8 !important; }
+    #bottom-nav { display: none; }
+    @media (max-width: 639px) {
+      .nav-dup { display: none !important; }
+      body { padding-bottom: calc(58px + env(safe-area-inset-bottom)); }
+      #bottom-nav { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-top: 1px solid #e2e8f0; padding-bottom: env(safe-area-inset-bottom); }
+      #bottom-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 6px; font-size: 10px; font-weight: 700; color: #475569; }
+      #bottom-nav button span { font-size: 18px; line-height: 1; }
+      html.dark #bottom-nav { background: rgba(2,6,23,.96); border-color: #1e293b; }
+      html.dark #bottom-nav button { color: #cbd5e1; }
+    }
     html.dark body { background-color: #000000; background-image: repeating-linear-gradient(135deg, #0d0d0d 0px, #0d0d0d 1px, transparent 1px, transparent 15px); }
     html.dark .bg-white, html.dark .bg-white\/95 { background-color: #000000; }
     html.dark .bg-slate-50 { background-color: #050505; }
@@ -905,7 +937,7 @@
         </div>
       </div>
       
-      <div class="flex justify-between sm:justify-end items-center gap-3 sm:gap-6 bg-slate-800/50 rounded-2xl px-4 py-2 border border-slate-700 w-full lg:w-auto">
+      <div class="flex justify-between sm:justify-end items-center gap-3 sm:gap-6 px-1 py-0 w-full lg:w-auto">
         <div class="text-center sm:text-right flex flex-col flex-1 sm:flex-none">
           <p class="header-stat-label text-[9px] sm:text-[10px] text-slate-400 uppercase tracking-widest font-bold mb-1">Promedio</p>
           <div class="flex items-baseline gap-1 justify-center sm:justify-end">
@@ -960,13 +992,13 @@
           <button id="btn-install" onclick="installApp()" class="hidden shrink-0 text-xs bg-slate-900 text-white px-3 py-2 rounded-xl font-bold hover:bg-slate-800 transition shadow-sm flex items-center gap-1.5">
             <span>📱</span> Instalar App
           </button>
-          <button onclick="openSchedule()" class="shrink-0 text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm">
+          <button onclick="openSchedule()" class="nav-dup shrink-0 text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl font-bold border border-indigo-200 hover:bg-indigo-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📅</span> Horarios
           </button>
-          <button onclick="openExamsModal()" class="shrink-0 text-xs bg-teal-50 text-teal-700 px-3 py-2 rounded-xl font-bold border border-teal-400 transition flex items-center gap-1.5 shadow-sm">
+          <button onclick="openExamsModal()" class="nav-dup shrink-0 text-xs bg-teal-50 text-teal-700 px-3 py-2 rounded-xl font-bold border border-teal-400 transition flex items-center gap-1.5 shadow-sm">
             <span>📝</span> Mesas
           </button>
-          <button onclick="openSimulador()" class="shrink-0 text-xs bg-cyan-50 text-cyan-700 px-3 py-2 rounded-xl font-bold border border-cyan-200 hover:bg-cyan-100 transition flex items-center gap-1.5 shadow-sm">
+          <button onclick="openSimulador()" class="nav-dup shrink-0 text-xs bg-cyan-50 text-cyan-700 px-3 py-2 rounded-xl font-bold border border-cyan-200 hover:bg-cyan-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📈</span> Proyectar
           </button>
           <label class="flex shrink-0 items-center gap-2 cursor-pointer text-xs font-bold text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-xl border border-blue-200 transition shadow-sm">
@@ -979,10 +1011,10 @@
             <option value="1">1° cuatrimestre</option>
             <option value="2">2° cuatrimestre</option>
           </select>
-          <button onclick="openSyncModal()" class="shrink-0 text-xs bg-amber-50 text-amber-700 px-3 py-2 rounded-xl font-bold border border-amber-200 hover:bg-amber-100 transition flex items-center gap-1.5 shadow-sm">
+          <button onclick="openSyncModal()" class="nav-dup shrink-0 text-xs bg-amber-50 text-amber-700 px-3 py-2 rounded-xl font-bold border border-amber-200 hover:bg-amber-100 transition flex items-center gap-1.5 shadow-sm">
             <span>💾</span> Sincronizar
           </button>
-          <button onclick="openReportModal()" id="btn-export" class="shrink-0 text-xs bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
+          <button onclick="openReportModal()" id="btn-export" class="nav-dup shrink-0 text-xs bg-emerald-50 text-emerald-700 px-3 py-2 rounded-xl font-bold border border-emerald-200 hover:bg-emerald-100 transition flex items-center gap-1.5 shadow-sm">
             <span>📄</span> Reporte
           </button>
           <button id="btn-undo" onclick="undoLast()" disabled class="shrink-0 text-xs bg-slate-50 text-slate-700 px-3 py-2 rounded-xl font-bold border border-slate-300 hover:bg-slate-200 transition flex items-center gap-1.5 shadow-sm" title="Deshacer el último cambio (Ctrl+Z)">
@@ -1662,7 +1694,7 @@ function init() {
 
   // Vibración háptica en los botones de la barra superior
   document.addEventListener('click', e => {
-    if (navigator.vibrate && e.target.closest('.sticky button')) navigator.vibrate(30);
+    if (navigator.vibrate && e.target.closest('.sticky button, #bottom-nav button')) navigator.vibrate(30);
   });
 
   // Pull-to-refresh desactivado: competía con el gesto de deslizar hacia abajo para cerrar ventanas.
@@ -4272,5 +4304,12 @@ document.addEventListener('keydown', e => {
 });
 window.addEventListener('DOMContentLoaded', init);
 </script>
+<nav id="bottom-nav">
+    <button onclick="openSchedule()"><span>📅</span>Horarios</button>
+    <button onclick="openExamsModal()"><span>📝</span>Mesas</button>
+    <button onclick="openSimulador()"><span>📈</span>Proyectar</button>
+    <button onclick="openReportModal()"><span>📄</span>Reporte</button>
+    <button onclick="openSyncModal()"><span>🔄</span>Sync</button>
+  </nav>
 </body>
 </html>
