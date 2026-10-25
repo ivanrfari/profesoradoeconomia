@@ -441,6 +441,9 @@
     html.dark .subject-card .card-divider { border-color: #1e293b !important; }
     html.dark .subject-card .info-btn { border-color: #334155 !important; color: #cbd5e1 !important; }
     html.dark .subject-card[data-state="approved"] .status-label { color: #38bdf8 !important; }
+    #progress-strip, #toolbar-row { max-height: 90px; transition: max-height .25s ease, opacity .2s ease, padding .25s ease; }
+    body.toolbar-collapsed #progress-strip, body.toolbar-collapsed #toolbar-row { max-height: 0 !important; opacity: 0; padding-top: 0 !important; padding-bottom: 0 !important; overflow: hidden; border-width: 0; pointer-events: none; }
+    @media (max-width: 639px) { #btn-top { bottom: calc(92px + env(safe-area-inset-bottom)) !important; } }
     #bottom-nav { display: none; }
     @media (max-width: 639px) {
       .nav-dup { display: none !important; }
@@ -986,7 +989,7 @@
           </div>
         </div>
 
-        <div class="flex items-center justify-start lg:justify-end gap-2 w-full lg:w-auto overflow-x-auto hide-scrollbar pb-1 lg:pb-0 pt-1 lg:pt-0">
+        <div id="toolbar-row" class="flex items-center justify-start lg:justify-end gap-2 w-full lg:w-auto overflow-x-auto hide-scrollbar pb-1 lg:pb-0 pt-1 lg:pt-0">
           <button id="btn-density" onclick="toggleDensity()" title="Vista compacta" class="shrink-0 text-sm bg-slate-50 text-slate-700 w-9 h-9 rounded-xl border border-slate-300 hover:bg-slate-200 transition shadow-sm flex items-center justify-center">☰</button>
           <div class="w-px h-6 bg-slate-300 hidden lg:block shrink-0 mx-1"></div>
           <!-- BOTÓN INSTALAR (Inicia oculto, se muestra si el navegador lo permite) -->
@@ -1676,6 +1679,7 @@ function init() {
       document.getElementById('app-header').classList.toggle('shrunk', __hdrShrunk);
       document.getElementById('app-header').style.backgroundPosition = `0px ${y * -0.25}px`;
       document.getElementById('progress-strip').classList.toggle('shrunk', __hdrShrunk);
+      document.body.classList.toggle('toolbar-collapsed', __hdrShrunk);
       __hdrTicking = false;
     });
   }, { passive: true });
