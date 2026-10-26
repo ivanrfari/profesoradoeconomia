@@ -1700,8 +1700,9 @@ function init() {
     __hdrTicking = true;
     requestAnimationFrame(() => {
       const y = window.scrollY;
-      if (!__hdrShrunk && y > 80) __hdrShrunk = true;
-      else if (__hdrShrunk && y < 40) __hdrShrunk = false;
+      const H = document.getElementById('app-header').offsetHeight;
+      if (!__hdrShrunk && y > H + 40) __hdrShrunk = true;
+      else if (__hdrShrunk && y < H - 100) __hdrShrunk = false;
       document.getElementById('progress-strip').classList.toggle('shrunk', __hdrShrunk);
       document.body.classList.toggle('toolbar-collapsed', __hdrShrunk);
       __hdrTicking = false;
