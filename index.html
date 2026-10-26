@@ -1744,6 +1744,26 @@ function init() {
     } catch (e) { console.warn('Link de solo lectura inválido'); }
   }
   checkBackupReminder();
+
+  // Header "magnético": al soltar el scroll a medio camino, termina de esconderse (o volver) solo.
+  if (window.matchMedia('(pointer: coarse)').matches) {
+    let st, touching = false, lastY = 0, dir = 0;
+    const snap = () => {
+      clearTimeout(st);
+      st = setTimeout(() => {
+        if (touching) return;
+        const H = document.getElementById('app-header').offsetHeight, y = window.scrollY;
+        if (y > 2 && y < H - 2) window.scrollTo({ top: dir > 0 ? H : 0, behavior: 'smooth' });
+      }, 120);
+    };
+    window.addEventListener('touchstart', () => { touching = true; }, { passive: true });
+    window.addEventListener('touchend', () => { touching = false; snap(); }, { passive: true });
+    window.addEventListener('scroll', () => {
+      const y = window.scrollY;
+      if (y !== lastY) dir = y > lastY ? 1 : -1;
+      lastY = y; snap();
+    }, { passive: true });
+  }
   const shortcut = new URLSearchParams(location.search).get('shortcut');
   if (shortcut === 'horarios') openSchedule();
   else if (shortcut === 'reporte') openReportModal();
