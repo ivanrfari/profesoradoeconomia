@@ -783,10 +783,11 @@
         <p class="text-xs text-slate-500 leading-relaxed">Comparte <b>solo</b> tus horarios y los cuatrimestres: quien lo importe no pierde sus notas ni sus materias aprobadas.</p>
         <textarea id="sched-share-code" readonly rows="3" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-[11px] font-mono outline-none resize-none"></textarea>
         <div class="grid grid-cols-2 gap-2"><button onclick="copySchedShare()" class="btn-secondary px-3 py-2.5 text-xs">📋 Copiar código</button><button onclick="shareSchedWhatsApp()" class="btn-primary px-3 py-2.5 text-xs">💬 WhatsApp</button></div>
+        <button onclick="showSchedQR()" class="btn-secondary w-full px-3 py-2.5 text-xs">📱 Mostrar como código QR</button>
         <div class="pt-3 border-t border-slate-200 space-y-2">
           <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Importar el horario de un compañero</p>
           <textarea id="sched-share-import" rows="3" placeholder="Pegá acá el código (sched1|...)" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-[11px] font-mono outline-none resize-none"></textarea>
-          <button onclick="importSchedShare()" class="btn-primary w-full px-3 py-2.5">Importar horario</button>
+          <div class="grid grid-cols-2 gap-2"><button onclick="openQrScan()" class="btn-secondary px-3 py-2.5 text-xs">📷 Escanear QR</button><button onclick="importSchedShare()" class="btn-primary px-3 py-2.5 text-xs">Importar horario</button></div>
         </div>
       </div>
     </div>
@@ -1326,16 +1327,16 @@ const loadQRCode = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/qrcodej
 const loadJsQR = () => loadLib('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js');
 const loadJsPDF = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
 
-function openQrShow() {
-  markBackup();
-  const code = document.getElementById('sync-export-code').value;
+function openQrShow(custom) {
+  if (!custom) markBackup();
+  const code = custom || document.getElementById('sync-export-code').value;
   if (!code || /^Error/.test(code)) { showAlert('⚠️ Atención', 'No se pudo generar el código.'); return; }
   const holder = document.getElementById('qr-canvas-holder');
   holder.innerHTML = '<p class="text-xs text-slate-400 py-16">Generando…</p>';
   openBox('qr-show-modal');
   loadQRCode().then(() => {
     holder.innerHTML = '';
-    new QRCode(holder, { text: code, width: 220, height: 220, correctLevel: QRCode.CorrectLevel.L });
+    new QRCode(holder, { text: code, width: 256, height: 256, correctLevel: QRCode.CorrectLevel.L });
   }).catch(() => { holder.innerHTML = '<p class="text-xs text-red-500 py-16">No se pudo generar el QR (¿sin internet?).</p>'; });
 }
 function closeQrShow(e) { closeBox('qr-show-modal', e); }
@@ -1393,8 +1394,8 @@ function openQrScan() {
           const found = jsQR(img.data, img.width, img.height);
           if (found && found.data) {
             closeQrScan();
-            document.getElementById('sync-import-code').value = found.data;
-            importSyncCode();
+            if (/^sched[12]\|/.test(found.data)) { $id('sched-share-import').value = found.data; importSchedShare(); }
+            else { document.getElementById('sync-import-code').value = found.data; importSyncCode(); }
             return;
           }
         }
@@ -3886,6 +3887,20 @@ function buildSchedShareCode() {
   DAYS.forEach(d => (state.schedule[d] || []).forEach(it => { const t = state.notes[it.id]?.term; if (t) terms[it.id] = t; }));
   return 'sched1|' + btoa(unescape(encodeURIComponent(JSON.stringify({ v: 1, plan: state.activePlan, s: state.schedule, t: terms }))));
 }
+function buildSchedQRCode() {
+  const items = [], t = {};
+  DAYS.forEach((d, di) => (state.schedule[d] || []).forEach(it => {
+    const si = SUBJECTS.findIndex(x => x.id === it.id);
+    if (si < 0) return;
+    items.push([di, si, it.time, it.mod || '', it.reg || '', it.aula || '', it.forced ? 1 : 0]);
+    const tm = state.notes[it.id]?.term; if (tm) t[si] = tm;
+  }));
+  return 'sched2|' + btoa(unescape(encodeURIComponent(JSON.stringify([items, t]))));
+}
+function showSchedQR() {
+  if (!planCount(state.activePlan)) { showToast('No hay horarios para compartir en este plan', false); return; }
+  openQrShow(buildSchedQRCode());
+}
 function openSchedShare() {
   $id('sched-share-title').textContent = `${planCount(state.activePlan)} bloque(s) horario(s)`;
   $id('sched-share-code').value = planCount(state.activePlan) ? buildSchedShareCode() : '';
@@ -3908,9 +3923,18 @@ function shareSchedWhatsApp() {
 }
 async function importSchedShare() {
   const txt = $id('sched-share-import').value.trim();
-  const raw = (txt.match(/sched1\|[A-Za-z0-9+\/=]+/) || [txt.replace(/\s+/g, '')])[0];
+  const raw = (txt.match(/sched[12]\|[A-Za-z0-9+\/=]+/) || [txt.replace(/\s+/g, '')])[0];
   let data = null;
-  try { if (raw.startsWith('sched1|')) data = JSON.parse(decodeURIComponent(escape(atob(raw.slice(7))))); } catch (e) { data = null; }
+  try {
+    if (raw.startsWith('sched1|')) data = JSON.parse(decodeURIComponent(escape(atob(raw.slice(7)))));
+    else if (raw.startsWith('sched2|')) {
+      const [items, tt] = JSON.parse(decodeURIComponent(escape(atob(raw.slice(7)))));
+      const sc = emptySchedule(), t = {};
+      items.forEach(a => { const sid = SUBJECTS[a[1]]?.id, day = DAYS[a[0]]; if (sid && day) sc[day].push({ id: sid, time: a[2], mod: a[3], reg: a[4], aula: a[5], forced: a[6] === 1 }); });
+      Object.keys(tt || {}).forEach(i => { if (SUBJECTS[i]) t[SUBJECTS[i].id] = tt[i]; });
+      data = { s: sc, t };
+    }
+  } catch (e) { data = null; }
   if (!data || typeof data !== 'object') { showAlert('⚠️ Código inválido', 'El código no es de un horario compartido (tiene que empezar con <b>sched1|</b>).'); return; }
   const sched = sanitizeSchedule(data.s);
   const total = DAYS.reduce((a, d) => a + sched[d].length, 0);
