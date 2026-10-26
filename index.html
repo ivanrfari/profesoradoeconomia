@@ -445,12 +445,27 @@
     body.toolbar-collapsed #progress-strip, body.toolbar-collapsed #toolbar-row { max-height: 0 !important; opacity: 0; padding-top: 0 !important; padding-bottom: 0 !important; overflow: hidden; border-width: 0; pointer-events: none; }
     @media (max-width: 639px) { #btn-top { bottom: calc(92px + env(safe-area-inset-bottom)) !important; } }
     body.toolbar-collapsed #toolbar-wrap { gap: 0 !important; padding-top: .4rem !important; padding-bottom: .4rem !important; }
+    .subject-card [class*="text-[10px]"], .year-col [class*="text-[10px]"] { font-size: 11.5px !important; }
+    .subject-card [class*="text-[9px]"] { font-size: 11px !important; }
+    .subject-card [class*="text-[11px]"] { font-size: 12px !important; }
+    html:not(.dark) #main-grid .text-slate-400 { color: #64748b !important; }
+    body.ro #toolbar-row, body.ro #bottom-nav, body.ro .nav-dup, body.ro #backup-banner { display: none !important; }
+    body.ro #ro-bar { display: block !important; }
+    @media (max-width: 639px) {
+      #bottom-nav button.active { color: #2563eb; position: relative; }
+      #bottom-nav button.active::before { content: ''; position: absolute; top: 0; left: 28%; right: 28%; height: 3px; border-radius: 0 0 4px 4px; background: #2563eb; }
+      html.dark #bottom-nav button.active { color: #60a5fa; }
+      html.dark #bottom-nav button.active::before { background: #60a5fa; }
+      body.modal-open #bottom-nav { z-index: 55; }
+      body.modal-open .modal-backdrop { padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important; }
+      body.modal-open .modal-backdrop > div { max-height: calc(100dvh - 110px - env(safe-area-inset-bottom)) !important; }
+    }
     #bottom-nav { display: none; }
     @media (max-width: 639px) {
       .nav-dup { display: none !important; }
       body { padding-bottom: calc(74px + env(safe-area-inset-bottom)); }
       #bottom-nav { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-top: 1px solid #e2e8f0; padding-bottom: calc(env(safe-area-inset-bottom) + 14px); }
-      #bottom-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 6px; font-size: 10px; font-weight: 700; color: #475569; }
+      #bottom-nav button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0 6px; font-size: 11px; font-weight: 700; color: #475569; }
       #bottom-nav button span { font-size: 18px; line-height: 1; }
       html.dark #bottom-nav { background: rgba(2,6,23,.96); border-color: #1e293b; }
       html.dark #bottom-nav button { color: #cbd5e1; }
@@ -509,6 +524,7 @@
     <img src="icon-192.png" width="72" height="72" style="border-radius:20px" alt="">
     <p class="text-white font-black text-xs tracking-wider">MAPA CURRICULAR ISFD 100</p>
   </div>
+  <div id="ro-bar" class="hidden bg-amber-300 text-amber-950 text-xs font-extrabold text-center py-1.5">👁 Vista de solo lectura · <button onclick="location.href=location.pathname" class="underline">Salir</button></div>
   <script>try { if (sessionStorage.getItem('splashSeen')) document.getElementById('splash').remove(); else sessionStorage.setItem('splashSeen', '1'); } catch (e) {}</script>
 
   <script>
@@ -591,6 +607,7 @@
             <button onclick="copySyncCode()" id="btn-copy-sync" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow-sm">Copiar</button>
             <button onclick="openQrShow()" title="Ver como QR" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm flex items-center gap-1">▦ QR</button>
           </div>
+          <button onclick="shareReadOnly()" class="mt-2 w-full bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm">👁 Compartir link de solo lectura</button>
           <button onclick="shareSyncWhatsApp()" class="mt-2 w-full bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded-lg text-xs font-bold transition shadow-sm flex items-center justify-center gap-1.5">
             <span>📲</span> Compartir por WhatsApp
           </button>
@@ -1076,6 +1093,7 @@
         <span class="shrink-0 text-emerald-400 text-xs">›</span>
       </div>
     </div>
+    <div id="backup-banner" class="hidden bg-rose-50 border-b border-rose-200"><div class="max-w-screen-2xl mx-auto px-4 py-2 flex items-center gap-2 text-xs font-bold text-rose-700"><span id="backup-banner-text" class="flex-1"></span><button onclick="openSyncModal()" class="bg-white border border-rose-200 px-2.5 py-1 rounded-lg shrink-0">Hacer copia</button><button onclick="snoozeBackup()" class="px-1.5 py-1 shrink-0" aria-label="Más tarde">✕</button></div></div>
     <div id="exam-banner" onclick="openExamsModal()" class="hidden cursor-pointer bg-amber-50 border-b border-amber-200">
       <div class="max-w-screen-2xl mx-auto px-4 py-2 text-xs font-bold text-amber-700">
         <span id="exam-banner-text" class="block truncate"></span>
@@ -1307,6 +1325,7 @@ const loadJsQR = () => loadLib('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQ
 const loadJsPDF = () => loadLib('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
 
 function openQrShow() {
+  markBackup();
   const code = document.getElementById('sync-export-code').value;
   if (!code || /^Error/.test(code)) { showAlert('⚠️ Atención', 'No se pudo generar el código.'); return; }
   const holder = document.getElementById('qr-canvas-holder');
@@ -1475,8 +1494,9 @@ function normalizeText(s) {
 function esc(s) {
   return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
+var __RO = /^#ver=/.test(location.hash);
 function safeGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
-function safeSet(key, val) { try { localStorage.setItem(key, val); } catch (e) { console.warn('No se pudo guardar:', e); } }
+function safeSet(key, val) { if (__RO) return; try { localStorage.setItem(key, val); } catch (e) { console.warn('No se pudo guardar:', e); } }
 function loadJSON(key) {
   try { const raw = safeGet(key); return raw ? JSON.parse(raw) : null; }
   catch (e) { console.warn('Datos dañados en', key, e); return null; }
@@ -1665,7 +1685,8 @@ function init() {
   updateAllCards();
   updateProgress();
   syncThemeButton();
-  if (safeGet('isfd100_densidad') === '1') { document.getElementById('grid-container').classList.add('list-view'); document.getElementById('btn-density').textContent = '▦'; }
+  const __dens = safeGet('isfd100_densidad');
+  if (__dens === '1' || (__dens === null && window.innerWidth < 640)) { document.getElementById('grid-container').classList.add('list-view'); document.getElementById('btn-density').textContent = '▦'; }
   updateUndoButton();
   updateStudentUI();
 
@@ -1712,6 +1733,17 @@ function init() {
     if (gc) gc.style.display = '';
   }, 200);
 
+  if (__RO) {
+    try {
+      const d = decodeShortCode(location.hash.slice(5));
+      state.userSubjects = d.u; state.schedule = d.s;
+      if (d.t) Object.keys(d.t).forEach(id => setNote(id, { term: d.t[id] }));
+      if (d.a) state.student = d.a;
+      document.body.classList.add('ro');
+      refreshAll(); updateStudentUI();
+    } catch (e) { console.warn('Link de solo lectura inválido'); }
+  }
+  checkBackupReminder();
   const shortcut = new URLSearchParams(location.search).get('shortcut');
   if (shortcut === 'horarios') openSchedule();
   else if (shortcut === 'reporte') openReportModal();
@@ -1723,7 +1755,7 @@ function init() {
     clearTimeout(__searchDebounce);
     __searchDebounce = setTimeout(() => {
       state.searchQuery = normalizeText(e.target.value.trim());
-      applyFilterStyles();
+      clearTimeout(window.__srchT); window.__srchT = setTimeout(applyFilterStyles, 120);
     }, 150);
   });
 }
@@ -1952,6 +1984,7 @@ function handleCardClick(id) {
 }
 
 function openStatusModal(id) {
+  if (__RO) return;
   const subject = SUBJECTS.find(s => s.id === id);
   document.getElementById('status-subject-name').textContent = subject.name;
   document.getElementById('status-subject-id').value = id;
@@ -2278,7 +2311,48 @@ function closeSyncModal(e) {
   setTimeout(() => { modal.classList.add('hidden'); }, 150);
 }
 
+function navGo(id, fn) {
+  const open = [...document.querySelectorAll('.modal-backdrop:not(.hidden)')];
+  if (open.some(m => m.id === id)) { __modalCloseFns[id](); return; }
+  open.forEach(m => { const c = __modalCloseFns[m.id]; if (c) c(); });
+  open.length ? setTimeout(fn, 230) : fn();
+}
+new MutationObserver(() => {
+  const ids = [...document.querySelectorAll('.modal-backdrop:not(.hidden)')].map(m => m.id);
+  document.body.classList.toggle('modal-open', ids.length > 0);
+  document.querySelectorAll('#bottom-nav button').forEach(b => b.classList.toggle('active', ids.includes(b.dataset.m)));
+}).observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+function markBackup() {
+  safeSet('isfd100_last_backup', String(Date.now()));
+  const b = document.getElementById('backup-banner'); if (b) b.classList.add('hidden');
+}
+function snoozeBackup() {
+  safeSet('isfd100_backup_snooze', String(Date.now() + 3 * 864e5));
+  document.getElementById('backup-banner').classList.add('hidden');
+}
+function checkBackupReminder() {
+  if (__RO) return;
+  const now = Date.now();
+  if (!safeGet('isfd100_backup_seen')) safeSet('isfd100_backup_seen', String(now));
+  if (!Object.keys(state.userSubjects).length) return;
+  const last = +safeGet('isfd100_last_backup') || 0;
+  const days = Math.floor((now - (last || +safeGet('isfd100_backup_seen') || now)) / 864e5);
+  if (days < 14 || now < (+safeGet('isfd100_backup_snooze') || 0)) return;
+  document.getElementById('backup-banner-text').textContent = last ? `Hace ${days} días que no hacés una copia de seguridad de tu progreso.` : 'Todavía no hiciste ninguna copia de seguridad de tu progreso.';
+  document.getElementById('backup-banner').classList.remove('hidden');
+}
+function shareReadOnly() {
+  const code = document.getElementById('sync-export-code').value;
+  if (!code || /^Error/.test(code)) { showAlert('⚠️ Atención', 'No se pudo generar el link.'); return; }
+  markBackup();
+  const url = location.href.split('#')[0] + '#ver=' + code;
+  const text = `Mirá mi avance${state.student ? ' (' + state.student + ')' : ''} en el Planificador Curricular, en modo solo lectura:\n${url}`;
+  if (navigator.share) navigator.share({ title: 'Mi avance', text }).catch(() => {});
+  else window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
+}
+function focusSchedForm() { const e = $id('sched-subject'); e.scrollIntoView({ block: 'center' }); e.focus(); }
 function shareSyncWhatsApp() {
+  markBackup();
   const code = document.getElementById('sync-export-code').value;
   if (!code || /^Error/.test(code)) { showAlert('⚠️ Atención', 'No se pudo generar el código para compartir.'); return; }
   const quien = state.student ? ` de ${state.student}` : '';
@@ -2290,6 +2364,7 @@ function shareSyncWhatsApp() {
   }
 }
 async function copySyncCode() {
+  markBackup();
   const input = document.getElementById('sync-export-code');
   const btn = document.getElementById('btn-copy-sync');
   let ok = false;
@@ -3188,7 +3263,7 @@ function renderExamsModal() {
 
   let html = '';
   if (pending.length === 0) {
-    html += '<p class="text-xs text-slate-400 text-center italic py-6">No hay mesas cargadas.</p>';
+    html += '<div class="text-center py-6"><div class="text-5xl mb-2">📝</div><p class="font-black text-slate-700 text-sm">Todavía no cargaste mesas</p><p class="text-xs text-slate-500 mt-1 mb-3">Cuando apruebes una cursada, cargá acá la fecha del final.</p><button onclick="document.getElementById(\'exam-subject\').focus()" class="bg-blue-600 text-white px-4 py-2 rounded-xl font-bold text-xs">➕ Cargar una mesa</button></div>';
   }
   const nextIdx = pending.findIndex(p => p.e.date);
   pending.forEach(({ id, s, e }, i) => {
@@ -3674,6 +3749,10 @@ function buildSchedModel(view) {
 function renderScheduleGrid() {
   const model = buildSchedModel(state.scheduleView);
   renderSchedStats(model.items);
+  if (model.items && !model.items.length) {
+    $id('schedule-grid').innerHTML = '<div class="text-center py-10 px-4"><div class="text-6xl mb-3">🗓️</div><p class="font-black text-slate-700">Todavía no cargaste horarios</p><p class="text-xs text-slate-500 mt-1 mb-4">Elegí una materia, un día y un horario para armar tu semana.</p><button onclick="focusSchedForm()" class="btn-primary px-5 py-2">➕ Cargar mi primera clase</button></div>';
+    return;
+  }
   $id('schedule-grid').innerHTML = state.schedMode === 'agenda' ? renderAgendaView(model) : state.schedMode === 'timeline' ? renderTimelineView(model) : renderColumnsView(model);
 }
 function refreshScheduleUI() {
@@ -4311,11 +4390,11 @@ document.addEventListener('keydown', e => {
 window.addEventListener('DOMContentLoaded', init);
 </script>
 <nav id="bottom-nav">
-    <button onclick="openSchedule()"><span>📅</span>Horarios</button>
-    <button onclick="openExamsModal()"><span>📝</span>Mesas</button>
-    <button onclick="openSimulador()"><span>📈</span>Proyectar</button>
-    <button onclick="openReportModal()"><span>📄</span>Reporte</button>
-    <button onclick="openSyncModal()"><span>🔄</span>Sync</button>
+    <button data-m="schedule-modal" onclick="navGo('schedule-modal',openSchedule)"><span>📅</span>Horarios</button>
+    <button data-m="exams-modal" onclick="navGo('exams-modal',openExamsModal)"><span>📝</span>Mesas</button>
+    <button data-m="simulador-modal" onclick="navGo('simulador-modal',openSimulador)"><span>📈</span>Proyectar</button>
+    <button data-m="report-modal" onclick="navGo('report-modal',openReportModal)"><span>📄</span>Reporte</button>
+    <button data-m="sync-modal" onclick="navGo('sync-modal',openSyncModal)"><span>🔄</span>Sync</button>
   </nav>
 </body>
 </html>
