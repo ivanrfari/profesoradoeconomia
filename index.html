@@ -1745,6 +1745,7 @@ function init() {
     } catch (e) { console.warn('Link de solo lectura inválido'); }
   }
   checkBackupReminder();
+  setInterval(renderTodayBanner, 30000);
 
   // Header "magnético": al soltar el scroll a medio camino, termina de esconderse (o volver) solo.
   if (window.matchMedia('(pointer: coarse)').matches) {
@@ -3375,22 +3376,36 @@ function upcomingExams(maxDays) {
 }
 function renderTodayBanner() {
   const el = document.getElementById('today-banner');
-  const dow = new Date().getDay();
+  const d = new Date(), dow = d.getDay(), now = d.getHours() * 60 + d.getMinutes();
   const today = dow === 0 ? null : DAYS[dow - 1];
   const period = String(currentAcademicPeriod().period);
   const items = today ? (state.schedule[today] || [])
     .filter(it => { const s = SUBJECT_BY_ID[it.id]; return s && termVisible(subjectTerm(s), period); })
-    .sort((a, b) => (a.time || '').localeCompare(b.time || '')) : [];
+    .map(it => ({ name: SUBJECT_BY_ID[it.id]?.name, time: it.time, r: parseTimeRange(it.time) })) : [];
   if (!items.length) { el.classList.add('hidden'); return; }
+  const fmt = m => m < 60 ? `${m} min` : `${Math.floor(m / 60)} h${m % 60 ? ' ' + (m % 60) + ' min' : ''}`;
+  const p = items.filter(x => x.r).sort((a, b) => a.r.start - b.r.start), u = items.filter(x => !x.r);
+  const cur = p.find(x => now >= x.r.start && now < x.r.end);
+  const next = p.find(x => x.r.start > now);
+  const later = p.filter(x => x.r.start > now && x !== next).map(x => `${x.name} (${x.time})`);
+  const parts = [];
+  if (cur) parts.push(`Cursando: ${cur.name} · termina en ${fmt(cur.r.end - now)}`);
+  if (next) parts.push(`Próxima: ${next.name} en ${fmt(next.r.start - now)} (${next.time})`);
+  if (!cur && !next && p.length) parts.push('Hoy terminaste tus clases ✓');
+  if (later.length) parts.push('Después: ' + later.join(', '));
+  if (u.length) parts.push((p.length ? 'Sin horario: ' : 'Hoy: ') + u.map(x => x.name).join(', '));
+  const text = parts.join(' · ');
   const txt = document.getElementById('today-banner-text');
-  txt.textContent = 'Hoy: ' + items.map(it => `${SUBJECT_BY_ID[it.id]?.name} (${it.time || '?'})`).join(' · ');
+  el.classList.remove('hidden');
+  if (txt.dataset.last === text) return;
+  txt.dataset.last = text;
+  txt.textContent = text;
   txt.style.animation = ''; txt.style.paddingLeft = '0';
   requestAnimationFrame(() => {
     const over = txt.scrollWidth > txt.parentElement.clientWidth;
     txt.style.paddingLeft = over ? '100%' : '0';
     txt.style.animation = over ? `marquee ${Math.max(8, txt.scrollWidth / 45)}s linear infinite` : '';
   });
-  el.classList.remove('hidden');
 }
 function updateExamBanner() {
   const el = document.getElementById('exam-banner');
