@@ -461,8 +461,8 @@
       html.dark #bottom-nav button.active { color: #60a5fa; }
       html.dark #bottom-nav button.active::before { background: #60a5fa; }
       body.modal-open #bottom-nav { z-index: 95; }
-      body.modal-open .modal-backdrop { padding-bottom: calc(84px + env(safe-area-inset-bottom)) !important; }
-      body.modal-open .modal-backdrop > div { max-height: calc(100dvh - 110px - env(safe-area-inset-bottom)) !important; }
+      body.modal-open .modal-backdrop { padding: 0 0 var(--navh, 72px) 0 !important; }
+      body.modal-open .modal-backdrop > div { max-height: calc(100dvh - var(--navh, 72px) - 28px) !important; }
     }
     html, body { overscroll-behavior-y: none; }
     :root { --ease: cubic-bezier(.4,0,.2,1); --dur: .25s; }
@@ -491,7 +491,8 @@
       #toast { bottom: calc(88px + env(safe-area-inset-bottom)) !important; }
       .modal-backdrop { align-items: flex-end !important; }
       .modal-backdrop > div { width: 100% !important; max-width: none !important; border-radius: 24px 24px 0 0 !important; }
-      .modal-backdrop > div::before { content: ''; display: block; flex-shrink: 0; width: 40px; height: 4px; border-radius: 2px; background: #cbd5e1; margin: 8px auto 4px; }
+      .modal-backdrop > div { position: relative; overflow: hidden !important; }
+      .modal-backdrop > div::before { content: ''; position: absolute; top: 6px; left: 50%; margin-left: -18px; width: 36px; height: 4px; border-radius: 2px; background: rgba(148,163,184,.75); z-index: 5; pointer-events: none; }
       .modal-backdrop > div.scale-95 { transform: translateY(60px) !important; opacity: 0 !important; }
       .modal-backdrop > div.scale-100 { transform: none !important; opacity: 1 !important; }
     }
@@ -2451,6 +2452,7 @@ function navGo(id, fn) {
 new MutationObserver(() => {
   const ids = [...document.querySelectorAll('.modal-backdrop:not(.hidden)')].map(m => m.id);
   document.body.classList.toggle('modal-open', ids.length > 0);
+  const nv = document.getElementById('bottom-nav'); if (nv) document.documentElement.style.setProperty('--navh', nv.offsetHeight + 'px');
   document.querySelectorAll('#bottom-nav button').forEach(b => b.classList.toggle('active', ids.includes(b.dataset.m)));
 }).observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
 function markBackup() {
