@@ -514,6 +514,45 @@
     #bottom-nav { box-shadow: 0 -8px 22px -10px rgba(15,23,42,.25); }
     .chip { box-shadow: 0 1px 2px rgba(15,23,42,.06); }
     .chip.active { box-shadow: 0 5px 12px -4px rgba(37,99,235,.55); }
+    /* ── Rediseño profesional: paleta sobria, tarjeta simple, sin paneles ── */
+    [class*="year-tint-"] { background: transparent !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; }
+    .year-col > div:first-child { border-bottom-width: 1px !important; border-color: #e2e8f0 !important; font-size: 19px; }
+    .year-col > div:first-child > span:first-child { display: none !important; }
+    .year-col > div:first-child > span:last-child { background: transparent !important; border: 0 !important; box-shadow: none !important; color: #94a3b8 !important; font-weight: 600; text-transform: none !important; letter-spacing: 0 !important; font-size: 12px !important; }
+    html.dark .year-col > div:first-child { border-color: #1e293b !important; }
+    .subject-card { padding: 1rem 1.1rem !important; }
+    .subject-card .status-icon { display: none !important; }
+    .subject-card .subtitle { font-family: inherit !important; text-transform: none !important; letter-spacing: 0 !important; font-size: 12.5px !important; font-weight: 500 !important; color: #64748b !important; }
+    .subject-card .crit { color: #b91c1c; font-weight: 600; }
+    .subject-card .card-extras { gap: 6px; }
+    .subject-card .card-chip { background: transparent !important; border: 0 !important; padding: 0 !important; color: #64748b !important; font-size: 12px !important; font-weight: 500 !important; }
+    .subject-card .card-chip.warn { color: #b45309 !important; } .subject-card .card-chip.danger { color: #b91c1c !important; }
+    .subject-card .status-label { text-transform: none !important; letter-spacing: 0 !important; font-size: 12.5px !important; font-weight: 600 !important; display: inline-flex; align-items: center; gap: 6px; }
+    .subject-card .status-label::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .subject-card[data-state="approved"] .status-label { color: #2563eb !important; }
+    .subject-card[data-state="en_curso"] .status-label { color: #b45309 !important; }
+    .subject-card[data-state="recursar"] .status-label { color: #c2410c !important; }
+    .subject-card[data-state="cursada"] .status-label { color: #0f766e !important; }
+    .subject-card[data-state="enabled"] .status-label { color: #64748b !important; }
+    .subject-card[data-state="locked"] .status-label { color: #94a3b8 !important; }
+    .subject-card[data-state="approved"] { border-left-color: #2563eb !important; background: linear-gradient(135deg, #f6faff 0%, #e8f0ff 100%) !important; border-color: #c7d9fb !important; box-shadow: 0 1px 2px rgba(37,99,235,.12), 0 12px 24px -12px rgba(37,99,235,.45) !important; }
+    .subject-card[data-state="approved"] h3 { color: #1e3a8a !important; }
+    .subject-card[data-state="approved"]::after { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 4px 10px rgba(37,99,235,.45); }
+    .subject-card[data-state="en_curso"] { border-left-color: #d97706 !important; }
+    .subject-card[data-state="recursar"] { border-left-color: #c2410c !important; }
+    .subject-card[data-state="cursada"] { border-left-color: #0f766e !important; }
+    .subject-card[data-state="enabled"] { border-left-color: #94a3b8 !important; }
+    .subject-card .info-btn { width: 32px; height: 32px; padding: 0 !important; justify-content: center; border-radius: 999px; }
+    html.dark .subject-card .subtitle { color: #94a3b8 !important; }
+    html.dark .subject-card .crit { color: #f87171; }
+    html.dark .subject-card .card-chip { color: #94a3b8 !important; }
+    html.dark .subject-card[data-state="approved"] .status-label { color: #60a5fa !important; }
+    html.dark .subject-card[data-state="en_curso"] .status-label { color: #fbbf24 !important; }
+    html.dark .subject-card[data-state="cursada"] .status-label { color: #2dd4bf !important; }
+    html.dark .subject-card[data-state="approved"] { background: linear-gradient(135deg, #0f1f3d 0%, #172a52 100%) !important; border-color: #1e3a8a !important; }
+    html.dark .subject-card[data-state="approved"] h3 { color: #dbeafe !important; }
+    #app-header { padding-top: .5rem !important; padding-bottom: .5rem !important; }
+    #app-title { text-transform: none !important; letter-spacing: 0 !important; font-size: 14px !important; font-weight: 600 !important; color: #fff !important; }
     #bottom-nav { display: none; }
     @media (max-width: 639px) {
       .nav-dup { display: none !important; }
@@ -1992,27 +2031,19 @@ function createCard(subject) {
   card.setAttribute('role', 'button');
   
   const isBottleneck = subject.bottleneckCount >= 3;
-  const bottleneckHtml = isBottleneck 
-    ? `<span class="bg-red-100 text-red-700 border border-red-200 px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-widest shadow-sm ml-2" title="Esta materia traba el cursado de otras ${subject.bottleneckCount} materias">🔥 Ruta Crítica</span>` 
-    : '';
+  const critHtml = isBottleneck ? ` · <span class="crit" title="Esta materia traba el cursado de otras ${subject.bottleneckCount} materias">Ruta crítica</span>` : '';
 
   card.innerHTML = `
-    <div class="flex justify-between items-start mb-3">
-      <div class="flex items-center">
-        <span class="campo-badge ${CAMPO_COLORS[subject.campo].bg} px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-widest text-white shadow-sm">${CAMPO_COLORS[subject.campo].icon} ${CAMPO_COLORS[subject.campo].label}</span>
-        ${bottleneckHtml}
-      </div>
-      <span class="status-icon text-lg leading-none"></span>
-    </div>
-    <h3 class="font-black text-[15px] leading-snug mb-1.5 pr-2 transition-colors">${subject.name}</h3>
-    <p class="subtitle text-[11px] font-bold tracking-wide uppercase font-mono transition-colors">${subject.regimen} · ${subject.hs}hs</p>
+    <span class="status-icon"></span>
+    <h3 class="font-semibold text-[15px] leading-snug mb-1 pr-2 transition-colors">${subject.name}</h3>
+    <p class="subtitle transition-colors">${CAMPO_COLORS[subject.campo].label} · ${subject.regimen} · ${subject.hs} hs${critHtml}</p>
     <div class="card-extras flex-wrap gap-1.5 mt-2" style="display:none"></div>
     
     <div class="card-divider mt-auto pt-3.5 border-t flex justify-between items-center transition-colors">
       <span class="status-label text-[10px] font-black uppercase tracking-widest transition-colors"></span>
       <div class="flex items-center gap-1.5">
-        <button onclick="toggleChain(event, '${subject.id}')" data-id="${subject.id}" class="info-btn chain-btn h-8 px-2.5 rounded-full text-[11px] font-bold flex items-center gap-1 transition shadow-sm" title="Resaltar cadena de correlativas" aria-label="Resaltar cadena de correlativas de ${subject.name}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg> Cadena</button>
-        <button onclick="openModal(event, '${subject.id}')" class="info-btn h-8 px-2.5 rounded-full text-[11px] font-bold flex items-center gap-1 transition shadow-sm" title="Ver Info"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg> Info</button>
+        <button onclick="toggleChain(event, '${subject.id}')" data-id="${subject.id}" class="info-btn chain-btn h-8 px-2.5 rounded-full text-[11px] font-bold flex items-center gap-1 transition shadow-sm" title="Resaltar cadena de correlativas" aria-label="Resaltar cadena de correlativas de ${subject.name}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button>
+        <button onclick="openModal(event, '${subject.id}')" class="info-btn h-8 px-2.5 rounded-full text-[11px] font-bold flex items-center gap-1 transition shadow-sm" title="Ver Info"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg></button>
       </div>
     </div>
   `;
@@ -3560,7 +3591,7 @@ function renderCardExtras(subject) {
   const note = state.notes[subject.id];
   if (u?.status === 'cursada' && ex && ex.date) {
     const n = daysUntil(ex.date);
-    chips.push(`<span class="card-chip ${n < 0 ? 'danger' : n <= 7 ? 'warn' : ''}" title="Mesa de examen: ${esc(relDaysLabel(n))}">📅 ${esc(fmtDateShort(ex.date))}</span>`);
+    chips.push(`<span class="card-chip ${n < 0 ? 'danger' : n <= 7 ? 'warn' : ''}" title="Mesa de examen: ${esc(relDaysLabel(n))}">Mesa ${esc(fmtDateShort(ex.date))}</span>`);
   }
   if (u?.status === 'cursada' && ex && ex.attempts > 0) {
     chips.push(`<span class="card-chip" title="Veces que rendiste el final">↻ ${ex.attempts}</span>`);
@@ -3569,10 +3600,10 @@ function renderCardExtras(subject) {
   if (stt === 'en_curso' || stt === 'recursar' || (!u && isSubjectEnabled(subject.id))) {
     const blocks = [];
     DAYS.forEach(d => (state.schedule[d] || []).forEach(it => { if (it.id === subject.id && parseTimeRange(it.time)) blocks.push(`${DAY_ABBR[d]} ${esc(it.time)}`); }));
-    if (blocks.length) chips.push(`<span class="card-chip sched" title="Horario cargado">🕒 ${blocks.slice(0, 2).join(' · ')}${blocks.length > 2 ? ' +' + (blocks.length - 2) : ''}</span>`);
+    if (blocks.length) chips.push(`<span class="card-chip sched" title="Horario cargado">${blocks.slice(0, 2).join(' · ')}${blocks.length > 2 ? ' +' + (blocks.length - 2) : ''}</span>`);
   }
   if (note && (note.text || note.teacher || note.room)) {
-    chips.push('<span class="card-chip" title="Tenés notas en esta materia">🗒️ Notas</span>');
+    chips.push('<span class="card-chip" title="Tenés notas en esta materia">Notas</span>');
   }
   const t = subjectTerm(subject);
   if (t === '1' || t === '2' || t === 'B') chips.push(`<span class="card-chip">${TERM_LABEL[t]}</span>`);
