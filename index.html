@@ -496,6 +496,24 @@
       .modal-backdrop > div.scale-95 { transform: translateY(60px) !important; opacity: 0 !important; }
       .modal-backdrop > div.scale-100 { transform: none !important; opacity: 1 !important; }
     }
+    /* ── Profundidad y resalte de materias aprobadas ── */
+    html:not(.dark) body { background-image: linear-gradient(180deg, #f8fafc 0%, #e8eef6 100%) !important; background-attachment: fixed; }
+    html.dark body { background-image: linear-gradient(180deg, #000 0%, #060d1a 100%) !important; background-attachment: fixed; }
+    #app-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #1e3a8a 135%) !important; box-shadow: 0 10px 26px -12px rgba(15,23,42,.7); }
+    html.dark #app-header { background: linear-gradient(135deg, #020617 0%, #0b1220 55%, #172554 140%) !important; }
+    .subject-card { background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important; box-shadow: 0 1px 2px rgba(15,23,42,.06), 0 8px 18px -8px rgba(15,23,42,.2) !important; }
+    .subject-card:hover, .subject-card:active { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(15,23,42,.08), 0 16px 28px -12px rgba(15,23,42,.32) !important; }
+    html.dark .subject-card { background: linear-gradient(180deg, #111c33 0%, #0b1220 100%) !important; box-shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 20px -10px rgba(0,0,0,.8) !important; }
+    .subject-card[data-state="approved"] { background: linear-gradient(135deg, #f0f9ff 0%, #d9efff 100%) !important; border-color: #bae6fd !important; box-shadow: 0 1px 2px rgba(2,132,199,.15), 0 12px 24px -10px rgba(2,132,199,.5) !important; }
+    .subject-card[data-state="approved"] h3 { color: #075985 !important; }
+    .subject-card[data-state="approved"]::after { content: '✓'; position: absolute; top: -9px; right: -6px; width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, #38bdf8, #0284c7); color: #fff; font-weight: 900; font-size: 14px; display: flex; align-items: center; justify-content: center; border: 2px solid #fff; box-shadow: 0 4px 10px rgba(2,132,199,.5); z-index: 2; }
+    html.dark .subject-card[data-state="approved"] { background: linear-gradient(135deg, #0c2a43 0%, #0c4a6e 100%) !important; border-color: #0369a1 !important; box-shadow: 0 1px 2px rgba(0,0,0,.5), 0 12px 24px -10px rgba(14,165,233,.45) !important; }
+    html.dark .subject-card[data-state="approved"] h3 { color: #e0f2fe !important; }
+    html.dark .subject-card[data-state="approved"]::after { border-color: #0b1220; }
+    .sticky.top-0 { box-shadow: 0 8px 16px -10px rgba(15,23,42,.3); }
+    #bottom-nav { box-shadow: 0 -8px 22px -10px rgba(15,23,42,.25); }
+    .chip { box-shadow: 0 1px 2px rgba(15,23,42,.06); }
+    .chip.active { box-shadow: 0 5px 12px -4px rgba(37,99,235,.55); }
     #bottom-nav { display: none; }
     @media (max-width: 639px) {
       .nav-dup { display: none !important; }
