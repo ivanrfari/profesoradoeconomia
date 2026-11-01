@@ -4430,7 +4430,7 @@ function renderTimelineView(model) {
       <div class="relative border-l border-slate-200" style="height:${H}px">${lines}${blocks}</div></div>`;
   }).join('');
   const extra = noTime.length ? `<div class="mt-4"><p class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Sin horario definido</p><div class="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl">${noTime.map(schedCardHTML).join('')}</div></div>` : '';
-  return `<div class="bg-white border border-slate-200 rounded-xl overflow-hidden w-max"><div class="flex"><div class="w-12 shrink-0"><div class="h-9"></div><div class="relative" style="height:${H}px">${labels}</div></div>${cols}</div></div>${extra}`;
+  return `<div class="bg-white border border-slate-200 rounded-xl overflow-hidden w-max pb-4"><div class="flex"><div class="w-12 shrink-0"><div class="h-9"></div><div class="relative" style="height:${H}px">${labels}</div></div>${cols}</div></div>${extra}`;
 }
 function buildSchedModel(view) {
   const items = collectScheduleItems(view).sort(sortScheduleItems);
