@@ -64,8 +64,18 @@
     .year-col { min-width: 280px; max-width: 300px; }
     #grid-container { display: flex; gap: 1rem; min-width: max-content; }
     @media (max-width: 639px) {
-      #main-grid { scroll-snap-type: x mandatory; scroll-padding-left: 1rem; padding-top: 1.15rem !important; }
-      .year-col { min-width: calc(100vw - 2rem); max-width: calc(100vw - 2rem); scroll-snap-align: start; scroll-snap-stop: always; }
+      #main-grid { scroll-snap-type: x mandatory; scroll-padding-left: 1rem; padding-top: 0.75rem !important; }
+      .year-col {
+        min-width: calc(100vw - 2rem);
+        max-width: calc(100vw - 2rem);
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        backdrop-filter: none !important;
+      }
     }
     @media (min-width: 640px) {
       #main-grid { overflow: visible; }
@@ -686,7 +696,6 @@
       body.modal-open .modal-backdrop > div { max-height: calc(100dvh - var(--navh, 74px) - 24px) !important; }
       .modal-backdrop { align-items: flex-end !important; }
       .modal-backdrop > div { width: 100% !important; max-width: none !important; border-radius: 24px 24px 0 0 !important; position: relative; }
-      .modal-backdrop > div::before { content: ''; position: absolute; top: 7px; left: 50%; margin-left: -18px; width: 36px; height: 4px; border-radius: 2px; background: rgba(148,163,184,.65); z-index: 5; pointer-events: none; }
       .modal-backdrop > div.scale-95 { transform: translateY(60px) !important; opacity: 0 !important; }
       .modal-backdrop > div.scale-100 { transform: none !important; opacity: 1 !important; }
     }
@@ -923,7 +932,7 @@
     </div>
   </div>
 
-  <div id="status-modal" class="modal-backdrop fixed inset-0 z-[80] flex items-center justify-center p-4 hidden" onclick="closeStatusModal(event)">
+  <div id="status-modal" class="modal-backdrop fixed inset-0 z-[80] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl transform scale-95 transition-transform duration-200 max-h-[92vh] overflow-y-auto" onclick="event.stopPropagation()">
       <div class="flex items-start justify-between gap-2 mb-3">
         <div class="min-w-0">
@@ -1019,9 +1028,12 @@
     </div>
   </div>
 
-  <div id="sync-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden" onclick="closeSyncModal(event)">
+  <div id="sync-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
-      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>💾</span> Sincronización y respaldo</h2>
+      <div class="flex items-center justify-between gap-2 mb-1">
+        <h2 class="text-xl font-black text-slate-900 flex items-center gap-2"><span>💾</span> Sincronización y respaldo</h2>
+        <button onclick="closeSyncModal()" aria-label="Cerrar" class="shrink-0 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">✕</button>
+      </div>
       <p class="text-xs text-slate-500 mb-5 leading-relaxed">El código lleva tu progreso, horarios y períodos. El archivo de respaldo lleva <b>todo</b> (también mesas de examen y notas).</p>
       
       <div class="space-y-6 overflow-y-auto">
@@ -1060,7 +1072,7 @@
     </div>
   </div>
 
-  <div id="generic-confirm-modal" class="modal-backdrop fixed inset-0 z-[110] flex items-center justify-center p-4 hidden" onclick="resolveConfirm(false)">
+  <div id="generic-confirm-modal" class="modal-backdrop fixed inset-0 z-[110] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
       <p id="generic-confirm-text" class="text-sm text-slate-700 leading-relaxed mb-5 font-medium"></p>
       <div class="flex gap-3 justify-end">
@@ -1092,7 +1104,7 @@
     </div>
   </div>
 
-  <div id="schedule-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 hidden" onclick="closeSchedule(event)">
+  <div id="schedule-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-2 sm:p-4 hidden">
     <div class="bg-white rounded-3xl w-full max-w-5xl h-[90vh] sm:h-[85vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation(); closeSchedMenu()">
       <div class="bg-slate-900 text-white px-4 py-3 sm:px-5 sm:py-4 shrink-0 flex justify-between items-center gap-2">
         <h2 class="text-lg sm:text-xl font-black flex items-center gap-2 tracking-tight"><span>📅</span> Horarios</h2>
@@ -1158,7 +1170,7 @@
     </div>
   </div>
 
-  <div id="sched-item-modal" class="modal-backdrop fixed inset-0 z-[65] flex items-center justify-center p-3 hidden" onclick="closeSchedItem(event)">
+  <div id="sched-item-modal" class="modal-backdrop fixed inset-0 z-[65] flex items-center justify-center p-3 hidden">
     <div class="bg-white rounded-3xl max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
       <div class="p-5 pb-3 flex items-start justify-between gap-3 shrink-0">
         <div><p class="text-[10px] font-black uppercase tracking-widest text-blue-600">Editar bloque horario</p><h2 id="schedi-title" class="text-lg font-black text-slate-900 leading-tight mt-0.5"></h2></div>
@@ -1196,7 +1208,7 @@
     </div>
   </div>
 
-  <div id="sched-share-modal" class="modal-backdrop fixed inset-0 z-[65] flex items-center justify-center p-3 hidden" onclick="closeSchedShare(event)">
+  <div id="sched-share-modal" class="modal-backdrop fixed inset-0 z-[65] flex items-center justify-center p-3 hidden">
     <div class="bg-white rounded-3xl max-w-md w-full max-h-[92vh] flex flex-col shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
       <div class="p-5 pb-2 flex items-start justify-between gap-3 shrink-0">
         <div><h2 class="text-lg font-black text-slate-900">🤝 Compartir Horario</h2><p id="sched-share-title" class="text-xs text-slate-500 font-bold mt-0.5"></p></div>
@@ -1216,7 +1228,7 @@
     </div>
   </div>
 
-  <div id="simulador-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden" onclick="closeSimulador(event)">
+  <div id="simulador-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 transform scale-95 transition-transform duration-200 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between gap-2">
         <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 tracking-tight">
@@ -1243,7 +1255,7 @@
     </div>
   </div>
 
-  <div id="exams-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 hidden" onclick="closeExamsModal(event)">
+  <div id="exams-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 hidden">
     <div class="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] shadow-2xl transform scale-95 transition-transform duration-200 flex flex-col overflow-hidden" onclick="event.stopPropagation()">
       <div class="bg-slate-900 text-white p-5 flex justify-between items-center shrink-0">
         <h2 class="text-xl font-black flex items-center gap-2 tracking-tight"><span>📝</span> Mesas de examen</h2>
@@ -1265,7 +1277,7 @@
     </div>
   </div>
 
-  <div id="cal-modal" class="modal-backdrop fixed inset-0 z-[70] flex items-center justify-center p-4 hidden" onclick="closeCalModal(event)">
+  <div id="cal-modal" class="modal-backdrop fixed inset-0 z-[70] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
       <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>📆</span> Llevar al calendario</h2>
       <p class="text-xs text-slate-500 mb-5 leading-relaxed">Genera un archivo <b>.ics</b> que podés abrir con Google Calendar, Outlook o el calendario del celular. Cada materia se repite todas las semanas dentro del rango.</p>
@@ -1305,9 +1317,12 @@
     </div>
   </div>
 
-  <div id="report-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-4 hidden" onclick="closeReportModal(event)">
+  <div id="report-modal" class="modal-backdrop fixed inset-0 z-[60] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
-      <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-4"><span>📄</span> Exportar reporte</h2>
+      <div class="flex items-center justify-between gap-2 mb-4">
+        <h2 class="text-xl font-black text-slate-900 flex items-center gap-2"><span>📄</span> Exportar reporte</h2>
+        <button onclick="closeReportModal()" aria-label="Cerrar" class="shrink-0 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">✕</button>
+      </div>
       <div class="space-y-3">
         <button onclick="closeReportModal(); exportMap()" class="w-full text-left px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 transition">
           <span class="block text-sm font-black">🖼️ Imagen del mapa curricular</span>
@@ -1329,7 +1344,7 @@
     </div>
   </div>
 
-  <div id="name-modal" class="modal-backdrop fixed inset-0 z-[80] flex items-center justify-center p-4 hidden" onclick="closeNameModal(event)">
+  <div id="name-modal" class="modal-backdrop fixed inset-0 z-[80] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200" onclick="event.stopPropagation()">
       <h2 class="text-xl font-black text-slate-900 flex items-center gap-2 mb-1"><span>👤</span> Alumno de este perfil</h2>
       <p class="text-xs text-slate-500 mb-4 leading-relaxed">El nombre aparece arriba de todo y en los reportes, horarios, calendario y respaldos, para saber de quién es el perfil cargado. Queda guardado solo en este navegador.</p>
@@ -1342,7 +1357,7 @@
     </div>
   </div>
 
-  <div id="qr-show-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden" onclick="closeQrShow(event)">
+  <div id="qr-show-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-xs w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200 text-center" onclick="event.stopPropagation()">
       <h2 class="text-lg font-black text-slate-900 mb-1">📱 Escaneá este código</h2>
       <p class="text-[11px] text-slate-500 mb-4">Abrí "Escanear un QR" en el otro dispositivo y apuntá la cámara acá.</p>
@@ -1351,7 +1366,7 @@
     </div>
   </div>
 
-  <div id="qr-scan-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden" onclick="closeQrScan(event)">
+  <div id="qr-scan-modal" class="modal-backdrop fixed inset-0 z-[90] flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-3xl max-w-xs w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200 text-center" onclick="event.stopPropagation()">
       <h2 class="text-lg font-black text-slate-900 mb-3">📷 Escanear código</h2>
       <video id="qr-video" muted autoplay playsinline class="w-full rounded-xl bg-slate-900 aspect-square object-cover"></video>
@@ -1374,29 +1389,33 @@
     <div class="max-w-screen-2xl mx-auto flex flex-col gap-3">
       
       <!-- Fila Superior: Identidad + Acciones rápidas -->
-      <div class="flex items-center justify-between gap-2">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-2.5 min-w-0">
           <img src="icon-192.png" alt="" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-md shrink-0 border border-white/15">
-          <div class="min-w-0">
-            <h1 id="app-title" class="text-[11px] sm:text-xs font-extrabold tracking-wide text-sky-300 uppercase truncate">ISFD N°100 · Prof. en Economía</h1>
-            <button id="btn-student" onclick="openNameModal()" class="mt-0.5 inline-flex max-w-full items-center gap-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 text-white px-2.5 py-0.5 rounded-full transition" title="Cambiar el nombre del alumno de este perfil">
-              <span id="student-avatar" class="w-4 h-4 rounded-full bg-blue-500/40 flex items-center justify-center text-[9px] font-black shrink-0">👤</span>
-              <span id="student-label" class="truncate max-w-[160px] sm:max-w-[260px]">Agregar nombre</span>
-              <span class="text-slate-300 text-[10px] shrink-0">✎</span>
-            </button>
+          <div class="min-w-0 flex-1">
+            <p class="text-[10px] font-bold uppercase tracking-widest text-sky-300/90 leading-none mb-0.5">ISFD N°100 · Planificador Curricular</p>
+            <h1 id="app-title" class="text-sm sm:text-base font-extrabold tracking-tight text-white leading-tight">Profesorado en Economía</h1>
           </div>
         </div>
 
-        <div class="flex items-center gap-1.5 shrink-0">
-          <button id="btn-install" onclick="installApp()" class="hidden text-xs bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1.5 rounded-xl font-bold transition shadow-sm flex items-center gap-1">
-            <span>📱</span> <span class="hidden sm:inline">Instalar</span>
+        <div class="flex items-center justify-between sm:justify-end gap-2">
+          <button id="btn-student" onclick="openNameModal()" class="inline-flex max-w-full items-center gap-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 border border-white/15 text-white px-2.5 py-1 rounded-full transition" title="Cambiar el nombre del alumno de este perfil">
+            <span id="student-avatar" class="w-4 h-4 rounded-full bg-blue-500/40 flex items-center justify-center text-[9px] font-black shrink-0">👤</span>
+            <span id="student-label" class="truncate max-w-[160px] sm:max-w-[240px]">Agregar nombre</span>
+            <span class="text-slate-300 text-[10px] shrink-0">✎</span>
           </button>
-          <button id="btn-undo" onclick="undoLast()" disabled class="w-8 h-8 sm:w-auto sm:px-2.5 sm:py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold flex items-center justify-center gap-1 transition" title="Deshacer el último cambio (Ctrl+Z)">
-            <span>↶</span> <span class="hidden xl:inline">Deshacer</span>
-          </button>
-          <button id="btn-legend" onclick="toggleLegend()" title="¿Qué significa cada color?" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs flex items-center justify-center transition">❔</button>
-          <button id="btn-theme" onclick="toggleTheme()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs flex items-center justify-center transition" title="Cambiar tema">🌙</button>
-          <button onclick="confirmReset()" class="w-8 h-8 rounded-xl bg-red-500/20 hover:bg-red-500/35 border border-red-400/30 text-red-200 text-xs flex items-center justify-center transition" title="Reiniciar todos los datos">🔄</button>
+
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button id="btn-install" onclick="installApp()" class="hidden text-xs bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1.5 rounded-xl font-bold transition shadow-sm flex items-center gap-1">
+              <span>📱</span> <span class="hidden sm:inline">Instalar</span>
+            </button>
+            <button id="btn-undo" onclick="undoLast()" disabled class="w-8 h-8 sm:w-auto sm:px-2.5 sm:py-1.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold flex items-center justify-center gap-1 transition" title="Deshacer el último cambio (Ctrl+Z)">
+              <span>↶</span> <span class="hidden xl:inline">Deshacer</span>
+            </button>
+            <button id="btn-legend" onclick="toggleLegend()" title="¿Qué significa cada color?" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs flex items-center justify-center transition">❔</button>
+            <button id="btn-theme" onclick="toggleTheme()" class="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs flex items-center justify-center transition" title="Cambiar tema">🌙</button>
+            <button onclick="confirmReset()" class="w-8 h-8 rounded-xl bg-red-500/20 hover:bg-red-500/35 border border-red-400/30 text-red-200 text-xs flex items-center justify-center transition" title="Reiniciar todos los datos">🔄</button>
+          </div>
         </div>
       </div>
 
@@ -1604,7 +1623,7 @@
   <!-- ══════════════════════════════════════════
        MODAL DE INFORMACIÓN MATERIA
   ══════════════════════════════════════════ -->
-  <div id="modal-backdrop" class="modal-backdrop fixed inset-0 z-[75] flex items-center justify-center p-3 sm:p-4 hidden" onclick="closeModal(event)">
+  <div id="modal-backdrop" class="modal-backdrop fixed inset-0 z-[75] flex items-center justify-center p-3 sm:p-4 hidden">
     <div id="modal-box" class="bg-white w-full max-w-lg shadow-2xl rounded-3xl overflow-hidden transform scale-95 transition-transform duration-200 border border-slate-200 flex flex-col max-h-[90vh]" onclick="event.stopPropagation()">
       
       <div id="modal-header" class="p-5 sm:p-6 text-white bg-slate-900 border-b border-slate-700 relative overflow-hidden shrink-0">
@@ -1713,32 +1732,6 @@ const __modalCloseFns = {
 window.addEventListener('scroll', () => {
   document.getElementById('btn-top').classList.toggle('hidden', window.scrollY < 500);
 }, { passive: true });
-
-(function initSwipeToClose() {
-  let startY = 0, startX = 0, swiping = false, card = null;
-  document.addEventListener('touchstart', e => {
-    const c = e.target.closest('.modal-backdrop > div');
-    if (!c || c.parentElement.id === 'simulador-modal') return;
-    const sb = e.target.closest('[data-scroll-body]');
-    if (sb && sb.scrollHeight > sb.clientHeight + 2) return;
-    card = c; startY = e.touches[0].clientY; startX = e.touches[0].clientX; swiping = true;
-  }, { passive: true });
-  document.addEventListener('touchmove', e => {
-    if (!swiping || !card) return;
-    const dy = e.touches[0].clientY - startY, dx = e.touches[0].clientX - startX;
-    if (dy > 0 && Math.abs(dy) > Math.abs(dx)) {
-      card.style.transform = `translateY(${Math.min(dy, 200)}px)`;
-      card.style.opacity = String(Math.max(1 - dy / 300, 0.4));
-    }
-  }, { passive: true });
-  document.addEventListener('touchend', e => {
-    if (!swiping || !card) return;
-    const dy = e.changedTouches[0].clientY - startY;
-    card.style.transform = ''; card.style.opacity = '';
-    if (dy > 100) { const fn = __modalCloseFns[card.parentElement.id]; if (fn) fn(); }
-    swiping = false; card = null;
-  }, { passive: true });
-})();
 
 let __confirmResolve = null;
 function showConfirm(message, okLabel) {
@@ -2379,7 +2372,7 @@ function renderGrid() {
     const col = document.createElement('div');
     col.className = `year-col flex flex-col gap-3.5 year-tint-${yr} rounded-3xl p-3 sm:p-4`;
     col.innerHTML = `
-      <div class="pb-2.5 mb-0.5 border-b border-slate-200">
+      <div class="hidden sm:block pb-2.5 mb-0.5 border-b border-slate-200">
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
             <span class="w-7 h-7 rounded-xl bg-blue-600 text-white font-display font-extrabold text-sm flex items-center justify-center shadow-sm">${yr}°</span>
@@ -2923,26 +2916,6 @@ document.addEventListener('touchmove', e => {
 ['touchend', 'touchcancel'].forEach(ev => document.addEventListener(ev, () => clearTimeout(__lpTimer), { passive: true }));
 document.addEventListener('click', e => { if (__lpFired) { __lpFired = false; if (e.target.closest('.subject-card')) { e.stopPropagation(); e.preventDefault(); } } }, true);
 document.addEventListener('contextmenu', e => { if (e.target.closest('.subject-card')) e.preventDefault(); });
-(() => { // Modales como hojas: arrastrar hacia abajo para cerrar (celular)
-  let sheet = null, y0 = 0, dy = 0;
-  document.addEventListener('touchstart', e => {
-    if (window.innerWidth > 639) return;
-    const b = e.target.closest('.modal-backdrop > div'); if (!b) return;
-    if (e.touches[0].clientY - b.getBoundingClientRect().top > 64) return;
-    sheet = b; y0 = e.touches[0].clientY; dy = 0;
-  }, { passive: true });
-  document.addEventListener('touchmove', e => {
-    if (!sheet) return;
-    dy = e.touches[0].clientY - y0;
-    if (dy > 0) { sheet.style.transition = 'none'; sheet.style.setProperty('transform', `translateY(${dy}px)`, 'important'); }
-  }, { passive: true });
-  document.addEventListener('touchend', () => {
-    if (!sheet) return;
-    const b = sheet; sheet = null; b.style.transition = '';
-    if (dy > 110) { const c = __modalCloseFns[b.parentElement.id]; if (c) c(); setTimeout(() => b.style.removeProperty('transform'), 320); }
-    else b.style.removeProperty('transform');
-  }, { passive: true });
-})();
 function navGo(id, fn) {
   const open = [...document.querySelectorAll('.modal-backdrop:not(.hidden)')];
   if (open.some(m => m.id === id)) { __modalCloseFns[id](); return; }
