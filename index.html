@@ -6,19 +6,26 @@
   <title>Mapa Curricular · Economía · ISFD N°100</title>
   
   <meta name="theme-color" content="#0f172a" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Economía 100" />
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" href="icon-192.png">
   <script>
-    /* Captura temprana del evento de instalación PWA para no perderlo antes de que cargue el resto del script */
+    /* Captura temprana de beforeinstallprompt y registro inmediato del Service Worker para instalar como WebAPK real */
     window.__deferredInstallPrompt = null;
+    window.__installPromptCallbacks = [];
     window.addEventListener('beforeinstallprompt', function(e) {
       e.preventDefault();
       window.__deferredInstallPrompt = e;
       var b = document.getElementById('btn-install');
-      if (b) b.classList.remove('hidden');
+      if (b) { b.classList.remove('hidden'); b.style.display = 'inline-flex'; }
+      while (window.__installPromptCallbacks.length) {
+        var cb = window.__installPromptCallbacks.shift();
+        try { cb(e); } catch (err) {}
+      }
     });
+    if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+      navigator.serviceWorker.register('service-worker.js').catch(function(err) { console.log('SW setup falló:', err); });
+    }
     /* Tema: claro por defecto; solo se usa el oscuro si lo elegiste con el botón. Se aplica antes de pintar para que no parpadee. */
     try {
       var t = localStorage.getItem('isfd100_theme');
@@ -29,12 +36,9 @@
       }
     } catch (e) {}
   </script>
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@800&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-  <link rel="icon" href="icon-192.png">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -1424,7 +1428,7 @@
           </button>
 
           <div class="flex items-center gap-1 shrink-0">
-            <button id="btn-install" onclick="installApp()" class="hidden text-[11px] bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-extrabold transition shadow-sm flex items-center gap-1 border border-blue-400/30" title="Instalar aplicación en tu dispositivo">
+            <button id="btn-install" onclick="installApp()" style="display:none" class="hidden text-[11px] bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-extrabold transition shadow-sm items-center gap-1 border border-blue-400/30" title="Instalar aplicación en tu dispositivo">
               <span>📲</span> <span>Instalar</span>
             </button>
             <button id="btn-undo" onclick="undoLast()" disabled class="w-7 h-7 sm:w-auto sm:px-2.5 sm:py-1 rounded-lg bg-white/[0.08] hover:bg-white/15 border border-white/10 text-white text-xs font-bold flex items-center justify-center gap-1 transition" title="Deshacer el último cambio (Ctrl+Z)">
@@ -1904,16 +1908,28 @@ window.addEventListener('appinstalled', () => {
 function showInstallBtn() {
   if (isAppInstalled()) { hideInstallBtn(); return; }
   const btn = document.getElementById('btn-install');
-  if (btn) btn.classList.remove('hidden');
+  if (btn) {
+    btn.classList.remove('hidden');
+    btn.style.display = 'inline-flex';
+  }
 }
 
 function hideInstallBtn() {
   const btn = document.getElementById('btn-install');
-  if (btn) btn.classList.add('hidden');
+  if (btn) {
+    btn.classList.add('hidden');
+    btn.style.display = 'none';
+  }
 }
 
 async function installApp() {
-  const promptEvent = deferredPrompt || window.__deferredInstallPrompt;
+  let promptEvent = deferredPrompt || window.__deferredInstallPrompt;
+  if (!promptEvent && window.__installPromptCallbacks) {
+    promptEvent = await new Promise(resolve => {
+      const timer = setTimeout(() => resolve(null), 1800);
+      window.__installPromptCallbacks.push(ev => { clearTimeout(timer); resolve(ev); });
+    });
+  }
   if (promptEvent) {
     try {
       await promptEvent.prompt();
@@ -1935,17 +1951,17 @@ function showInstallHelp() {
   const ua = navigator.userAgent;
   let msg;
   if (location.protocol === 'file:') {
-    msg = 'Estás abriendo el archivo desde tu disco, y así el navegador no permite instalarla. Publicala en una dirección <b>https://</b> (por ejemplo GitHub Pages o Netlify) y abrila desde ahí.';
+    msg = 'Estás abriendo el archivo desde tu disco, y así el navegador no permite instalarla. Publicala en una dirección <b>https://</b> (por ejemplo GitHub Pages) y abrila desde ahí.';
   } else if (/iPhone|iPad|iPod/.test(ua)) {
     msg = 'En Safari: tocá <b>Compartir</b> y después <b>Agregar a inicio</b>.';
   } else if (/Firefox\//.test(ua) && !/Android/.test(ua)) {
     msg = 'Firefox de escritorio no permite instalar apps web. Abrila con <b>Chrome</b> o <b>Edge</b>.';
   } else if (/Edg\//.test(ua)) {
-    msg = 'En Edge: menú <b>⋯</b> → <b>Aplicaciones</b> → <b>Instalar este sitio como aplicación</b>. Si ya la instalaste, buscala en el menú Inicio.';
+    msg = 'Si ya tenías instalada la app en tu dispositivo, ya está en tu lista de aplicaciones (o desinstalá la versión anterior y recargá esta página para instalarla con 1 toque). También podés ir al menú <b>⋯</b> → <b>Aplicaciones</b> → <b>Instalar este sitio como aplicación</b>.';
   } else {
-    msg = 'En Chrome: menú <b>⋮</b> → <b>Transmitir, guardar y compartir</b> → <b>Instalar página como aplicación</b> (o el ícono de instalar en la barra de direcciones). Si ya la instalaste, buscala en el menú Inicio.';
+    msg = 'Si ya tenías instalada la app en tu celular o PC, <b>ya figura en tu lista de aplicaciones</b> y se actualiza sola (Chrome bloquea reinstalar una app que ya está instalada).<br><br>Si la borraste o querés reinstalarla como aplicación completa con su ícono: desinstalá cualquier versión previa de <b>Economía 100</b> de tu lista de apps, recargá la página y tocá <b>📲 Instalar</b> (o desde el menú <b>⋮</b> → <b>Agregar a la pantalla principal</b> → elegí <b>Instalar aplicación</b>, no "Crear acceso directo").';
   }
-  showAlert('📱 Instalar la app', msg);
+  showAlert('📲 Instalar aplicación', msg);
 }
 
 /* ─────────────────────────────────────────────
