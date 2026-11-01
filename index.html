@@ -1429,27 +1429,26 @@
 
       <!-- Barra de Resumen Unificada (Minimalista) -->
       <div id="progress-strip" class="hdr-kpi-card flex flex-col gap-2">
-        <div id="hdr-stats" class="grid grid-cols-3 divide-x divide-white/10 items-center">
-          <div class="pr-2.5 flex items-baseline justify-between gap-1">
-            <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Prom.</span>
-            <span class="text-sm sm:text-base font-extrabold text-white font-display tracking-tight" id="promedio-label">-</span>
+        <div id="hdr-stats" class="grid grid-cols-3 divide-x divide-white/10">
+          <div class="pr-2 flex flex-col">
+            <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold leading-none">Promedio</span>
+            <span class="text-base sm:text-lg font-extrabold text-white font-display tracking-tight leading-snug mt-1" id="promedio-label">-</span>
           </div>
 
-          <div class="px-2.5 flex items-baseline justify-between gap-1" title="Horas con final aprobado sobre el total de horas del plan">
-            <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Avance</span>
-            <div class="flex items-baseline gap-0.5">
-              <span class="text-sm sm:text-base font-extrabold text-white font-display tracking-tight" id="pct-label">0</span>
-              <span class="text-[10px] font-bold text-sky-400">%</span>
-              <span class="text-[10px] text-slate-400 font-mono ml-1">(<span id="approved-count" class="text-slate-200">0</span>/<span id="total-count">0</span>)</span>
+          <div class="px-3 flex flex-col" title="Horas con final aprobado sobre el total de horas del plan">
+            <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold leading-none">Avance</span>
+            <div class="flex items-baseline gap-1 mt-1 whitespace-nowrap">
+              <span class="text-base sm:text-lg font-extrabold text-white font-display tracking-tight leading-snug"><span id="pct-label">0</span><span class="text-xs font-bold text-sky-400">%</span></span>
+              <span class="text-[10.5px] text-slate-400 font-mono">(<span id="approved-count" class="text-slate-200 font-bold">0</span>/<span id="total-count">0</span>)</span>
               <span id="pct-caption" class="hidden"></span>
             </div>
           </div>
 
-          <div class="pl-2.5 flex items-baseline justify-between gap-1 truncate">
-            <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold">Horas</span>
-            <div class="flex items-baseline gap-0.5 truncate">
-              <span class="text-sm sm:text-base font-extrabold text-white font-display tracking-tight" id="hs-count">0</span>
-              <span id="hs-total" class="text-[9px] font-bold text-slate-400 truncate">HS</span>
+          <div class="pl-3 flex flex-col">
+            <span class="text-[9px] text-slate-400 uppercase tracking-wider font-bold leading-none">Carga Horaria</span>
+            <div class="flex items-baseline gap-1 mt-1 whitespace-nowrap">
+              <span class="text-base sm:text-lg font-extrabold text-white font-display tracking-tight leading-snug" id="hs-count">0</span>
+              <span id="hs-total" class="text-[10px] font-bold text-slate-400">HS</span>
             </div>
           </div>
         </div>
