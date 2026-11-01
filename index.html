@@ -425,9 +425,39 @@
       padding: 3px 10px; border-radius: 999px; color: #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.25);
       white-space: nowrap;
     }
-    .subject-card.chain-pre::before  { content: '🔸 Necesita'; background: #d97706; }
-    .subject-card.chain-post::before { content: '🔹 Destraba'; background: #4f46e5; }
-    .subject-card.chain-self::before { content: '🔗 Elegida'; background: #0284c7; }
+    .subject-card.chain-pre::before  { content: attr(data-chain-badge); background: #d97706; }
+    .subject-card.chain-post::before { content: attr(data-chain-badge); background: #4f46e5; }
+    .subject-card.chain-self::before { content: attr(data-chain-badge); background: #0284c7; }
+    .info-btn.chain-btn.pinned {
+      background: #2563eb !important;
+      border-color: #2563eb !important;
+      color: #ffffff !important;
+    }
+    @media (max-width: 639px) {
+      body.chain-active #year-tabs,
+      body.chain-active #year-dots {
+        display: none !important;
+      }
+      body.chain-active #main-grid {
+        overflow-x: hidden !important;
+        scroll-snap-type: none !important;
+      }
+      body.chain-active #grid-container {
+        display: flex !important;
+        flex-direction: column !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        gap: 0.75rem !important;
+      }
+      body.chain-active .year-col {
+        min-width: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+      }
+      body.chain-active .year-col.chain-col-empty {
+        display: none !important;
+      }
+    }
 
     #progress-bar { background: linear-gradient(90deg, #2563eb, #38bdf8); transition: width 0.6s cubic-bezier(.16,1,.3,1); }
     #progress-bar-cursada { background: linear-gradient(90deg, #0d9488, #5eead4); transition: width 0.6s cubic-bezier(.16,1,.3,1); }
@@ -1350,9 +1380,13 @@
         <button onclick="closeReportModal()" aria-label="Cerrar" class="shrink-0 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">✕</button>
       </div>
       <div class="space-y-3">
+        <button onclick="closeReportModal(); exportStoryCard()" class="w-full text-left px-4 py-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100 transition">
+          <span class="block text-sm font-black">📱 Tarjeta de avance vertical (WhatsApp / Historias)</span>
+          <span class="block text-[11px] font-medium mt-0.5">Imagen vertical (9:16) lista para compartir con tu promedio, barras por año y cursada actual.</span>
+        </button>
         <button onclick="closeReportModal(); exportMap()" class="w-full text-left px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 hover:bg-emerald-100 transition">
-          <span class="block text-sm font-black">🖼️ Imagen del mapa curricular</span>
-          <span class="block text-[11px] font-medium mt-0.5">Un PNG con todas las materias y su estado.</span>
+          <span class="block text-sm font-black">🖼️ Imagen del mapa curricular completo</span>
+          <span class="block text-[11px] font-medium mt-0.5">Un PNG panorámico con las 4 columnas de materias y su estado.</span>
         </button>
         <div class="px-4 py-3 rounded-xl bg-slate-50 border border-slate-200">
           <p class="text-sm font-black text-slate-800">🖨️ Imprimir o guardar como PDF</p>
@@ -3423,10 +3457,283 @@ function runSimulador() {
     html += finales.map(s => simCard(s, `Final pendiente · Año ${s.year}`)).join('');
   }
   if (selected.length) {
-    html += `<p class="text-[11px] text-slate-500 font-medium ${finales.length ? 'mt-4 ' : ''}mb-3">Plan sugerido. Estas materias están libres de trabas y priorizan la <b>Ruta Crítica</b> para destrabar correlativas posteriores:</p>`;
+    window.__lastSimulatedIds = selected.map(s => s.id);
+    html += `<div class="flex items-center justify-between gap-2 ${finales.length ? 'mt-4 ' : ''}mb-2.5">
+      <p class="text-[11px] text-slate-500 font-medium leading-snug">Plan sugerido por <b>Ruta Crítica</b>:</p>
+      <button type="button" onclick="applySimulatedPlan()" class="shrink-0 text-[11px] font-extrabold bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-xl shadow-sm transition flex items-center gap-1">⚡ Pasar ${selected.length} a En Curso</button>
+    </div>`;
     html += selected.map(s => simCard(s, `${s.regimen} · Año ${s.year}`)).join('');
   }
   container.innerHTML = html;
+}
+
+function applySimulatedPlan() {
+  const ids = (window.__lastSimulatedIds || []).filter(id => SUBJECT_BY_ID[id] && isSubjectEnabled(id) && !state.userSubjects[id]);
+  if (!ids.length) {
+    showToast('No hay materias nuevas para pasar a En Curso', false);
+    return;
+  }
+  pushUndo(`Plan sugerido (${ids.length} mat.) → En curso`);
+  ids.forEach(id => {
+    state.userSubjects[id] = { status: 'en_curso', grade: null };
+  });
+  saveState();
+  refreshAll();
+  closeSimulador();
+}
+
+/* ── Exportar Tarjeta Vertical (9:16 WhatsApp / Historias) ── */
+function exportStoryCard() {
+  const W = 1080, H = 1920;
+  const canvas = document.createElement('canvas');
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const FONT = 'Inter, system-ui, "Segoe UI", Roboto, sans-serif';
+  const total = SUBJECTS.length;
+  const totalHs = state.totalHs || SUBJECTS.reduce((acc, s) => acc + s.hs, 0);
+  let approvedCount = 0, cursadaCount = 0, enCursoCount = 0, approvedHs = 0, cursadaHs = 0, gSum = 0, gN = 0;
+  const yrStats = { 1: { a: 0, c: 0, t: 0 }, 2: { a: 0, c: 0, t: 0 }, 3: { a: 0, c: 0, t: 0 }, 4: { a: 0, c: 0, t: 0 } };
+  const enCursoList = [];
+
+  SUBJECTS.forEach(s => {
+    yrStats[s.year].t++;
+    const u = state.userSubjects[s.id];
+    if (!u) return;
+    if (u.status === 'approved') {
+      approvedCount++;
+      approvedHs += s.hs;
+      yrStats[s.year].a++;
+      if (u.grade != null) { gSum += Number(u.grade); gN++; }
+    } else if (u.status === 'cursada') {
+      cursadaCount++;
+      cursadaHs += s.hs;
+      yrStats[s.year].c++;
+    } else if (u.status === 'en_curso' || u.status === 'recursar') {
+      enCursoCount++;
+      enCursoList.push(s);
+    }
+  });
+
+  const complete = total > 0 && approvedCount === total;
+  let pct = totalHs === 0 ? 0 : Math.round((approvedHs / totalHs) * 100);
+  if (!complete && pct >= 100) pct = 99;
+  const promedio = gN > 0 ? (gSum / gN).toFixed(2) : '—';
+
+  // Fondo oscuro profundo tipo AMOLED con acento azul
+  const bg = ctx.createLinearGradient(0, 0, 0, H);
+  bg.addColorStop(0, '#040814');
+  bg.addColorStop(0.45, '#070e22');
+  bg.addColorStop(1, '#02040a');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  const glow = ctx.createRadialGradient(W * 0.5, 280, 20, W * 0.5, 280, 620);
+  glow.addColorStop(0, 'rgba(37, 99, 235, 0.24)');
+  glow.addColorStop(1, 'rgba(37, 99, 235, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, 960);
+
+  const pad = 72;
+  let y = 96;
+
+  // Encabezado Institucional
+  ctx.fillStyle = 'rgba(56, 189, 248, 0.14)';
+  roundRect(ctx, pad, y, 420, 46, 23);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = '#38bdf8';
+  ctx.font = `800 20px ${FONT}`;
+  ctx.fillText('ISFD N°100 · AVELLANEDA', pad + 24, y + 30);
+
+  y += 88;
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `900 54px ${FONT}`;
+  ctx.fillText('Profesorado en Economía', pad, y);
+
+  y += 46;
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = `600 28px ${FONT}`;
+  const studentLine = state.student ? `👤 ${fitText(ctx, state.student, W - pad * 2 - 40)}` : 'Mapa Curricular · Progreso Académico';
+  ctx.fillText(studentLine, pad, y);
+
+  // Tarjeta Principal de Avance + KPIs
+  y += 52;
+  const heroH = 380;
+  ctx.fillStyle = 'rgba(15, 23, 42, 0.78)';
+  roundRect(ctx, pad, y, W - pad * 2, heroH, 36);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(148, 163, 184, 0.18)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Porcentaje grande a la izquierda
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = `800 22px ${FONT}`;
+  ctx.fillText('AVANCE GLOBAL', pad + 44, y + 64);
+
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `900 116px ${FONT}`;
+  const pctStr = `${pct}%`;
+  ctx.fillText(pctStr, pad + 40, y + 184);
+
+  ctx.fillStyle = '#cbd5e1';
+  ctx.font = `700 28px ${FONT}`;
+  ctx.fillText(`${approvedCount} de ${total} materias aprobadas`, pad + 44, y + 234);
+
+  // Barra de progreso general
+  const barX = pad + 44, barY = y + 266, barW = W - pad * 2 - 88, barH = 26;
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+  roundRect(ctx, barX, barY, barW, barH, 13);
+  ctx.fill();
+  const wA = totalHs ? Math.round((approvedHs / totalHs) * barW) : 0;
+  const wC = totalHs ? Math.round((cursadaHs / totalHs) * barW) : 0;
+  if (wA + wC > 0) {
+    ctx.fillStyle = '#14b8a6';
+    roundRect(ctx, barX, barY, Math.min(barW, Math.max(20, wA + wC)), barH, 13);
+    ctx.fill();
+  }
+  if (wA > 0) {
+    const gBar = ctx.createLinearGradient(barX, 0, barX + wA, 0);
+    gBar.addColorStop(0, '#2563eb');
+    gBar.addColorStop(1, '#38bdf8');
+    ctx.fillStyle = gBar;
+    roundRect(ctx, barX, barY, Math.max(20, wA), barH, 13);
+    ctx.fill();
+  }
+
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = `600 22px ${FONT}`;
+  ctx.fillText(`Azul: Final aprobado (${approvedHs} hs)   ·   Verde: Regular (${cursadaCount} final pend.)`, barX, barY + 58);
+
+  // Tarjeta de Promedio arriba a la derecha dentro del Hero
+  const promBoxW = 280, promBoxH = 156, promBoxX = W - pad - promBoxW - 44, promBoxY = y + 44;
+  ctx.fillStyle = 'rgba(37, 99, 235, 0.16)';
+  roundRect(ctx, promBoxX, promBoxY, promBoxW, promBoxH, 26);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(59, 130, 246, 0.35)';
+  ctx.stroke();
+
+  ctx.fillStyle = '#93c5fd';
+  ctx.font = `800 20px ${FONT}`;
+  ctx.fillText('PROMEDIO', promBoxX + 32, promBoxY + 46);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = `900 68px ${FONT}`;
+  ctx.fillText(promedio, promBoxX + 32, promBoxY + 124);
+
+  // Sección: Avance por Año (1° a 4°)
+  y += heroH + 54;
+  ctx.fillStyle = '#38bdf8';
+  ctx.font = `800 22px ${FONT}`;
+  ctx.fillText('AVANCE POR AÑO', pad, y);
+
+  y += 24;
+  const yrBoxH = 98, yrGap = 18;
+  [1, 2, 3, 4].forEach(yr => {
+    const st = yrStats[yr];
+    const yrPct = st.t ? Math.round((st.a / st.t) * 100) : 0;
+    const yrRegPct = st.t ? Math.round(((st.a + st.c) / st.t) * 100) : 0;
+
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.72)';
+    roundRect(ctx, pad, y, W - pad * 2, yrBoxH, 24);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = '#ffffff';
+    ctx.font = `800 28px ${FONT}`;
+    ctx.fillText(`${yr}° Año`, pad + 32, y + 42);
+
+    const statTxt = `${st.a}/${st.t} aprob.${st.c ? ` · ${st.c} reg.` : ''} (${yrPct}%)`;
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = `700 23px ${FONT}`;
+    const tw = ctx.measureText(statTxt).width;
+    ctx.fillText(statTxt, W - pad - 32 - tw, y + 42);
+
+    const bx = pad + 32, by = y + 60, bw = W - pad * 2 - 64, bh = 16;
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+    roundRect(ctx, bx, by, bw, bh, 8);
+    ctx.fill();
+
+    if (yrRegPct > 0) {
+      ctx.fillStyle = 'rgba(20, 184, 166, 0.65)';
+      roundRect(ctx, bx, by, Math.max(16, Math.round((yrRegPct / 100) * bw)), bh, 8);
+      ctx.fill();
+    }
+    if (yrPct > 0) {
+      ctx.fillStyle = '#3b82f6';
+      roundRect(ctx, bx, by, Math.max(16, Math.round((yrPct / 100) * bw)), bh, 8);
+      ctx.fill();
+    }
+
+    y += yrBoxH + yrGap;
+  });
+
+  // Sección: Materias En Curso (o Habilitadas destacadas)
+  y += 28;
+  const listToShow = enCursoList.length ? enCursoList : SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.userSubjects[s.id]);
+  const secTitle = enCursoList.length ? `CURSANDO ACTUALMENTE (${enCursoList.length})` : `HABILITADAS PARA CURSAR (${listToShow.length})`;
+  ctx.fillStyle = enCursoList.length ? '#c084fc' : '#38bdf8';
+  ctx.font = `800 22px ${FONT}`;
+  ctx.fillText(secTitle, pad, y);
+
+  y += 24;
+  const maxPills = 5;
+  const shown = listToShow.slice(0, maxPills);
+  if (!shown.length) {
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = `600 26px ${FONT}`;
+    ctx.fillText(complete ? '🎉 ¡Carrera completada!' : 'Sin materias activas seleccionadas.', pad, y + 40);
+  } else {
+    shown.forEach(s => {
+      ctx.fillStyle = enCursoList.length ? 'rgba(147, 51, 234, 0.14)' : 'rgba(15, 23, 42, 0.72)';
+      roundRect(ctx, pad, y, W - pad * 2, 68, 18);
+      ctx.fill();
+      ctx.strokeStyle = enCursoList.length ? 'rgba(168, 85, 247, 0.35)' : 'rgba(56, 189, 248, 0.25)';
+      ctx.stroke();
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = `700 25px ${FONT}`;
+      ctx.fillText(fitText(ctx, s.name, W - pad * 2 - 180), pad + 26, y + 43);
+
+      const yrTag = `${s.year}° Año`;
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = `700 21px ${FONT}`;
+      const ytw = ctx.measureText(yrTag).width;
+      ctx.fillText(yrTag, W - pad - 26 - ytw, y + 42);
+
+      y += 80;
+    });
+    if (listToShow.length > maxPills) {
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = `700 22px ${FONT}`;
+      ctx.fillText(`+ ${listToShow.length - maxPills} materia(s) más`, pad + 10, y + 18);
+    }
+  }
+
+  // Pie de tarjeta
+  const fecha = new Date().toLocaleDateString('es-AR', { year: 'numeric', month: 'long', day: 'numeric' });
+  ctx.fillStyle = '#64748b';
+  ctx.font = `600 22px ${FONT}`;
+  ctx.fillText(`Planificador Curricular · ISFD N°100 · ${fecha}`, pad, H - 64);
+
+  const fileName = `Avance-ISFD100${state.student ? '-' + fileSlug(state.student) : ''}.png`;
+  if (canvas.toBlob) {
+    canvas.toBlob(b => {
+      if (b) shareFile(b, fileName, 'image/png');
+    }, 'image/png');
+  } else {
+    const a = document.createElement('a');
+    a.download = fileName;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  }
 }
 
 /* ── Exportar a Imagen ── */
@@ -3756,26 +4063,47 @@ function chainClosure(id, dir) {
 function applyChain() {
   const id = chainPinned || chainHover;
   const banner = document.getElementById('chain-banner');
+  document.body.classList.toggle('chain-active', !!chainPinned);
   document.querySelectorAll('.chain-btn').forEach(b => b.classList.toggle('pinned', b.dataset.id === chainPinned));
   const cards = document.querySelectorAll('.subject-card');
-  cards.forEach(c => c.classList.remove('chain-dim', 'chain-pre', 'chain-post', 'chain-self'));
+  cards.forEach(c => {
+    c.classList.remove('chain-dim', 'chain-pre', 'chain-post', 'chain-self');
+    c.removeAttribute('data-chain-badge');
+  });
+  document.querySelectorAll('#grid-container .year-col').forEach(col => col.classList.remove('chain-col-empty'));
   if (!id) { banner.classList.add('hidden'); applyFilterStyles(); return; }
   const pre = chainClosure(id, 'pre'), post = chainClosure(id, 'post');
   cards.forEach(c => {
     const cid = c.id.replace('card-', '');
-    if (cid === id) c.classList.add('chain-self');
-    else if (pre.has(cid)) c.classList.add('chain-pre');
-    else if (post.has(cid)) c.classList.add('chain-post');
-    else if (!chainPinned) c.classList.add('chain-dim');   // al pasar el mouse (sin tocar), solo se atenúa
+    const yr = SUBJECT_BY_ID[cid]?.year;
+    const yrSuffix = yr ? ` · ${yr}° Año` : '';
+    if (cid === id) {
+      c.classList.add('chain-self');
+      c.setAttribute('data-chain-badge', `🔗 Elegida${yrSuffix}`);
+    } else if (pre.has(cid)) {
+      c.classList.add('chain-pre');
+      c.setAttribute('data-chain-badge', `🔸 Necesita${yrSuffix}`);
+    } else if (post.has(cid)) {
+      c.classList.add('chain-post');
+      c.setAttribute('data-chain-badge', `🔹 Destraba${yrSuffix}`);
+    } else if (!chainPinned) {
+      c.classList.add('chain-dim');   // al pasar el mouse (sin tocar), solo se atenúa
+    }
   });
   // Al FIJAR la cadena (tocar el botón) se oculta el resto, como en Modo Inscripción
   applyFilterStyles();
   if (chainPinned) {
+    document.querySelectorAll('#grid-container .year-col').forEach(col => {
+      const hasVisible = !!col.querySelector('.subject-card:not(.hidden)');
+      col.classList.toggle('chain-col-empty', !hasVisible);
+    });
     const name = esc(SUBJECT_BY_ID[id].name);
+    const sinCorr = pre.size === 0 && post.size === 0;
     document.getElementById('chain-banner-text').innerHTML =
       `<span class="truncate font-black">🔗 ${name}</span>` +
-      `<span class="shrink-0 whitespace-nowrap"><span class="text-amber-700">🔸 Necesita ${pre.size}</span> · <span class="text-indigo-700">🔹 Destraba ${post.size}</span></span>` +
-      `<span class="hidden md:inline shrink-0 text-slate-500 font-medium">(el resto queda oculto)</span>`;
+      (sinCorr
+        ? `<span class="shrink-0 whitespace-nowrap text-slate-500">Sin correlativas previas ni posteriores</span>`
+        : `<span class="shrink-0 whitespace-nowrap"><span class="text-amber-700">🔸 Necesita ${pre.size}</span> · <span class="text-indigo-700">🔹 Destraba ${post.size}</span></span>`);
     banner.classList.remove('hidden');
   } else {
     banner.classList.add('hidden');
