@@ -6,7 +6,19 @@
   <title>Mapa Curricular · Economía · ISFD N°100</title>
   
   <meta name="theme-color" content="#0f172a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Economía 100" />
   <script>
+    /* Captura temprana del evento de instalación PWA para no perderlo antes de que cargue el resto del script */
+    window.__deferredInstallPrompt = null;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      window.__deferredInstallPrompt = e;
+      var b = document.getElementById('btn-install');
+      if (b) b.classList.remove('hidden');
+    });
     /* Tema: claro por defecto; solo se usa el oscuro si lo elegiste con el botón. Se aplica antes de pintar para que no parpadee. */
     try {
       var t = localStorage.getItem('isfd100_theme');
@@ -1412,8 +1424,8 @@
           </button>
 
           <div class="flex items-center gap-1 shrink-0">
-            <button id="btn-install" onclick="installApp()" class="hidden text-xs bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded-lg font-bold transition flex items-center gap-1">
-              <span>📱</span> <span class="hidden sm:inline">Instalar</span>
+            <button id="btn-install" onclick="installApp()" class="hidden text-[11px] bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-extrabold transition shadow-sm flex items-center gap-1 border border-blue-400/30" title="Instalar aplicación en tu dispositivo">
+              <span>📲</span> <span>Instalar</span>
             </button>
             <button id="btn-undo" onclick="undoLast()" disabled class="w-7 h-7 sm:w-auto sm:px-2.5 sm:py-1 rounded-lg bg-white/[0.08] hover:bg-white/15 border border-white/10 text-white text-xs font-bold flex items-center justify-center gap-1 transition" title="Deshacer el último cambio (Ctrl+Z)">
               <span>↶</span> <span class="hidden xl:inline">Deshacer</span>
@@ -1866,21 +1878,31 @@ function closeQrScan(e) {
 }
 
 let DEPS = {};   // mapa materia → materias que la tienen como correlativa
-const isAppInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+const isAppInstalled = () =>
+  window.matchMedia('(display-mode: standalone)').matches ||
+  window.matchMedia('(display-mode: fullscreen)').matches ||
+  window.navigator.standalone === true;
+
+if (window.__deferredInstallPrompt) {
+  deferredPrompt = window.__deferredInstallPrompt;
+}
 
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
+  window.__deferredInstallPrompt = e;
   showInstallBtn();
 });
 
 window.addEventListener('appinstalled', () => {
   deferredPrompt = null;
+  window.__deferredInstallPrompt = null;
   hideInstallBtn();
+  if (typeof showToast === 'function') showToast('✓ Aplicación instalada en tu dispositivo', false);
 });
 
 function showInstallBtn() {
-  if (isAppInstalled) return;
+  if (isAppInstalled()) { hideInstallBtn(); return; }
   const btn = document.getElementById('btn-install');
   if (btn) btn.classList.remove('hidden');
 }
@@ -1890,13 +1912,18 @@ function hideInstallBtn() {
   if (btn) btn.classList.add('hidden');
 }
 
-function installApp() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') hideInstallBtn();
-      deferredPrompt = null;
-    });
+async function installApp() {
+  const promptEvent = deferredPrompt || window.__deferredInstallPrompt;
+  if (promptEvent) {
+    try {
+      await promptEvent.prompt();
+      const choiceResult = await promptEvent.userChoice;
+      if (choiceResult && choiceResult.outcome === 'accepted') {
+        hideInstallBtn();
+      }
+    } catch (e) {}
+    deferredPrompt = null;
+    window.__deferredInstallPrompt = null;
   } else {
     showInstallHelp();
   }
