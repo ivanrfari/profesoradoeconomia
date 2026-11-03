@@ -74,6 +74,8 @@
       -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
     }
     input, textarea, select, [contenteditable] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+    img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
+    #app-header img, #splash img { pointer-events: none; }
 
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -1455,7 +1457,7 @@
       <!-- Fila Superior: Identidad + Acciones rápidas -->
       <div class="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
         <div class="flex items-center gap-2.5 min-w-0">
-          <img src="icon-192.png" alt="" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl shrink-0 border border-white/15">
+          <img src="icon-192.png" alt="" draggable="false" oncontextmenu="return false;" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl shrink-0 border border-white/15 pointer-events-none select-none">
           <div class="min-w-0 flex-1">
             <p class="text-[9.5px] font-bold uppercase tracking-widest text-sky-400/90 leading-none mb-0.5">ISFD N°100 · Planificador Curricular</p>
             <h1 id="app-title" class="text-sm sm:text-base font-extrabold tracking-tight text-white leading-tight">Profesorado en Economía</h1>
@@ -2991,7 +2993,7 @@ document.addEventListener('touchmove', e => {
 }, { passive: true });
 ['touchend', 'touchcancel'].forEach(ev => document.addEventListener(ev, () => clearTimeout(__lpTimer), { passive: true }));
 document.addEventListener('click', e => { if (__lpFired) { __lpFired = false; if (e.target.closest('.subject-card')) { e.stopPropagation(); e.preventDefault(); } } }, true);
-document.addEventListener('contextmenu', e => { if (e.target.closest('.subject-card')) e.preventDefault(); });
+document.addEventListener('contextmenu', e => { if (e.target.closest('.subject-card, #app-header, img')) e.preventDefault(); });
 function navGo(id, fn) {
   const open = [...document.querySelectorAll('.modal-backdrop:not(.hidden)')];
   if (open.some(m => m.id === id)) { __modalCloseFns[id](); return; }
