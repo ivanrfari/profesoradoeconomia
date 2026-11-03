@@ -138,8 +138,7 @@
       animation: cardIn 0.4s cubic-bezier(.16,1,.3,1) backwards;
     }
     .subject-card.hidden { display: none !important; }
-    .subject-card:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(15, 23, 42, 0.07), 0 16px 28px -10px rgba(15, 23, 42, 0.16); }
-    .subject-card:active { transform: scale(0.985); }
+    .subject-card:hover { box-shadow: 0 4px 10px rgba(15, 23, 42, 0.07), 0 16px 28px -10px rgba(15, 23, 42, 0.16); }
     .subject-card h3 { color: #0f172a; font-weight: 700; letter-spacing: -0.015em; line-height: 1.32; }
     .subject-card .subtitle { color: #64748b; font-size: 11.5px; font-weight: 600; }
     .subject-card .card-divider { border-color: #f1f5f9; }
@@ -414,7 +413,12 @@
     /* ── Cadena de correlativas ── */
     .subject-card.chain-dim { opacity: 0.42 !important; }
     .subject-card.chain-pre, .subject-card.chain-post, .subject-card.chain-self {
-      outline-offset: 3px; margin-top: 14px;
+      outline-offset: 2px;
+    }
+    body.chain-active .subject-card.chain-pre,
+    body.chain-active .subject-card.chain-post,
+    body.chain-active .subject-card.chain-self {
+      margin-top: 10px;
     }
     .subject-card.chain-pre  { outline: 3px solid #f59e0b; box-shadow: 0 0 0 5px rgba(245, 158, 11, 0.15); }
     .subject-card.chain-post { outline: 3px solid #6366f1; box-shadow: 0 0 0 5px rgba(99, 102, 241, 0.15); }
@@ -2506,9 +2510,6 @@ function createCard(subject) {
     if (e.target !== card) return;
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(subject.id); }
   });
-  
-  card.addEventListener('mouseenter', () => onCardEnter(subject.id));
-  card.addEventListener('mouseleave', onCardLeave);
 
   return card;
 }
