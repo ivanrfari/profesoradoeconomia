@@ -176,9 +176,11 @@
     .campo-cfg { background: #e0e7ff; color: #3730a3; }
     .campo-cfe { background: #d1fae5; color: #065f46; }
     .campo-cpd { background: #fef3c7; color: #92400e; }
+    .campo-uco { background: #f3e8ff; color: #6b21a8; }
     html.dark .campo-cfg { background: rgba(99, 102, 241, 0.2); color: #a5b4fc; }
     html.dark .campo-cfe { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
     html.dark .campo-cpd { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+    html.dark .campo-uco { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; }
 
     .meta-pill {
       font-size: 11px;
@@ -1595,15 +1597,15 @@
     <!-- Selector Segmentado de Años para Móvil (Siempre visible arriba) -->
     <div id="year-tabs" class="flex sm:hidden backdrop-blur-md px-2.5 py-1.5 gap-1.5">
       <button type="button" onclick="scrollToYear(1)" class="yr-tab active" data-yr="1">
-        <div class="flex items-center gap-1"><span>1° Año</span><span class="text-[10px] opacity-75 font-mono" data-yr-count="1">0/8</span></div>
+        <div class="flex items-center gap-1"><span>1° Año</span><span class="text-[10px] opacity-75 font-mono" data-yr-count="1">0/10</span></div>
         <div class="yr-tab-bar"><span data-yr-bar="1" style="width:0%"></span></div>
       </button>
       <button type="button" onclick="scrollToYear(2)" class="yr-tab" data-yr="2">
-        <div class="flex items-center gap-1"><span>2° Año</span><span class="text-[10px] opacity-75 font-mono" data-yr-count="2">0/10</span></div>
+        <div class="flex items-center gap-1"><span>2° Año</span><span class="text-[10px] opacity-75 font-mono" data-yr-count="2">0/11</span></div>
         <div class="yr-tab-bar"><span data-yr-bar="2" style="width:0%"></span></div>
       </button>
       <button type="button" onclick="scrollToYear(3)" class="yr-tab" data-yr="3">
-        <div class="flex items-center gap-1"><span>3° Año</span><span class="text-[10px] opacity-75 font-mono" data-yr-count="3">0/10</span></div>
+        <div class="flex items-center gap-1"><span>3° Año</span><span class="text-[10px] opacity-75 font-mono" data-yr-count="3">0/11</span></div>
         <div class="yr-tab-bar"><span data-yr-bar="3" style="width:0%"></span></div>
       </button>
       <button type="button" onclick="scrollToYear(4)" class="yr-tab" data-yr="4">
@@ -2079,7 +2081,7 @@ const SUBJECTS = [
   { id: 'practica-iii', name: 'Práctica Docente III', year: 3, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['pedagogia', 'educacion-transformaciones', 'esi', 'cultura-digital', 'matematica-cs-economicas', 'historia-mundial', 'intro-economia-politica', 'teoria-organizaciones', 'sic-i', 'practica-i', 'practica-ii', 'didactica-curriculum', 'economia-politica-i'], accreditedPrereqs: ['practica-ii', 'didactica-curriculum', 'economia-politica-i'], finalidades: 'Asumir progresivamente la responsabilidad de planificar y evaluar secuencias de enseñanza.', contenidos: ['Residencia progresiva en aulas de nivel secundario','Planificación de unidades y clases','Relación docente-alumno y gestión del aula','Análisis reflexivo de la práctica propia'] },
 
   // 4TO AÑO
-  { id: 'reflexion-filosofica', name: 'Reflexión filosófico-política de la práctica docente', year: 4, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['problemas-filosoficos', 'practica-iii'], accreditedPrereqs: ['practica-iii'], finalidades: 'Profundizar la reflexión crítica sobre la práctica docente orientada a la emancipación.', contenidos: ['Ética y compromiso político del docente','Educación, democracia y ciudadanía','El docente como intelectual transformador','Perspectivas poscríticas en educación'] },
+  { id: 'reflexion-filosofica', name: 'Reflexión filosófico-política de la práctica docente', year: 4, campo: 'CFG', formato: 'Taller', regimen: 'Anual', hs: 64, prereqs: ['problemas-filosoficos', 'practica-iii'], accreditedPrereqs: ['practica-iii'], finalidades: 'Profundizar la reflexión crítica sobre la práctica docente orientada a la emancipación.', contenidos: ['Ética y compromiso político del docente','Educación, democracia y ciudadanía','El docente como intelectual transformador','Perspectivas poscríticas en educación'] },
   { id: 'derechos-interculturalidad', name: 'Derechos, interculturalidad y ciudadanía', year: 4, campo: 'CFG', formato: 'Seminario', regimen: 'Cuatrimestral', hs: 32, prereqs: ['educacion-transformaciones'], finalidades: 'Reflexionar sobre la diversidad cultural y el enfoque intercultural.', contenidos: ['Interculturalidad crítica y derechos humanos','Pueblos originarios y educación intercultural bilingüe','Migraciones, xenofobia y escuela','Educación antirracista y perspectiva afrodescendiente'] },
   { id: 'eoi-cfg', name: 'Espacio de Opción Institucional (CFG)', year: 4, campo: 'CFG', formato: 'Taller', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Espacio de definición institucional.', contenidos: ['Definido por el ISFD N°100 según su proyecto institucional'] },
   { id: 'problemas-ensenanza', name: 'Problemas de la enseñanza de las Ciencias Económicas', year: 4, campo: 'CFE', formato: 'Ateneo', regimen: 'Anual', hs: 64, prereqs: ['didactica-cs-economicas', 'practica-iii'], accreditedPrereqs: ['practica-iii'], finalidades: 'Analizar colectivamente los principales problemas de la enseñanza en secundaria.', contenidos: ['Problemas epistémicos de la Economía como disciplina escolar','La motivación y el interés en Ciencias Económicas','TIC y nuevos recursos para la enseñanza económica','Evaluación alternativa: portfolio, proyectos, rúbricas'] },
@@ -2088,7 +2090,8 @@ const SUBJECTS = [
   { id: 'economia-politica-iii', name: 'Economía Política III', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: ['intro-economia-politica'], finalidades: 'Profundizar en grandes debates: financiarización, trabajo, Estado y poscapitalismo.', contenidos: ['El debate sobre el fin del trabajo','Economía popular, social y solidaria','Renta básica universal y redistribución','Perspectivas ecosocialistas y feministas'] },
   { id: 'diseno-proyectos', name: 'Diseño de Proyectos Organizacionales', year: 4, campo: 'CFE', formato: 'Taller', regimen: 'Anual', hs: 96, prereqs: ['sistemas-administrativos', 'administracion-financiera', 'sic-ii'], finalidades: 'Desarrollar competencias para el diseño y evaluación de proyectos en contextos reales.', contenidos: ['Marco lógico para la planificación de proyectos','Estudio de prefactibilidad técnica y financiera','Formulación de proyectos de economía social','Monitoreo, evaluación y sistematización de proyectos'] },
   { id: 'eoi-cfe', name: 'Espacio de Opción Institucional (CFE)', year: 4, campo: 'CFE', formato: 'A definir', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Espacio de definición institucional para profundizar en Ciencias Económicas.', contenidos: ['Definido por el ISFD N°100 según su proyecto institucional'] },
-  { id: 'practica-iv', name: 'Práctica Docente IV — Residencia', year: 4, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['didactica-curriculum', 'psicologia-aprendizaje', 'analisis-instituciones', 'pensamiento-politico', 'sic-ii', 'historia-argentina', 'economia-politica-i', 'administracion', 'derecho-cs-economicas', 'herramientas-estadisticas', 'practica-ii', 'economia-politica-ii', 'practica-iii', 'didactica-cs-economicas', 'trayectorias-jovenes'], accreditedPrereqs: ['practica-iii', 'didactica-cs-economicas', 'trayectorias-jovenes'], finalidades: 'Asumir la conducción del proceso de enseñanza de manera integral completando la residencia.', contenidos: ['Residencia docente autónoma en nivel secundario','Elaboración del portfolio de residencia','Reflexión crítica sobre la práctica profesional','Coloquio integrador y presentación final'] }
+  { id: 'practica-iv', name: 'Práctica Docente IV — Residencia', year: 4, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['didactica-curriculum', 'psicologia-aprendizaje', 'analisis-instituciones', 'pensamiento-politico', 'sic-ii', 'historia-argentina', 'economia-politica-i', 'administracion', 'derecho-cs-economicas', 'herramientas-estadisticas', 'practica-ii', 'economia-politica-ii', 'practica-iii', 'didactica-cs-economicas', 'trayectorias-jovenes'], accreditedPrereqs: ['practica-iii', 'didactica-cs-economicas', 'trayectorias-jovenes'], finalidades: 'Asumir la conducción del proceso de enseñanza de manera integral completando la residencia.', contenidos: ['Residencia docente autónoma en nivel secundario','Elaboración del portfolio de residencia','Reflexión crítica sobre la práctica profesional','Coloquio integrador y presentación final'] },
+  { id: 'uco', name: 'Unidad Curricular Optativa (UCO)', year: 4, campo: 'UCO', formato: 'Taller', regimen: 'Anual', hs: 64, prereqs: ['pedagogia', 'educacion-transformaciones', 'esi', 'cultura-digital', 'matematica-cs-economicas', 'historia-mundial', 'intro-economia-politica', 'teoria-organizaciones', 'sic-i', 'practica-i', 'didactica-curriculum', 'psicologia-aprendizaje', 'analisis-instituciones', 'pensamiento-politico', 'sic-ii', 'historia-argentina', 'economia-politica-i', 'administracion', 'derecho-cs-economicas', 'herramientas-estadisticas', 'practica-ii'], finalidades: 'Acreditar 1 taller optativo (se puede cursar en 3° o 4° año) a elección entre tres propuestas formativas oficiales.', contenidos: ['Opción 1: Producción de materiales de enseñanza (analógicos y digitales)','Opción 2: Investigación educativa (producción de saberes sobre la enseñanza)','Opción 3: Experiencias culturales, de ciencia y tecnología','Se cursa en 3° o 4° año con todas las cursadas de 1° y 2° año aprobadas'] }
 ];
 
 /* ─────────────────────────────────────────────
@@ -2124,6 +2127,7 @@ const CAMPO_COLORS = {
   CFG: { bg: 'bg-[#1e3a8a]', label: 'CFG', icon: '📘', title: 'Formación General' },
   CFE: { bg: 'bg-[#059669]', label: 'CFE', icon: '📗', title: 'Formación Específica' },
   CPD: { bg: 'bg-[#d97706]', label: 'CPD', icon: '🏫', title: 'Práctica Docente' },
+  UCO: { bg: 'bg-[#7c3aed]', label: 'UCO', icon: '✨', title: 'Unidad Curricular Optativa (3° o 4° Año)' },
 };
 const STATE_ICONS = {
   approved: '<svg viewBox="0 0 20 20" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5l4 4 8-9"/></svg>',
@@ -3366,7 +3370,7 @@ function computeCapacityPlan(capacity) {
     const available = capacity - (occupancy[p] || 0);
     if (available > 0) {
       const candidates = pending.filter(s => s.prereqs.every(pid => {
-        return prereqOkForCursar(s, pid) || (finishPeriod[pid] !== undefined && finishPeriod[pid] < p);
+        return prereqCursadaOk(pid) || (finishPeriod[pid] !== undefined && finishPeriod[pid] < p);
       }));
       candidates.sort((a, b) => (b.bottleneckCount - a.bottleneckCount) || (a.year - b.year));
       const take = candidates.slice(0, available);
@@ -3853,7 +3857,7 @@ const SUBJECT_BY_ID = Object.fromEntries(SUBJECTS.map(s => [s.id, s]));
 const STATUS_LABEL = { enabled: 'Habilitada', en_curso: 'En curso', recursar: 'Recursando', cursada: 'Cursada aprobada', approved: 'Aprobada' };
 const TERM_LABEL = { A: 'Anual', '1': '1° cuat.', '2': '2° cuat.', B: '1° y 2° cuat.', '': 'Período sin definir' };
 const VIEW_LABEL = { all: 'Todo el año', '1': '1° cuatrimestre', '2': '2° cuatrimestre' };
-const CAMPO_HEX = { CFG: '#1e3a8a', CFE: '#059669', CPD: '#d97706' };
+const CAMPO_HEX = { CFG: '#1e3a8a', CFE: '#059669', CPD: '#d97706', UCO: '#7c3aed' };
 const BACKUP_APP = 'planificador-isfd100';
 
 /* ── Utilidades ── */
@@ -4678,7 +4682,7 @@ function schedFlags(it) {
 function schedCardHTML(it) {
   const s = it.subject, view = state.scheduleView;
   const approved = state.userSubjects[s.id]?.status === 'approved';
-  const col = it.conflict ? 'border-red-500' : it.tolerated ? 'border-amber-500' : s.campo === 'CFG' ? 'border-blue-500' : s.campo === 'CFE' ? 'border-emerald-500' : 'border-amber-500';
+  const col = it.conflict ? 'border-red-500' : it.tolerated ? 'border-amber-500' : s.campo === 'CFG' ? 'border-blue-500' : s.campo === 'CFE' ? 'border-emerald-500' : s.campo === 'UCO' ? 'border-purple-500' : 'border-amber-500';
   const bg = it.conflict ? 'bg-red-50' : it.tolerated ? 'bg-amber-50' : 'bg-slate-50';
   const termChip = (view === 'all' && (it.term === '1' || it.term === '2' || it.term === 'B'))
     ? `<span class="inline-block mt-1 text-[9px] font-black uppercase tracking-wide bg-slate-100 text-slate-600 border border-slate-200 px-1.5 py-0.5 rounded">${TERM_LABEL[it.term]}</span>` : '';
@@ -4772,7 +4776,7 @@ function renderTimelineView(model) {
     const blocks = layoutLanes(entries).map(it => {
       const top = Math.round((Math.max(it.range.start, t0) - t0) * PPM);
       const h = Math.max(20, Math.round((Math.min(it.range.end, t1) - Math.max(it.range.start, t0)) * PPM) - 2);
-      const col = it.conflict ? 'border-red-500 bg-red-50' : it.tolerated ? 'border-amber-500 bg-amber-50' : it.subject.campo === 'CFG' ? 'border-blue-500 bg-blue-50' : it.subject.campo === 'CFE' ? 'border-emerald-500 bg-emerald-50' : 'border-amber-500 bg-amber-50';
+      const col = it.conflict ? 'border-red-500 bg-red-50' : it.tolerated ? 'border-amber-500 bg-amber-50' : it.subject.campo === 'CFG' ? 'border-blue-500 bg-blue-50' : it.subject.campo === 'CFE' ? 'border-emerald-500 bg-emerald-50' : it.subject.campo === 'UCO' ? 'border-purple-500 bg-purple-50' : 'border-amber-500 bg-amber-50';
       return `<div class="absolute p-px" style="top:${top}px;height:${h + 2}px;left:${it._lane * 100 / it._lanes}%;width:${100 / it._lanes}%">
         <div onclick="openSchedItem('${it.day}', ${it.index})" role="button" tabindex="0" title="${esc(it.subject.name)} · ${esc(it.time)}" class="h-full w-full overflow-hidden rounded-md border-l-4 ${col} border-y border-r border-slate-200 p-1 cursor-pointer hover:shadow-md transition text-[10px] leading-tight">
           <p class="font-bold text-slate-800 truncate">${esc(it.subject.name)}</p>
