@@ -1,6 +1,6 @@
 /* Service worker real: cachea la app y sus recursos externos (Tailwind, confetti, html2canvas)
    para que abra sin internet después de la primera visita. */
-const CACHE = 'isfd100-v3';
+const CACHE = 'isfd100-v4';
 const APP_SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', event => {
