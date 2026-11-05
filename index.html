@@ -2063,7 +2063,7 @@ const SUBJECTS = [
   { id: 'administracion', name: 'Administración', year: 2, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: ['teoria-organizaciones'], finalidades: 'Estudiar los procesos administrativos y herramientas de gestión.', contenidos: ['Planeamiento estratégico y operativo','Estructura organizacional y diseño','Dirección, liderazgo y motivación','Control de gestión y tablero de comando'] },
   { id: 'derecho-cs-economicas', name: 'Elementos de Derecho para Ciencias Económicas', year: 2, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: [], finalidades: 'Brindar los fundamentos del derecho privado y público relevantes.', contenidos: ['Introducción al Código Civil y Comercial','Contratos: tipos y elementos','Derecho laboral básico','Derecho tributario y sociedades comerciales'] },
   { id: 'herramientas-estadisticas', name: 'Herramientas estadísticas para el análisis económico', year: 2, campo: 'CFE', formato: 'Taller', regimen: 'Cuatrimestral', hs: 32, prereqs: ['matematica-cs-economicas'], finalidades: 'Desarrollar competencias en el uso de herramientas estadísticas cuantitativas.', contenidos: ['Estadística descriptiva e inferencial','Correlación y regresión lineal','Series de tiempo: tendencia y estacionalidad','Uso de hojas de cálculo para análisis económico'] },
-  { id: 'practica-ii', name: 'Práctica Docente II', year: 2, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 128, prereqs: ['practica-i', 'educacion-transformaciones', 'intro-economia-politica'], finalidades: 'Ampliar el conocimiento sobre la institución escolar e intervenir en situaciones de enseñanza.', contenidos: ['La planificación como hipótesis de trabajo','Estrategias de enseñanza en Ciencias Económicas','Gestión del aula y convivencia escolar','Análisis reflexivo de las primeras intervenciones'] },
+  { id: 'practica-ii', name: 'Práctica Docente II', year: 2, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 128, prereqs: ['practica-i', 'educacion-transformaciones', 'intro-economia-politica'], accreditedPrereqs: ['practica-i', 'educacion-transformaciones', 'intro-economia-politica'], finalidades: 'Ampliar el conocimiento sobre la institución escolar e intervenir en situaciones de enseñanza.', contenidos: ['La planificación como hipótesis de trabajo','Estrategias de enseñanza en Ciencias Económicas','Gestión del aula y convivencia escolar','Análisis reflexivo de las primeras intervenciones'] },
   
   // 3ER AÑO
   { id: 'politica-educativa', name: 'Política educativa argentina', year: 3, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['pensamiento-politico'], finalidades: 'Analizar el sistema educativo argentino en sus dimensiones normativas y políticas.', contenidos: ['El Estado y la política educativa','Sistema educativo argentino: estructura y niveles','Financiamiento educativo y políticas de igualdad','Reformas educativas en Argentina'] },
@@ -2076,19 +2076,19 @@ const SUBJECTS = [
   { id: 'didactica-cs-economicas', name: 'Didáctica de las Ciencias Económicas', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['intro-economia-politica', 'teoria-organizaciones', 'sic-i', 'didactica-curriculum'], finalidades: 'Articular los saberes disciplinares con la Didáctica para diseñar propuestas de enseñanza.', contenidos: ['Transposición didáctica en Ciencias Económicas','Diseño de secuencias didácticas','Recursos y materiales para la enseñanza','Evaluación de aprendizajes en Ciencias Económicas'] },
   { id: 'derechos-esca', name: 'Derechos Económicos, Sociales, Culturales y Ambientales', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Abordar los derechos como marco para el análisis crítico de políticas públicas.', contenidos: ['Marco normativo internacional y nacional','Derecho al trabajo, salud, educación y vivienda','Ambiente y desarrollo sostenible','Movimientos sociales y exigibilidad de derechos'] },
   { id: 'sociologia-organizaciones', name: 'Sociología de las organizaciones', year: 3, campo: 'CFE', formato: 'Asignatura', regimen: 'Cuatrimestral', hs: 32, prereqs: ['teoria-organizaciones'], finalidades: 'Analizar las organizaciones desde una perspectiva sociológica.', contenidos: ['Perspectivas clásicas: Weber, Durkheim, Marx','Burocracia y racionalidad organizacional','Poder, control y resistencia en las organizaciones','Organizaciones y sociedad civil'] },
-  { id: 'practica-iii', name: 'Práctica Docente III', year: 3, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['practica-ii', 'didactica-curriculum', 'economia-politica-i'], finalidades: 'Asumir progresivamente la responsabilidad de planificar y evaluar secuencias de enseñanza.', contenidos: ['Residencia progresiva en aulas de nivel secundario','Planificación de unidades y clases','Relación docente-alumno y gestión del aula','Análisis reflexivo de la práctica propia'] },
+  { id: 'practica-iii', name: 'Práctica Docente III', year: 3, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['pedagogia', 'educacion-transformaciones', 'esi', 'cultura-digital', 'matematica-cs-economicas', 'historia-mundial', 'intro-economia-politica', 'teoria-organizaciones', 'sic-i', 'practica-i', 'practica-ii', 'didactica-curriculum', 'economia-politica-i'], accreditedPrereqs: ['practica-ii', 'didactica-curriculum', 'economia-politica-i'], finalidades: 'Asumir progresivamente la responsabilidad de planificar y evaluar secuencias de enseñanza.', contenidos: ['Residencia progresiva en aulas de nivel secundario','Planificación de unidades y clases','Relación docente-alumno y gestión del aula','Análisis reflexivo de la práctica propia'] },
 
   // 4TO AÑO
-  { id: 'reflexion-filosofica', name: 'Reflexión filosófico-política de la práctica docente', year: 4, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['politica-educativa'], finalidades: 'Profundizar la reflexión crítica sobre la práctica docente orientada a la emancipación.', contenidos: ['Ética y compromiso político del docente','Educación, democracia y ciudadanía','El docente como intelectual transformador','Perspectivas poscríticas en educación'] },
-  { id: 'derechos-interculturalidad', name: 'Derechos, interculturalidad y ciudadanía', year: 4, campo: 'CFG', formato: 'Seminario', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Reflexionar sobre la diversidad cultural y el enfoque intercultural.', contenidos: ['Interculturalidad crítica y derechos humanos','Pueblos originarios y educación intercultural bilingüe','Migraciones, xenofobia y escuela','Educación antirracista y perspectiva afrodescendiente'] },
+  { id: 'reflexion-filosofica', name: 'Reflexión filosófico-política de la práctica docente', year: 4, campo: 'CFG', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['problemas-filosoficos', 'practica-iii'], accreditedPrereqs: ['practica-iii'], finalidades: 'Profundizar la reflexión crítica sobre la práctica docente orientada a la emancipación.', contenidos: ['Ética y compromiso político del docente','Educación, democracia y ciudadanía','El docente como intelectual transformador','Perspectivas poscríticas en educación'] },
+  { id: 'derechos-interculturalidad', name: 'Derechos, interculturalidad y ciudadanía', year: 4, campo: 'CFG', formato: 'Seminario', regimen: 'Cuatrimestral', hs: 32, prereqs: ['educacion-transformaciones'], finalidades: 'Reflexionar sobre la diversidad cultural y el enfoque intercultural.', contenidos: ['Interculturalidad crítica y derechos humanos','Pueblos originarios y educación intercultural bilingüe','Migraciones, xenofobia y escuela','Educación antirracista y perspectiva afrodescendiente'] },
   { id: 'eoi-cfg', name: 'Espacio de Opción Institucional (CFG)', year: 4, campo: 'CFG', formato: 'Taller', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Espacio de definición institucional.', contenidos: ['Definido por el ISFD N°100 según su proyecto institucional'] },
-  { id: 'problemas-ensenanza', name: 'Problemas de la enseñanza de las Ciencias Económicas', year: 4, campo: 'CFE', formato: 'Ateneo', regimen: 'Anual', hs: 64, prereqs: ['didactica-cs-economicas'], finalidades: 'Analizar colectivamente los principales problemas de la enseñanza en secundaria.', contenidos: ['Problemas epistémicos de la Economía como disciplina escolar','La motivación y el interés en Ciencias Económicas','TIC y nuevos recursos para la enseñanza económica','Evaluación alternativa: portfolio, proyectos, rúbricas'] },
-  { id: 'politica-economica', name: 'Política Económica', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['economia-politica-ii'], finalidades: 'Estudiar instrumentos y objetivos de la política económica y su aplicación histórica.', contenidos: ['Política fiscal, monetaria y cambiaria','Inflación y estabilización económica','Política de ingresos y distribución','Casos de estudio: Argentina'] },
-  { id: 'problemas-desarrollo', name: 'Problemáticas del Desarrollo Latinoamericano', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['economia-politica-ii'], finalidades: 'Examinar las problemáticas del desarrollo económico en América Latina.', contenidos: ['Teoría de la dependencia y estructuralismo cepalino','Neoextractivismo y economías de enclave','Integración regional latinoamericana','Buen vivir y alternativas al desarrollo'] },
-  { id: 'economia-politica-iii', name: 'Economía Política III', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: ['economia-politica-ii'], finalidades: 'Profundizar en grandes debates: financiarización, trabajo, Estado y poscapitalismo.', contenidos: ['El debate sobre el fin del trabajo','Economía popular, social y solidaria','Renta básica universal y redistribución','Perspectivas ecosocialistas y feministas'] },
-  { id: 'diseno-proyectos', name: 'Diseño de Proyectos Organizacionales', year: 4, campo: 'CFE', formato: 'Taller', regimen: 'Anual', hs: 96, prereqs: ['administracion'], finalidades: 'Desarrollar competencias para el diseño y evaluación de proyectos en contextos reales.', contenidos: ['Marco lógico para la planificación de proyectos','Estudio de prefactibilidad técnica y financiera','Formulación de proyectos de economía social','Monitoreo, evaluación y sistematización de proyectos'] },
+  { id: 'problemas-ensenanza', name: 'Problemas de la enseñanza de las Ciencias Económicas', year: 4, campo: 'CFE', formato: 'Ateneo', regimen: 'Anual', hs: 64, prereqs: ['didactica-cs-economicas', 'practica-iii'], accreditedPrereqs: ['practica-iii'], finalidades: 'Analizar colectivamente los principales problemas de la enseñanza en secundaria.', contenidos: ['Problemas epistémicos de la Economía como disciplina escolar','La motivación y el interés en Ciencias Económicas','TIC y nuevos recursos para la enseñanza económica','Evaluación alternativa: portfolio, proyectos, rúbricas'] },
+  { id: 'politica-economica', name: 'Política Económica', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['herramientas-estadisticas', 'intro-economia-politica'], finalidades: 'Estudiar instrumentos y objetivos de la política económica y su aplicación histórica.', contenidos: ['Política fiscal, monetaria y cambiaria','Inflación y estabilización económica','Política de ingresos y distribución','Casos de estudio: Argentina'] },
+  { id: 'problemas-desarrollo', name: 'Problemáticas del Desarrollo Latinoamericano', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 64, prereqs: ['economia-politica-ii', 'historia-argentina'], finalidades: 'Examinar las problemáticas del desarrollo económico en América Latina.', contenidos: ['Teoría de la dependencia y estructuralismo cepalino','Neoextractivismo y economías de enclave','Integración regional latinoamericana','Buen vivir y alternativas al desarrollo'] },
+  { id: 'economia-politica-iii', name: 'Economía Política III', year: 4, campo: 'CFE', formato: 'Asignatura', regimen: 'Anual', hs: 96, prereqs: ['intro-economia-politica'], finalidades: 'Profundizar en grandes debates: financiarización, trabajo, Estado y poscapitalismo.', contenidos: ['El debate sobre el fin del trabajo','Economía popular, social y solidaria','Renta básica universal y redistribución','Perspectivas ecosocialistas y feministas'] },
+  { id: 'diseno-proyectos', name: 'Diseño de Proyectos Organizacionales', year: 4, campo: 'CFE', formato: 'Taller', regimen: 'Anual', hs: 96, prereqs: ['sistemas-administrativos', 'administracion-financiera', 'sic-ii'], finalidades: 'Desarrollar competencias para el diseño y evaluación de proyectos en contextos reales.', contenidos: ['Marco lógico para la planificación de proyectos','Estudio de prefactibilidad técnica y financiera','Formulación de proyectos de economía social','Monitoreo, evaluación y sistematización de proyectos'] },
   { id: 'eoi-cfe', name: 'Espacio de Opción Institucional (CFE)', year: 4, campo: 'CFE', formato: 'A definir', regimen: 'Cuatrimestral', hs: 32, prereqs: [], finalidades: 'Espacio de definición institucional para profundizar en Ciencias Económicas.', contenidos: ['Definido por el ISFD N°100 según su proyecto institucional'] },
-  { id: 'practica-iv', name: 'Práctica Docente IV — Residencia', year: 4, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['practica-iii'], finalidades: 'Asumir la conducción del proceso de enseñanza de manera integral completando la residencia.', contenidos: ['Residencia docente autónoma en nivel secundario','Elaboración del portfolio de residencia','Reflexión crítica sobre la práctica profesional','Coloquio integrador y presentación final'] }
+  { id: 'practica-iv', name: 'Práctica Docente IV — Residencia', year: 4, campo: 'CPD', formato: 'Taller + Terreno', regimen: 'Anual', hs: 160, prereqs: ['didactica-curriculum', 'psicologia-aprendizaje', 'analisis-instituciones', 'pensamiento-politico', 'sic-ii', 'historia-argentina', 'economia-politica-i', 'administracion', 'derecho-cs-economicas', 'herramientas-estadisticas', 'practica-ii', 'economia-politica-ii', 'practica-iii', 'didactica-cs-economicas', 'trayectorias-jovenes'], accreditedPrereqs: ['practica-iii', 'didactica-cs-economicas', 'trayectorias-jovenes'], finalidades: 'Asumir la conducción del proceso de enseñanza de manera integral completando la residencia.', contenidos: ['Residencia docente autónoma en nivel secundario','Elaboración del portfolio de residencia','Reflexión crítica sobre la práctica profesional','Coloquio integrador y presentación final'] }
 ];
 
 /* ─────────────────────────────────────────────
@@ -2522,12 +2522,18 @@ function createCard(subject) {
 function isSubjectEnabled(id) {
   const subject = SUBJECTS.find(s => s.id === id);
   if (!subject) return false;
-  return subject.prereqs.every(prereqCursadaOk);
+  return subject.prereqs.every(pid => prereqOkForCursar(subject, pid));
 }
 
-/* Para CURSAR una materia alcanza con tener la cursada aprobada de las correlativas (o el final). */
+/* Para CURSAR una materia: según el Diseño Curricular (Res. 3606/22), algunas correlativas piden cursada aprobada y otras unidad curricular acreditada (final aprobado). */
 function prereqCursadaOk(pid) {
   const st = state.userSubjects[pid]?.status;
+  return st === 'cursada' || st === 'approved';
+}
+
+function prereqOkForCursar(subject, pid) {
+  const st = state.userSubjects[pid]?.status;
+  if ((subject.accreditedPrereqs || []).includes(pid)) return st === 'approved';
   return st === 'cursada' || st === 'approved';
 }
 
@@ -2642,7 +2648,8 @@ async function saveSubjectStatus() {
   // Coherencia hacia adelante: no se puede "bajar" una materia si otras que dependen de ella ya están en marcha
   const broken = SUBJECTS.filter(d => d.prereqs.includes(id) && state.userSubjects[d.id]).filter(d => {
     const ds = state.userSubjects[d.id].status;
-    if (ds === 'approved' && FINAL_REQUIERE_CORRELATIVAS_ACREDITADAS) return newStatus !== 'approved';
+    const needsAccreditedToCursar = (d.accreditedPrereqs || []).includes(id);
+    if (needsAccreditedToCursar || (ds === 'approved' && FINAL_REQUIERE_CORRELATIVAS_ACREDITADAS)) return newStatus !== 'approved';
     return newStatus !== 'cursada' && newStatus !== 'approved';
   });
   if (broken.length > 0) {
@@ -2739,11 +2746,16 @@ function updateAllCards() {
     else {
       card.dataset.state = 'locked';
       iconEl.innerHTML = STATE_ICONS.locked;
-      const missingIds = subject.prereqs.filter(pid => !prereqCursadaOk(pid));
-      const missingNames = missingIds.map(pid => SUBJECTS.find(x => x.id === pid).name);
+      const accSet = new Set(subject.accreditedPrereqs || []);
+      const missingIds = subject.prereqs.filter(pid => !prereqOkForCursar(subject, pid));
+      const missingCursada = missingIds.filter(pid => !accSet.has(pid)).map(pid => SUBJECTS.find(x => x.id === pid).name);
+      const missingAcc = missingIds.filter(pid => accSet.has(pid)).map(pid => SUBJECTS.find(x => x.id === pid).name);
+      const tipParts = [];
+      if (missingCursada.length) tipParts.push(`Falta cursada aprobada de:\n• ${missingCursada.join('\n• ')}`);
+      if (missingAcc.length) tipParts.push(`Falta final aprobado (acreditada) de:\n• ${missingAcc.join('\n• ')}`);
 
       labelEl.innerHTML = `Req: ${missingIds.length} mat.`;
-      labelEl.title = `Falta aprobar la cursada de:\n• ${missingNames.join('\n• ')}`;
+      labelEl.title = tipParts.join('\n\n');
       labelEl.style.cursor = 'help';
       labelEl.style.textDecoration = 'underline dashed';
     }
@@ -3138,9 +3150,22 @@ function openModal(event, id) {
   const ul = document.getElementById('modal-contenidos');
   ul.innerHTML = subject.contenidos.map(c => `<li><span class="text-blue-500 mr-2 font-black">»</span> ${c}</li>`).join('');
 
-  const corrList = subject.prereqs.map(pid => `<span class="text-slate-400 mr-1">▪</span> ${SUBJECTS.find(x=>x.id===pid).name}`).join('<br>');
-  const corrText = subject.prereqs.length === 0 ? 'Materia de libre acceso'
-    : corrList + '<br><span class="block mt-3 text-[11px] font-medium text-slate-500 leading-snug">Para cursar: cursada aprobada de estas materias. Para rendir el final: final aprobado de estas materias.</span>';
+  const accSet = new Set(subject.accreditedPrereqs || []);
+  const cursadaPrereqs = subject.prereqs.filter(pid => !accSet.has(pid));
+  const accPrereqs = subject.prereqs.filter(pid => accSet.has(pid));
+  let corrText = '';
+  if (subject.prereqs.length === 0) {
+    corrText = 'Materia de libre acceso';
+  } else {
+    const blocks = [];
+    if (cursadaPrereqs.length) {
+      blocks.push(`<span class="block text-[11px] font-black uppercase tracking-wide text-slate-500 mb-1">Cursada aprobada de:</span>` + cursadaPrereqs.map(pid => `<span class="text-slate-400 mr-1">▪</span> ${SUBJECTS.find(x=>x.id===pid).name}`).join('<br>'));
+    }
+    if (accPrereqs.length) {
+      blocks.push(`<span class="block text-[11px] font-black uppercase tracking-wide text-amber-700 ${cursadaPrereqs.length ? 'mt-2.5 ' : ''}mb-1">Unidad curricular acreditada (final aprobado):</span>` + accPrereqs.map(pid => `<span class="text-amber-500 mr-1">▪</span> ${SUBJECTS.find(x=>x.id===pid).name}`).join('<br>'));
+    }
+    corrText = blocks.join('') + '<span class="block mt-3 text-[11px] font-medium text-slate-500 leading-snug">Para rendir el final: final aprobado de todas sus correlativas.</span>';
+  }
   document.getElementById('modal-corr').innerHTML = corrText;
   fillNotesSection(id);
 
@@ -3341,8 +3366,7 @@ function computeCapacityPlan(capacity) {
     const available = capacity - (occupancy[p] || 0);
     if (available > 0) {
       const candidates = pending.filter(s => s.prereqs.every(pid => {
-        const st = state.userSubjects[pid]?.status;
-        return st === 'cursada' || st === 'approved' || (finishPeriod[pid] !== undefined && finishPeriod[pid] < p);
+        return prereqOkForCursar(s, pid) || (finishPeriod[pid] !== undefined && finishPeriod[pid] < p);
       }));
       candidates.sort((a, b) => (b.bottleneckCount - a.bottleneckCount) || (a.year - b.year));
       const take = candidates.slice(0, available);
@@ -4518,7 +4542,7 @@ function buildScheduleOptions() {
   const fits = s => termVisible(subjectTerm(s), view);
   const byYear = (a, b) => a.year - b.year;
   const opt = s => `<option value="${s.id}">${s.bottleneckCount >= 3 ? '🔥 ' : ''}${s.name} (Año ${s.year})</option>`;
-  const optLocked = s => `<option value="${s.id}">${s.name} (Año ${s.year}) — faltan ${s.prereqs.filter(p => !prereqCursadaOk(p)).length} correlativa(s)</option>`;
+  const optLocked = s => `<option value="${s.id}">${s.name} (Año ${s.year}) — faltan ${s.prereqs.filter(p => !prereqOkForCursar(s, p)).length} correlativa(s)</option>`;
   const enCurso = SUBJECTS.filter(s => ['en_curso', 'recursar'].includes(state.userSubjects[s.id]?.status) && fits(s)).sort(byYear);
   const habilitadas = SUBJECTS.filter(s => isSubjectEnabled(s.id) && !state.userSubjects[s.id] && fits(s)).sort(byYear);
   const locked = sim ? SUBJECTS.filter(s => !isSubjectEnabled(s.id) && !state.userSubjects[s.id] && fits(s)).sort(byYear) : [];
@@ -4646,8 +4670,8 @@ function schedFlags(it) {
   else if (it.tolerated) h += `<p class="text-[10px] text-amber-700 font-black mt-1">🤝 Cruce acordado · ${it.overlaps[0].mins}m</p>`;
   const s = it.subject;
   if (!isSubjectEnabled(s.id) && !state.userSubjects[s.id]) {
-    const falta = s.prereqs.filter(p => !prereqCursadaOk(p)).map(p => esc(SUBJECT_BY_ID[p]?.name || p)).join(', ');
-    h += `<p class="text-[10px] text-violet-600 font-bold mt-1">🔮 Simulada (falta final de: ${falta})</p>`;
+    const falta = s.prereqs.filter(p => !prereqOkForCursar(s, p)).map(p => esc(SUBJECT_BY_ID[p]?.name || p)).join(', ');
+    h += `<p class="text-[10px] text-violet-600 font-bold mt-1">🔮 Simulada (falta correlativa de: ${falta})</p>`;
   }
   return h;
 }
